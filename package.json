@@ -1,0 +1,16 @@
+{
+  "name": "izc-pos-backend",
+  "version": "1.0.0",
+  "description": "API RestFull para la digitalización de los procesos de boletaje, venta de productos y servicios para el Instituto Zacatecano de Cultura",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jesus Miguel Hernandez Garcia, Guillermo Ordaz Rodriguez, Brandon Enrique Hernandez Martinez, Alexandre Almaraz Mayen. En colaboracion con labsol-COZCyT",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "mysql2": "^3.14.3",
+    "sequelize": "^6.37.7"
+  }
+}
