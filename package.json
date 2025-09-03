@@ -4,13 +4,19 @@
   "description": "API RestFull para la digitalización de los procesos de boletaje, venta de productos y servicios para el Instituto Zacatecano de Cultura",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "author": "Jesus Miguel Hernandez Garcia, Guillermo Ordaz Rodriguez, Brandon Enrique Hernandez Martinez, Alexandre Almaraz Mayen. En colaboracion con labsol-COZCyT",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.3",
     "sequelize": "^6.37.7"
-  }
+  },
+  "type": "module"
 }
