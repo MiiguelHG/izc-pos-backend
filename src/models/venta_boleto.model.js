@@ -5,14 +5,6 @@ export default (sequelize, Sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
-        fecha_venta: {
-            type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW
-        },
-        cantidad: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
         total: {
             type: Sequelize.DECIMAL(10, 2),
             allowNull: false

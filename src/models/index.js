@@ -19,7 +19,6 @@ import visitante from "./visitante.model.js";
 
 
 
-
 // Definir el objeto de la base de datos
 const db = {};
 
