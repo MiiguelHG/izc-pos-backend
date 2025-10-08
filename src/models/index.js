@@ -16,8 +16,21 @@ import venta_boleto from "./venta_boleto.model.js";
 import venta_producto from "./venta_producto.model.js";
 import venta_producto_detalle from "./venta_producto_detalle.model.js";
 import visitante from "./visitante.model.js";
+import dbConfig from "../config/database.js";
+// import dotenv from "dotenv";
+// dotenv.config();
 
-
+// Inicializar la conexion a la base de datos
+const sequelize = new Sequelize(
+    dbConfig.DB, 
+    dbConfig.USER, 
+    dbConfig.PASSWORD, 
+    {
+    host: dbConfig.HOST,
+    dialect: dbConfig.DIALECT,
+    port: dbConfig.PORT,
+    }
+);
 
 // Definir el objeto de la base de datos
 const db = {};
@@ -102,5 +115,6 @@ db.tipo_evento.hasMany(db.evento, {foreignKey: "id_tipoevento"});
 db.reserva_evento.belongsTo(db.evento, {foreignKey: "id_evento"});
 db.evento.hasMany(db.reserva_evento, {foreignKey: "id_evento"});
 
+db.ROLES = ["user", "admin", "moderator"];
 
 export default db;

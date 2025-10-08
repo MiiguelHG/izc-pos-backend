@@ -1,3 +1,5 @@
+import { hashSync } from "bcrypt";
+
 export default (sequelize, Sequelize) => {
     const Usuario = sequelize.define("usuarios", {
         id: {
@@ -13,6 +15,10 @@ export default (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             allowNull: false,
             unique: true
+        },
+        password: {
+            type: Sequelize.TEXT,
+            allowNull: false
         }, 
         activo: {
             type: Sequelize.BOOLEAN,
