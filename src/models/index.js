@@ -6,7 +6,7 @@ import boleto_emitido from "./boleto_emitido.model.js";
 import evento from "./evento.model.js";
 import forma_pago from "./forma_pago.model.js";
 import producto from "./producto.model.js";
-import refresh_token from "./refresh_token.model.js";
+import refresh_token from "./refresh_tokens.model.js";
 import reserva_evento from "./reserva_evento.model.js";
 import rol from "./rol.model.js";
 import tipo_boleto from "./tipo_boleto.model.js";
@@ -21,16 +21,16 @@ import dbConfig from "../config/database.js";
 // dotenv.config();
 
 // Inicializar la conexion a la base de datos
-const sequelize = new Sequelize(
-    dbConfig.DB, 
-    dbConfig.USER, 
-    dbConfig.PASSWORD, 
-    {
-    host: dbConfig.HOST,
-    dialect: dbConfig.DIALECT,
-    port: dbConfig.PORT,
-    }
-);
+// const sequelize = new Sequelize(
+//     dbConfig.DB, 
+//     dbConfig.USER, 
+//     dbConfig.PASSWORD, 
+//     {
+//     host: dbConfig.HOST,
+//     dialect: dbConfig.DIALECT,
+//     port: dbConfig.PORT,
+//     }
+// );
 
 // Definir el objeto de la base de datos
 const db = {};

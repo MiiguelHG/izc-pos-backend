@@ -3,19 +3,22 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 
 import db from './src/models/index.js';
+import authRoutes from './src/routes/authRoutes.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Middlewares globales //
 const corsOptions = {
     origin: process.env.CORS_ORIGIN || 'http://localhost:3000'
-}
-
+};
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Rutas //
 // Ruta simple de test
 app.get('/', (req, res) => {
     res.json({
@@ -23,9 +26,13 @@ app.get('/', (req, res) => {
     });
 });
 
+
+// --  Rutas de autenticación --
+app.use('/api/auth', authRoutes);
+
 // Sincronizar la base de datos e iniciar el servidor
 // Configurar opciones de sincronización según el entorno
-let syncOptions = {};
+const syncOptions = {};
 if (process.env.NODE_ENV === "development") {
     syncOptions.force = true; // Borra y recrea tablas en desarrollo
 } else if (process.env.NODE_ENV === "staging") {
