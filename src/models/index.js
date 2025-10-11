@@ -56,8 +56,8 @@ db.visitante = visitante(sequelize, Sequelize);
 // Relaciones entre tablas
 
 //Relacion usuario - rol (N:1) (Revisado)
-db.usuario.belongsTo(db.rol, {foreignKey: "id_rol"});
-db.rol.hasMany(db.usuario, {foreignKey: "id_rol"});
+db.usuario.belongsTo(db.rol, {foreignKey: "id_rol", as: "rol"});
+db.rol.hasMany(db.usuario, {foreignKey: "id_rol", as: "usuarios"});
 
 //Relacion usuario - refreshtoken (1:N) (Revisado)
 db.usuario.hasMany(db.refresh_tokens, {foreignKey:"id_usuario"});

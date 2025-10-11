@@ -4,6 +4,10 @@ import cors from 'cors';
 
 import db from './src/models/index.js';
 import authRoutes from './src/routes/authRoutes.js';
+import refreshTokenRoutes from './src/routes/refreshTokenRoutes.js';
+import rolRoutes from './src/routes/rolesRoutes.js';
+// import usuarioRoutes from './src/routes/usuarioRoutes.js';
+import { initRoles } from './src/utils/initRoles.js';
 
 dotenv.config();
 
@@ -30,6 +34,15 @@ app.get('/', (req, res) => {
 // --  Rutas de autenticación --
 app.use('/api/auth', authRoutes);
 
+// --  Rutas de tokens --
+app.use('/api/tokens', refreshTokenRoutes);
+
+// --  Rutas de roles --
+app.use('/api/roles', rolRoutes);
+
+// --  Rutas de usuarios --
+//app.use('/api/usuarios', usuarioRoutes);
+
 // Sincronizar la base de datos e iniciar el servidor
 // Configurar opciones de sincronización según el entorno
 const syncOptions = {};
@@ -39,8 +52,11 @@ if (process.env.NODE_ENV === "development") {
     syncOptions.alter = true; // Actualiza tablas en staging
 }
 
-db.sequelize.sync(syncOptions).then(() => {
+db.sequelize.sync(syncOptions).then(async () => {
     console.log('Database synchronized successfully');
+
+    // Inicializar roles por defecto
+    await initRoles(db);
 
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);

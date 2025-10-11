@@ -1,4 +1,5 @@
 import * as authJwt from "./authJwt.js";
-import { checkDuplicateUsernameOrEmail, checkRolesExisted } from "./verifySignUp.js";
+import * as verifySignUp from "./verifySignUp.js";
 
-export { authJwt, checkDuplicateUsernameOrEmail, checkRolesExisted };
+export { authJwt, verifySignUp };
+
