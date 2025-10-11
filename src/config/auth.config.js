@@ -1,3 +1,4 @@
 export default {
-    secret: "boletaje-museos-2524",
+  secret: process.env.JWT_SECRET,
+  refreshSecret: process.env.JWT_REFRESH_SECRET
 };

@@ -8,11 +8,13 @@ export default class UsuarioRepository extends BaseRepository {
     }
 
     async findByUsername(nombre){
-        return await this.model.findOne({ where: { nombre }, include: db.rol, });
+        return await this.model.findOne({ where: { nombre }, 
+            include: [{ model: db.rol, as: "rol" }] });
     }
 
     async findByEmail(email){
-        return await this.model.findOne({ where: { email }, include: db.rol, });
+        return await this.model.findOne({ where: { email }, 
+            include: [{ model: db.rol, as: "rol" }] });
     }
 
     async createUser({nombre, email, password, rolId}){
