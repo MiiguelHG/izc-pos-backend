@@ -20,8 +20,6 @@ import dbConfig from "../config/database.js";
 // import dotenv from "dotenv";
 // dotenv.config();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 // Inicializar la conexion a la base de datos
 // const sequelize = new Sequelize(
 //     dbConfig.DB, 
@@ -33,35 +31,6 @@ import dbConfig from "../config/database.js";
 //     port: dbConfig.PORT,
 //     }
 // );
-=======
-
->>>>>>> d45b712 (CambiosRelaciones2)
-=======
-// Inicializar la conexion a la base de datos
-<<<<<<< HEAD
-const sequelize = new Sequelize(
-    dbConfig.DB, 
-    dbConfig.USER, 
-    dbConfig.PASSWORD, 
-    {
-    host: dbConfig.HOST,
-    dialect: dbConfig.DIALECT,
-    port: dbConfig.PORT,
-    }
-);
->>>>>>> e6e1a1d (Middlewares)
-=======
-// const sequelize = new Sequelize(
-//     dbConfig.DB, 
-//     dbConfig.USER, 
-//     dbConfig.PASSWORD, 
-//     {
-//     host: dbConfig.HOST,
-//     dialect: dbConfig.DIALECT,
-//     port: dbConfig.PORT,
-//     }
-// );
->>>>>>> bf641b4 (autenticacion_V1)
 
 // Definir el objeto de la base de datos
 const db = {};

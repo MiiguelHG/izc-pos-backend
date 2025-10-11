@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-import { hashSync } from "bcryptjs";
-=======
-import { hashSync } from "bcrypt";
->>>>>>> e6e1a1d (Middlewares)
-
 export default (sequelize, Sequelize) => {
     const Usuario = sequelize.define("usuarios", {
         id: {
@@ -23,11 +17,7 @@ export default (sequelize, Sequelize) => {
         password: {
             type: Sequelize.TEXT,
             allowNull: false
-<<<<<<< HEAD
         },
-=======
-        }, 
->>>>>>> e6e1a1d (Middlewares)
         activo: {
             type: Sequelize.BOOLEAN,
             defaultValue: true
