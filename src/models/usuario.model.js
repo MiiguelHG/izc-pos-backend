@@ -14,6 +14,11 @@ export default (sequelize, Sequelize) => {
             allowNull: false,
             unique: true
         }, 
+        password: {
+            type: Sequelize.TEXT,
+            allowNull:false,
+            unique: true
+        },
         activo: {
             type: Sequelize.BOOLEAN,
             defaultValue: true
