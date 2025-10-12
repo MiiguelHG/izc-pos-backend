@@ -59,6 +59,10 @@ export class AuthController {
                 { expiresIn: "7d" } // 7 days
             );
 
+            const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+            const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+            await refreshTokenRepo.create(tokenHash, user.id, expiresAt);
+
             res.json({
                 message: "Login successful!",
                 accesToken,
@@ -85,7 +89,6 @@ export class AuthController {
                 return res.status(400).json({ message: "Refresh token required!" });
 
             const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
-            refreshTokenRepo.create(tokenHash, 2, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)); // Para pruebas
             const storedToken = await refreshTokenRepo.findByToken(tokenHash);
             console.log(tokenHash);
             console.log(storedToken);

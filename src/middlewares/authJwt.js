@@ -16,14 +16,17 @@ export const verifyToken = async (req, res, next) => {
 
   try {
     const cleanToken = token.replace("Bearer ", "");
-    const decoded = jwt.verify(cleanToken, authconfig.secret);
-    req.userId = decoded.id;
+    const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET);
 
-    const user = await Usuario.findByPk(req.userId);
+    const user = await Usuario.findByPk(decoded.id, {
+      include: [{ model: Rol, as: "rol" }],
+    });
+
     if (!user) {
       return res.status(401).json({ message: "Unauthorized!" });
     }
 
+    req.user = user; // ✅ Deja disponible req.user.id y req.user.rol
     next();
   } catch (error) {
     console.error("Error verifying token:", error);
@@ -36,7 +39,7 @@ export const verifyToken = async (req, res, next) => {
 // ======================
 export const isAdmin = async (req, res, next) => {
   try {
-    const user = await Usuario.findByPk(req.userId, {
+    const user = await Usuario.findByPk(req.user.id, {
       include: [{ model: Rol, as: "rol" }],
     });
 

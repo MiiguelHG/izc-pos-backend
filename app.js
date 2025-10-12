@@ -6,7 +6,7 @@ import db from './src/models/index.js';
 import authRoutes from './src/routes/authRoutes.js';
 import refreshTokenRoutes from './src/routes/refreshTokenRoutes.js';
 import rolRoutes from './src/routes/rolesRoutes.js';
-// import usuarioRoutes from './src/routes/usuarioRoutes.js';
+import usuarioRoutes from './src/routes/usuarioRoutes.js';
 import { initRoles } from './src/utils/initRoles.js';
 
 dotenv.config();
@@ -41,7 +41,10 @@ app.use('/api/tokens', refreshTokenRoutes);
 app.use('/api/roles', rolRoutes);
 
 // --  Rutas de usuarios --
-//app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/usuarios', usuarioRoutes);
+
+// -- Rutas de refresh tokens --
+app.use('/api/tokens', refreshTokenRoutes);
 
 // Sincronizar la base de datos e iniciar el servidor
 // Configurar opciones de sincronización según el entorno
