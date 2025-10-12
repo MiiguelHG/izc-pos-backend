@@ -1,5 +1,5 @@
 export default {
-  secret: "boletaje-museos-25-24",
-  jwtExpiration: 86400, // 24h
-  refreshExpirationDays: 7
+
+  secret: process.env.JWT_SECRET,
+  refreshSecret: process.env.JWT_REFRESH_SECRET
 };

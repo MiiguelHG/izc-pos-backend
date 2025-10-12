@@ -6,7 +6,7 @@ import boleto_emitido from "./boleto_emitido.model.js";
 import evento from "./evento.model.js";
 import forma_pago from "./forma_pago.model.js";
 import producto from "./producto.model.js";
-import refresh_token from "./refresh_token.model.js";
+import refresh_token from "./refresh_tokens.model.js";
 import reserva_evento from "./reserva_evento.model.js";
 import rol from "./rol.model.js";
 import tipo_boleto from "./tipo_boleto.model.js";
@@ -16,8 +16,21 @@ import venta_boleto from "./venta_boleto.model.js";
 import venta_producto from "./venta_producto.model.js";
 import venta_producto_detalle from "./venta_producto_detalle.model.js";
 import visitante from "./visitante.model.js";
+import dbConfig from "../config/database.js";
+// import dotenv from "dotenv";
+// dotenv.config();
 
-
+// Inicializar la conexion a la base de datos
+// const sequelize = new Sequelize(
+//     dbConfig.DB, 
+//     dbConfig.USER, 
+//     dbConfig.PASSWORD, 
+//     {
+//     host: dbConfig.HOST,
+//     dialect: dbConfig.DIALECT,
+//     port: dbConfig.PORT,
+//     }
+// );
 
 // Definir el objeto de la base de datos
 const db = {};
@@ -43,8 +56,8 @@ db.visitante = visitante(sequelize, Sequelize);
 // Relaciones entre tablas
 
 //Relacion usuario - rol (N:1) (Revisado)
-db.usuario.belongsTo(db.rol, {foreignKey: "id_rol"});
-db.rol.hasMany(db.usuario, {foreignKey: "id_rol"});
+db.usuario.belongsTo(db.rol, {foreignKey: "id_rol", as: "rol"});
+db.rol.hasMany(db.usuario, {foreignKey: "id_rol", as: "usuarios"});
 
 //Relacion usuario - refreshtoken (1:N) (Revisado)
 db.usuario.hasMany(db.refresh_tokens, {foreignKey:"id_usuario"});
@@ -102,5 +115,6 @@ db.tipo_evento.hasMany(db.evento, {foreignKey: "id_tipoevento"});
 db.reserva_evento.belongsTo(db.evento, {foreignKey: "id_evento"});
 db.evento.hasMany(db.reserva_evento, {foreignKey: "id_evento"});
 
+db.ROLES = ["user", "admin", "moderator"];
 
 export default db;

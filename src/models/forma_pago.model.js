@@ -1,5 +1,5 @@
 export default (sequelize, Sequelize) => {
-    const FormaPago = sequelize.defirne("formas_pago", {
+    const FormaPago = sequelize.define("formas_pago", {
         id: {
             type: Sequelize.INTEGER,
             primaryKey: true,

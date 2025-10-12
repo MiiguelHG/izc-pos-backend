@@ -1,140 +1,167 @@
-import db from "../models/index.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+import UsuarioRepository from "../repositories/usuarioRepository.js";
+import RefreshTokenRepository from "../repositories/refreshTokenRepository.js";
 import crypto from "crypto";
-import authConfig from "../config/auth.config.js";
 
-const { usuario: Usuario, rol: Rol, refresh_tokens: RefreshToken } = db;
 
-export const signup = async (req, res) => {
-  try {
-    const { nombre, email, password, id_rol } = req.body;
+const usuarioRepo = new UsuarioRepository();
+const refreshTokenRepo = new RefreshTokenRepository();
 
-    // Validar si ya existe
-    const existing = await Usuario.findOne({ where: { email } });
-    if (existing) return res.status(400).json({ message: "El correo ya está registrado." });
+export class AuthController {
+    static async register(req, res) {
+        try{
+            const { nombre, email, password, rolId } = req.body;
 
-    // Encriptar contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
+            const existing = await usuarioRepo.findByEmail(email);
+            if(existing)
+                return res.status(400).json({ message: "Email is already in use!" });
 
-    // Crear usuario
-    const user = await Usuario.create({
-      nombre,
-      email,
-      password: hashedPassword,
-      id_rol: id_rol || 1, // Rol por defecto (1 = user)
-    });
+            const user = await usuarioRepo.createUser({ nombre, email, password, rolId });
 
-    res.status(201).json({ message: "Usuario registrado correctamente.", user });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error en el registro.", error: error.message });
-  }
-};
+            res.status(201).json({
+                message: "User registered successfully!",
+                user: {
+                    id: user.id,
+                    nombre: user.nombre,
+                    email: user.email,
+                },
+            });
+        }catch(error){
+            res.status(500).json({ message: error.message });
+        }
+    }
 
-export const signin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+    static async login(req, res){
+        try{
+            const { email, password } = req.body;
 
-    const user = await Usuario.findOne({
-      where: { email },
-      include: { model: Rol },
-    });
+            const user = await usuarioRepo.findByEmail(email);
+            if(!user)
+                return res.status(404).json({ message: "User Not found." });
 
-    if (!user) return res.status(404).json({ message: "Usuario no encontrado." });
+            const passwordIsValid = await usuarioRepo.validatePassword(user, password);
+            if(!passwordIsValid)
+                return res.status(401).json({
+                    accessToken: null,
+                    message: "Invalid Password!",
+                });
 
-    const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) return res.status(401).json({ message: "Contraseña incorrecta." });
+            //Tokens
+            const accesToken = jwt.sign(
+                { id: user.id, rol: user.rolId },
+                process.env.JWT_SECRET,
+                { expiresIn: "15m" } // 15 minutes
+            );
 
-    // Generar JWT (Access Token)
-    const token = jwt.sign({ id: user.id }, authConfig.secret, { expiresIn: authConfig.jwtExpiration });
+            const refreshToken = jwt.sign(
+                { id: user.id },
+                process.env.JWT_REFRESH_SECRET,
+                { expiresIn: "7d" } // 7 days
+            );
 
-    // Generar refresh token (hash + registro en BD)
-    const rawToken = crypto.randomBytes(64).toString("hex");
-    const tokenHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+            res.json({
+                message: "Login successful!",
+                accesToken,
+                refreshToken,
+                user: {
+                    id: user.id,
+                    nombre: user.nombre,
+                    email: user.email,
+                    rolId: user.rolId,
+                },
+            });
+        }catch(error){
+            res.status(500).json({ message: error.message });
+        }
+    }
 
-    const expiresAt = new Date(Date.now() + authConfig.refreshExpirationDays * 24 * 60 * 60 * 1000);
+    static async refreshToken(req, res) {
+        try {
+            const { refreshToken } = req.body;
 
-    await RefreshToken.create({
-      token_hash: tokenHash,
-      id_usuario: user.id,
-      expires_at: expiresAt,
-    });
+            console.log("Token", refreshToken)
 
-    res.status(200).json({
-      id: user.id,
-      nombre: user.nombre,
-      email: user.email,
-      rol: user.rol?.name,
-      accessToken: token,
-      refreshToken: rawToken,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error en el inicio de sesión.", error: error.message });
-  }
-};
+            if (!refreshToken)
+                return res.status(400).json({ message: "Refresh token required!" });
 
-//Endpoint para el refresh token
+            const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+            refreshTokenRepo.create(tokenHash, 2, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)); // Para pruebas
+            const storedToken = await refreshTokenRepo.findByToken(tokenHash);
+            console.log(tokenHash);
+            console.log(storedToken);
 
-//Se extrae el refreshtoken del cuerpo la petición
-export const refreshToken = async (req, res) => {
-  try {
-    const { refreshToken } = req.body;
-    if (!refreshToken) return res.status(400).json({ message: "Se requiere un token de refresco." });
+            if (!storedToken)
+                return res.status(403).json({ message: "Invalid refresh token!" });
 
-    //Hasheo del token
-    const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
-    //Se busca en la tabla de refresh_token el registro cuyo token_hash coincida con el hash generado
-    const storedToken = await RefreshToken.findOne({ where: { token_hash: tokenHash } });
-    //Validaciones de seguridad
-    //1-No existe o fue manipulado el token
-    //2-El usuario cerro sesion o el token fue reemplazado
-    //3-El token expiró
-    if (!storedToken) return res.status(403).json({ message: "Token inválido." });
-    if (storedToken.revoked_at) return res.status(403).json({ message: "Token revocado." });
-    if (storedToken.expires_at < new Date()) return res.status(403).json({ message: "Token expirado." });
-    
-    //Busca el usuario con el token generado
-    const user = await Usuario.findByPk(storedToken.id_usuario);
-    if (!user) return res.status(404).json({ message: "Usuario no encontrado." });
+            if (storedToken.revoked_at)
+                return res.status(403).json({ message: "Refresh token has been revoked!" });
 
-    // Se genera un nuevo JWT
-    const newAccessToken = jwt.sign({ id: user.id }, authConfig.secret, { expiresIn: authConfig.jwtExpiration });
-    //Devuelve el nuevo token de acceso al usuario
-    res.status(200).json({
-      accessToken: newAccessToken,
-    });
-  } catch (error) { //Manejo de errores
-    console.error(error);
-    res.status(500).json({ message: "Error al refrescar el token.", error: error.message });
-  }
-};
+            if (new Date() > storedToken.expires_at) {
+                await refreshTokenRepo.revoke(tokenHash);
+                return res.status(403).json({ message: "Refresh token expired!" });
+            }
 
-// Endpoint para cerrar sesión (revocar el refresh token)
-export const logout = async (req, res) => {
-  try {
-    const { refreshToken } = req.body;
+            // Verificar JWT del refresh token
+            let payload;
+            try {
+                payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+            } catch {
+                await refreshTokenRepo.revoke(tokenHash);
+                return res.status(403).json({ message: "Invalid refresh token signature!" });
+            }
 
-    if (!refreshToken)
-      return res.status(400).json({ message: "Se requiere un token de refresco." });
+            const user = await usuarioRepo.findById(payload.id);
+            if (!user)
+                return res.status(404).json({ message: "User not found!" });
 
-    // Hashear el token recibido
-    const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+            // Generar nuevo access token
+            const newAccessToken = jwt.sign(
+                { id: user.id, rol: user.rolId },
+                process.env.JWT_SECRET,
+                { expiresIn: "15m" }
+            );
 
-    // Buscar el token en la base de datos
-    const storedToken = await RefreshToken.findOne({ where: { token_hash: tokenHash } });
+            // (opcional) Renovar el refresh token
+            const newRefreshToken = jwt.sign(
+                { id: user.id },
+                process.env.JWT_REFRESH_SECRET,
+                { expiresIn: "7d" }
+            );
 
-    if (!storedToken)
-      return res.status(403).json({ message: "Token inválido o no encontrado." });
+            const newTokenHash = crypto.createHash("sha256").update(newRefreshToken).digest("hex");
+            const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    // Marcarlo como revocado
-    storedToken.revoked_at = new Date();
-    await storedToken.save();
+            await refreshTokenRepo.create(newTokenHash, user.id, newExpiresAt);
+            await refreshTokenRepo.revoke(tokenHash);
 
-    res.status(200).json({ message: "Sesión cerrada correctamente. Token revocado." });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error al cerrar sesión.", error: error.message });
-  }
-};
+            res.json({
+                accessToken: newAccessToken,
+                refreshToken: newRefreshToken,
+            });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+
+    static async logout(req, res) {
+        try {
+            const { refreshToken } = req.body;
+
+            if (!refreshToken)
+                return res.status(400).json({ message: "Refresh token required!" });
+
+            const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
+            const token = await refreshTokenRepo.findByToken(tokenHash);
+
+            if (!token)
+                return res.status(404).json({ message: "Refresh token not found!" });
+
+            await refreshTokenRepo.revoke(tokenHash);
+
+            res.json({ message: "Logout successful. Refresh token revoked." });
+        } catch (error) {
+            res.status(500).json({ message: error.message });
+        }
+    }
+}
+

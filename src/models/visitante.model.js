@@ -3,6 +3,7 @@ export default (sequelize, Sequelize) => {
         id: {
             type: Sequelize.INTEGER,
             primaryKey: true,
+            autoIncrement: true
         },
         nombre: {
             type: Sequelize.STRING,
