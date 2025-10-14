@@ -2,7 +2,7 @@ import db from "../models/index.js";
 import bcrypt from "bcryptjs";
 import BaseRepository from "./baseRepository.js";
 
-export default class UsuarioRepository extends BaseRepository {
+class UsuarioRepository extends BaseRepository {
     constructor(){
         super(db.usuario);
     }
@@ -25,7 +25,14 @@ export default class UsuarioRepository extends BaseRepository {
     async validatePassword(user, password){
         return bcrypt.compareSync(password, user.password);
     }
+
+    async findAllUsers(){
+        return await this.model.findAll({
+            include: [{ model: db.rol, as: "rol" }],
+            attributes: { exclude: ["password"] }
+        });
+    }
 }
 
-
-
+const usuarioRepo = new UsuarioRepository();
+export default usuarioRepo;

@@ -36,5 +36,5 @@ class RolRepository extends BaseRepository {
         return await role.destroy();
     }
 }
-
-export default RolRepository;
+const rolRepository = new RolRepository();
+export default rolRepository;

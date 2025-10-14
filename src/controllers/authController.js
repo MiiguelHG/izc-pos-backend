@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
-import UsuarioRepository from "../repositories/usuarioRepository.js";
+import usuarioRepo from "../repositories/usuarioRepository.js";
 import RefreshTokenRepository from "../repositories/refreshTokenRepository.js";
 import crypto from "crypto";
 
 
-const usuarioRepo = new UsuarioRepository();
 const refreshTokenRepo = new RefreshTokenRepository();
 
 export class AuthController {

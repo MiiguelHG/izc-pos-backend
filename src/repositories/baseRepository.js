@@ -3,6 +3,13 @@ export default class BaseRepository {
         this.model = model;
     }
 
+    // static getInstance(model){
+    //     if(!this.instance){
+    //         this.instance = new BaseRepository(model);
+    //     }
+    //     return this.instance;
+    // }
+
     async findAll(options = {}){
         return await this.model.findAll(options);
     }
@@ -17,8 +24,11 @@ export default class BaseRepository {
 
     async update(id, data){
         const instance = await this.findByPk(id);
-        if(!instance) throw new Error("Instance not found");
-        return await instance.update(data);
+        if(!instance) {
+            return false;
+        }
+
+        return instance[0] > 0;
     }
 
     async delete(id){
