@@ -43,9 +43,6 @@ app.use('/api/roles', rolRoutes);
 // --  Rutas de usuarios --
 app.use('/api/usuarios', usuarioRoutes);
 
-// -- Rutas de refresh tokens --
-app.use('/api/tokens', refreshTokenRoutes);
-
 // Sincronizar la base de datos e iniciar el servidor
 // Configurar opciones de sincronización según el entorno
 const syncOptions = {};
