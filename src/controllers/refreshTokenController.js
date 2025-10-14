@@ -5,8 +5,8 @@ export class RefreshTokenController {
     // Obtener todos los tokens activos de un usuario //
     static async getUserTokens(req, res){
         try{
-            const userId = req.userId;
-            const tokens = await refreshTokenRepo.findActiveByUserId(userId);
+            const id_usuario = req.id_usuario;
+            const tokens = await refreshTokenRepo.findActiveByUserId(id_usuario);
             res.json(tokens);
         }catch(error){
             return res.status(500).json({ message: "Error al obtener tokens del usuario." });

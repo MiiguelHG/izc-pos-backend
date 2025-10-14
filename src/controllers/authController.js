@@ -10,13 +10,13 @@ const refreshTokenRepo = new RefreshTokenRepository();
 export class AuthController {
     static async register(req, res) {
         try{
-            const { nombre, email, password, rolId } = req.body;
+            const { nombre, email, password, id_rol } = req.body;
 
             const existing = await usuarioRepo.findByEmail(email);
             if(existing)
                 return res.status(400).json({ message: "Email is already in use!" });
 
-            const user = await usuarioRepo.createUser({ nombre, email, password, rolId });
+            const user = await usuarioRepo.createUser({ nombre, email, password, id_rol });
 
             res.status(201).json({
                 message: "User registered successfully!",
@@ -24,6 +24,7 @@ export class AuthController {
                     id: user.id,
                     nombre: user.nombre,
                     email: user.email,
+                    id_rol: user.id_rol,
                 },
             });
         }catch(error){
@@ -48,7 +49,7 @@ export class AuthController {
 
             //Tokens
             const accesToken = jwt.sign(
-                { id: user.id, rol: user.rolId },
+                { id: user.id, rol: user.id_rol },
                 process.env.JWT_SECRET,
                 { expiresIn: "15m" } // 15 minutes
             );
@@ -71,7 +72,7 @@ export class AuthController {
                     id: user.id,
                     nombre: user.nombre,
                     email: user.email,
-                    rolId: user.rolId,
+                    id_rol: user.id_rol,
                 },
             });
         }catch(error){
@@ -119,7 +120,7 @@ export class AuthController {
 
             // Generar nuevo access token
             const newAccessToken = jwt.sign(
-                { id: user.id, rol: user.rolId },
+                { id: user.id, rol: user.id_rol },
                 process.env.JWT_SECRET,
                 { expiresIn: "15m" }
             );

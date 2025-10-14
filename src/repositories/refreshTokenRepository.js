@@ -36,11 +36,11 @@ export default class RefreshTokenRepository {
     }
 
     // Obtener todos los tokens de un usuario //
-    async findActiveByUserId(userId){
+    async findActiveByUserId(id_usuario){
         const now = new Date();
         return await RefreshToken.findAll({
             where: { 
-                id_usuario: userId,
+                id_usuario: id_usuario,
                 revoked_at: null,
                 expires_at: {
                     [db.Sequelize.Op.gt]: now
