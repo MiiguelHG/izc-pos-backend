@@ -1,4 +1,5 @@
 import RolRepository from "../repositories/rolRepository.js";
+import { sendSuccess, sendError } from "../utils/responseFormater.js";
 
 const rolRepository = new RolRepository();
 
@@ -40,12 +41,25 @@ export class RolController {
 
     static async updateRole(req, res) {
         try{
+            // Antes
+            // const { name, description } = req.body;
+            // const role = await rolRepository.findById(req.params.id);
+
+            // if(!role)
+            //     return res.status(404).json({ message: "Rol not found." });
+
+            // const updatedRole = await rolRepository.updateRole(req.params.id, { name, description });
+            // return res.json(updatedRole);
+
+            // Después
             const { name, description } = req.body;
-            const role = await rolRepository.findById(req.params.id);
-            if(!role)
-                return res.status(404).json({ message: "Rol not found." });
-            const updatedRole = await rolRepository.updateRole(req.params.id, { name, description });
-            return res.json(updatedRole);
+            const updated = await rolRepository.updateRole(req.params.id, name, description);
+
+            if(!updated){
+                return sendError(res, 404, "Rol not found.");
+            }
+            return sendSuccess(res, 200, "Rol updated successfully.");
+
         }catch(error){
             return res.status(500).json({ message: "Error al actualizar rol." });
         }
@@ -53,11 +67,11 @@ export class RolController {
 
     static async deleteRole(req, res) {
         try{
-            const role = await rolRepository.findById(req.params.id);
-            if(!role)
-                return res.status(404).json({ message: "Rol not found." });
-            await rolRepository.deleteRole(req.params.id);
-            return res.json({ message: "Role deleted successfully." });
+            const deleted = await rolRepository.deleteRole(req.params.id);
+            if(!deleted){
+                return sendError(res, 404, "Rol not found.");
+            }
+            return sendSuccess(res, 200, "Rol deleted successfully.");
         }catch(error){
             return res.status(500).json({ message: "Error al eliminar rol." });
         }

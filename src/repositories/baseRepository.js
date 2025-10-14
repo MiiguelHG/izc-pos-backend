@@ -22,18 +22,14 @@ export default class BaseRepository {
         return await this.model.create(data);
     }
 
-    async update(id, data){
-        const instance = await this.findByPk(id);
-        if(!instance) {
-            return false;
-        }
+    async update(options = {}, data = {}){
+        const instance = await this.model.update(data, { where: options });
 
         return instance[0] > 0;
     }
 
-    async delete(id){
-        const instance = await this.findByPk(id);
-        if(!instance) throw new Error("Instance not found");
-        return await instance.destroy();
+    async delete(options = {}){
+        const instance = await this.model.destroy({ where: options });
+        return instance > 0;
     }
 }
