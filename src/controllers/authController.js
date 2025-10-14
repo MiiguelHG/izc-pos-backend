@@ -11,9 +11,9 @@ export class AuthController {
         try{
             const { nombre, email, password, rolId } = req.body;
 
-            const existing = await usuarioRepo.findByEmail(email);
-            if(existing)
-                return res.status(400).json({ message: "Email is already in use!" });
+            // const existing = await usuarioRepo.findByEmail(email);
+            // if(existing)
+            //     return res.status(400).json({ message: "Email is already in use!" });
 
             const user = await usuarioRepo.createUser({ nombre, email, password, rolId });
 

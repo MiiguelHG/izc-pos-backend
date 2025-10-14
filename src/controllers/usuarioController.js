@@ -25,8 +25,9 @@ export class UsuarioController {
             const { id } = req.params;
 
             // Solo admin o el propio usuario puede acceder
+            // Cambiar esto y verificar con un miiddleware
             if (req.user.rol.name !== "admin" && req.user.id !== parseInt(id))
-                return res.status(403).json({ message: "Access denied." });
+                return sendError(res, 403, "Access denied.");
 
             const user = await usuarioRepo.findById(id, {
                 include: ["rol"],
