@@ -1,17 +1,21 @@
 import UsuarioRepository from "../repositories/usuarioRepository.js";
+import { sendError, sendSuccess } from "../utils/responseFormater.js";
+
 const usuarioRepo = new UsuarioRepository();
 
 export class UsuarioController {
     // Obtener todos los usuarios (solo admin)
     static async getAll(req, res) {
         try {
-            const users = await usuarioRepo.findAll({
-                include: ["rol"],
-                attributes: { exclude: ["password"] }
-            });
-            res.json(users);
+            // const users = await usuarioRepo.findAll({
+            //     include: ["rol"],
+            //     attributes: { exclude: ["password"] }
+            // });
+            const users = await usuarioRepo.findAllUsers();
+
+            sendSuccess(res, 200, "Users retrieved successfully", users);
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            sendError(res, 500, error.message);
         }
     }
 
