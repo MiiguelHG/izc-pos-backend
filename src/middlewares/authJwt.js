@@ -1,104 +1,99 @@
 import jwt from "jsonwebtoken";
 import db from "../models/index.js";
-import authconfig from "../config/auth.config.js";
+import { sendSuccess, sendError } from "../utils/responseFormater.js";
+
 
 const { usuario: Usuario, rol: Rol } = db;
 
-// ======================
-// Verificar el token JWT
-// ======================
-export const verifyToken = async (req, res, next) => {
-  const token = req.headers["x-access-token"] || req.headers["authorization"];
+export default class authJwt {
+  static async verifyToken(req, res, next){
+    const token = req.headers["x-access-token"] || req.headers["authorization"];
 
-  if (!token) {
-    return res.status(403).json({ message: "No token provided!" });
-  }
-
-  try {
-    const cleanToken = token.replace("Bearer ", "");
-    const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET);
-
-    const user = await Usuario.findByPk(decoded.id, {
-      include: [{ model: Rol, as: "rol" }],
-    });
-
-    if (!user) {
-      return res.status(401).json({ message: "Unauthorized!" });
+    if (!token) {
+      sendError(res, 403, "No token provided!");
+      //return res.status(403).json({ message: "No token provided!" });
     }
 
-    req.user = user; // ✅ Deja disponible req.user.id y req.user.rol
-    next();
-  } catch (error) {
-    console.error("Error verifying token:", error);
-    return res.status(401).json({ message: "Unauthorized!" });
-  }
-};
+    try {
+      const cleanToken = token.replace("Bearer ", "");
+      const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET);
 
-// ======================
-// Verificar si es Admin
-// ======================
-export const isAdmin = async (req, res, next) => {
-  try {
-    const user = await Usuario.findByPk(req.user.id, {
-      include: [{ model: Rol, as: "rol" }],
-    });
+      const user = await Usuario.findByPk(decoded.id, {
+        include: [{ model: Rol, as: "rol" }],
+      });
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+      if (!user) {
+        sendError(res, 401, "Unauthorized!");
+        //return res.status(401).json({ message: "Unauthorized!" });
+      }
 
-    if (user.rol?.name === "admin") {
+      req.user = user; // ✅ Deja disponible req.user.id y req.user.rol
       next();
-      return;
+    } catch (error) {
+      sendError(res, 401, "Unauthorized!");
+      // console.error("Error verifying token:", error);
+      // return res.status(401).json({ message: "Unauthorized!" });
     }
+  };
 
-    res.status(403).json({ message: "Require Admin Role!" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
-  }
-};
+  static async isAdmin(req, res, next) {
+    try {
+      const user = await Usuario.findByPk(req.user.id, {
+        include: [{ model: Rol, as: "rol" }],
+      });
+      if (!user) sendError(res, 404, "User not found");
 
-// ==========================
-// Verificar si es Moderator
-// ==========================
-export const isModerator = async (req, res, next) => {
-  try {
-    const user = await Usuario.findByPk(req.userId, {
-      include: [{ model: Rol, as: "rol" }],
-    });
+      if (user.rol?.name === "admin") {
+        next();
+        return;
+      }
 
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    if (user.rol?.name === "moderator") {
-      next();
-      return;
+      // res.status(403).json({ message: "Require Admin Role!" });
+      sendError(res, 403, "Require Admin Role!");
+    } catch (error) {
+      sendError(res, 500, error.message);
+      // console.error(error);
+      // res.status(500).json({ message: error.message });
     }
+  };
 
-    res.status(403).json({ message: "Require Moderator Role!" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
-  }
-};
+  static async isModerator(req, res, next){
+    try{
+      const user = await Usuario.findByPk(req.user.id, {
+        include: [{ model: Rol, as: "rol" }],
+      });
+      if (!user) return sendError(res, 404, "User not found");
 
-// ===================================
-// Verificar si es Moderator o Admin
-// ===================================
-export const isModeratorOrAdmin = async (req, res, next) => {
-  try {
-    const user = await Usuario.findByPk(req.userId, {
-      include: [{ model: Rol, as: "rol" }],
-    });
+      if (user.rol?.name === "moderator") {
+        next();
+        return;
+      }
 
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    if (["admin", "moderator"].includes(user.rol?.name)) {
-      next();
-      return;
+      sendError(res, 403, "Require Moderator Role!");
+    } catch (error) {
+      sendError(res, 500, error.message);
     }
+  };
 
-    res.status(403).json({ message: "Require Moderator or Admin Role!" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: error.message });
-  }
-};
+  static async isModeratorOrAdmin(req, res, next) {
+    try {
+      const user = await Usuario.findByPk(req.user.id, {
+        include: [{ model: Rol, as: "rol" }],
+      });
+      if (!user) return sendError(res, 404, "User not found");
+
+      if (["admin", "moderator"].includes(user.rol?.name)) {
+        next();
+        return;
+      }
+
+      sendError(res, 403, "Require Moderator or Admin Role!");
+    } catch (error) {
+      sendError(res, 500, error.message);
+    }
+  };
+
+}
+
+
+

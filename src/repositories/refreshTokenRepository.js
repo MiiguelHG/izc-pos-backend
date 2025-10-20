@@ -1,7 +1,7 @@
 import db from "../models/index.js";
 const RefreshToken = db.refresh_tokens;
 
-export default class RefreshTokenRepository {
+class RefreshTokenRepository {
     // Crear un nuevo refresh token //
     async create(tokenHash, userId, expires_at){
         return await RefreshToken.create({ 
@@ -61,3 +61,6 @@ export default class RefreshTokenRepository {
         });
     }
 }
+
+const refreshTokenRepo = new RefreshTokenRepository();
+export default refreshTokenRepo;
