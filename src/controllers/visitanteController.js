@@ -1,14 +1,18 @@
-import VisitanteRepository from "../repositories/visitanteRepository.js";
 
-const visitanteRepository = new VisitanteRepository();
+import visitanteRepository from "../repositories/visitanteRepository.js";
+import { sendSuccess } from "../utils/responseFormater.js";
+//import VisitanteRepository from "../repositories/visitanteRepository.js";
+
+
+//const visitanteRepository = new VisitanteRepository();
 
 export class VisitanteController {
     static async getAllVisitantes(req, res) {
         try {
             const visitantes = await visitanteRepository.findAllVisitantes();
-            return res.json(visitantes);
+            return sendSuccess(res, 200, "Visitantes obtenidos correctamente.", visitantes);
         } catch(error) {
-            return res.status(500).json({ message: "Error al obtener visitantes." });
+            return sendError(res, 500, "Error al obtener visitantes.");
         }
     }
 
@@ -16,52 +20,48 @@ export class VisitanteController {
         try {
             const visitante = await visitanteRepository.findById(req.params.id);
             if(!visitante)
-                return res.status(404).json({ message: "Visitante no encontrado." });
-            return res.json(visitante);
+                return sendError(res, 404, "Visitante no encontrado.");
+            return sendSuccess(res, 200, "Visitante obtenido correctamente.", visitante);
         } catch(error) {
-            return res.status(500).json({ message: "Error al obtener visitante por ID." });
+            return sendError(res, 500, "Error al obtener visitante por ID.");
         }
     }
 
-    // Obtener visitantes en grupo
     static async getGroupVisitors(req, res) {
         try {
             const visitantes = await visitanteRepository.findGroupVisitors();
-            return res.json(visitantes);
+            return sendSuccess(res, 200, "Visitantes en grupo obtenidos correctamente.", visitantes);
         } catch(error) {
-            return res.status(500).json({ message: "Error al obtener visitantes en grupo." });
+            return sendError(res, 500, "Error al obtener visitantes en grupo.");
         }
     }
 
-    //Obtener visitantes individuales
     static async getIndividualVisitors(req, res) {
         try {
             const visitantes = await visitanteRepository.findIndividualVisitors();
-            return res.json(visitantes);
+            return sendSuccess(res, 200, "Visitantes individuales obtenidos correctamente.", visitantes);
         } catch(error) {
-            return res.status(500).json({ message: "Error al obtener visitantes individuales." });
+            return sendError(res, 500, "Error al obtener visitantes individuales.");
         }
     }
 
-    // Obtener visitantes por país
     static async getByCountry(req, res) {
         try {
             const { pais } = req.params;
             const visitantes = await visitanteRepository.findByCountry(pais);
-            return res.json(visitantes);
+            return sendSuccess(res, 200, `Visitantes de ${pais} obtenidos correctamente.`, visitantes);
         } catch(error) {
-            return res.status(500).json({ message: "Error al obtener visitantes por país." });
+            return sendError(res, 500, "Error al obtener visitantes por país.");
         }
     }
 
-    // Obtener visitantes por género
     static async getByGender(req, res) {
         try {
             const { genero } = req.params;
             const visitantes = await visitanteRepository.findByGender(genero);
-            return res.json(visitantes);
+            return sendSuccess(res, 200, `Visitantes de género ${genero} obtenidos correctamente.`, visitantes);
         } catch(error) {
-            return res.status(500).json({ message: "Error al obtener visitantes por género." });
+            return sendError(res, 500, "Error al obtener visitantes por género.");
         }
     }
 
@@ -83,32 +83,32 @@ export class VisitanteController {
 
             // Validar campos obligatorios
             if(!nombre || !apellido) {
-                return res.status(400).json({ message: "Nombre y apellido son obligatorios." });
+                return sendError(res, 400, "Nombre y apellido son obligatorios.");
             }
 
             // Validar email único si se proporciona
             if(email) {
                 const existingEmail = await visitanteRepository.findByEmail(email);
                 if(existingEmail) {
-                    return res.status(400).json({ message: "Ya existe un visitante con ese email." });
+                    return sendError(res, 400, "Ya existe un visitante con ese email.");
                 }
 
                 // Validar formato de email básico
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if(!emailRegex.test(email)) {
-                    return res.status(400).json({ message: "Formato de email inválido." });
+                    return sendError(res, 400, "Formato de email inválido.");
                 }
             }
 
             // Validar CP si se proporciona
             if(cp && (cp < 0 || cp > 99999)) {
-                return res.status(400).json({ message: "Código postal inválido." });
+                return sendError(res, 400, "Código postal inválido.");
             }
 
             // Validar datos de grupo
             if(grupo) {
                 if(!total_visitantes || total_visitantes <= 0) {
-                    return res.status(400).json({ message: "Para grupos, el total de visitantes es obligatorio y debe ser mayor a 0." });
+                    return sendError(res, 400, "Para grupos, el total de visitantes es obligatorio y debe ser mayor a 0.");
                 }
 
                 // Validar que la suma de hombres y mujeres coincida con el total
@@ -116,13 +116,11 @@ export class VisitanteController {
                 const cantidadMujeres = cantidad_mujeres || 0;
                 
                 if(cantidadHombres + cantidadMujeres !== total_visitantes) {
-                    return res.status(400).json({ 
-                        message: "La suma de hombres y mujeres debe ser igual al total de visitantes." 
-                    });
+                    return sendError(res, 400, "La suma de hombres y mujeres debe ser igual al total de visitantes.");
                 }
 
                 if(cantidadHombres < 0 || cantidadMujeres < 0) {
-                    return res.status(400).json({ message: "Las cantidades no pueden ser negativas." });
+                    return sendError(res, 400, "Las cantidades no pueden ser negativas.");
                 }
             }
 
@@ -139,9 +137,9 @@ export class VisitanteController {
                 cantidad_mujeres,
                 total_visitantes
             });
-            return res.status(201).json(newVisitor);
+            return sendSuccess(res, 201, "Visitante creado correctamente.", newVisitor);
         } catch(error) {
-            return res.status(500).json({ message: "Error al crear visitante." });
+            return sendError(res, 500, "Error al crear visitante.");
         }
     }
 
@@ -163,25 +161,25 @@ export class VisitanteController {
 
             const visitante = await visitanteRepository.findById(req.params.id);
             if(!visitante)
-                return res.status(404).json({ message: "Visitante no encontrado." });
+                return sendError(res, 404, "Visitante no encontrado.");
 
             // Validar email único si se proporciona y es diferente al actual
             if(email && email !== visitante.email) {
                 const existingEmail = await visitanteRepository.findByEmail(email);
                 if(existingEmail) {
-                    return res.status(400).json({ message: "Ya existe un visitante con ese email." });
+                    return sendError(res, 400, "Ya existe un visitante con ese email.");
                 }
 
                 // Validar formato de email
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if(!emailRegex.test(email)) {
-                    return res.status(400).json({ message: "Formato de email inválido." });
+                    return sendError(res, 400, "Formato de email inválido.");
                 }
             }
 
             // Validar CP si se proporciona
             if(cp !== undefined && (cp < 0 || cp > 99999)) {
-                return res.status(400).json({ message: "Código postal inválido." });
+                return sendError(res, 400, "Código postal inválido.");
             }
 
             // Validar datos de grupo si se actualiza
@@ -191,13 +189,11 @@ export class VisitanteController {
                 const cantMujeres = cantidad_mujeres !== undefined ? cantidad_mujeres : visitante.cantidad_mujeres || 0;
 
                 if(!totalFinal || totalFinal <= 0) {
-                    return res.status(400).json({ message: "Para grupos, el total de visitantes es obligatorio." });
+                    return sendError(res, 400, "Para grupos, el total de visitantes es obligatorio.");
                 }
 
                 if(cantHombres + cantMujeres !== totalFinal) {
-                    return res.status(400).json({ 
-                        message: "La suma de hombres y mujeres debe ser igual al total de visitantes." 
-                    });
+                    return sendError(res, 400, "La suma de hombres y mujeres debe ser igual al total de visitantes.");
                 }
             }
             
@@ -214,9 +210,9 @@ export class VisitanteController {
                 cantidad_mujeres,
                 total_visitantes
             });
-            return res.json(updatedVisitor);
+            return sendSuccess(res, 200, "Visitante actualizado correctamente.", updatedVisitor);
         } catch(error) {
-            return res.status(500).json({ message: "Error al actualizar visitante." });
+            return sendError(res, 500, "Error al actualizar visitante.");
         }
     }
 
@@ -224,12 +220,12 @@ export class VisitanteController {
         try {
             const visitante = await visitanteRepository.findById(req.params.id);
             if(!visitante)
-                return res.status(404).json({ message: "Visitante no encontrado." });
+                return sendError(res, 404, "Visitante no encontrado.");
             
             await visitanteRepository.deleteVisitor(req.params.id);
-            return res.json({ message: "Visitante eliminado correctamente." });
+            return sendSuccess(res, 200, "Visitante eliminado correctamente.");
         } catch(error) {
-            return res.status(500).json({ message: "Error al eliminar visitante." });
+            return sendError(res, 500, "Error al eliminar visitante.");
         }
     }
 }

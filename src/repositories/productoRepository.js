@@ -37,4 +37,5 @@ class ProductoRepository extends BaseRepository {
     }
 }
 
-export default ProductoRepository;
+const productoRepository = new ProductoRepository();
+export default productoRepository;

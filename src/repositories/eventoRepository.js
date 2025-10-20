@@ -37,4 +37,5 @@ class EventoRepository extends BaseRepository {
     }
 
 }
-export default EventoRepository;
+const eventoRepository = new EventoRepository();
+export default eventoRepository;

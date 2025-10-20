@@ -1,7 +1,7 @@
 import db from "../models/index.js";
 const RefreshToken = db.refresh_tokens;
 
-export default class RefreshTokenRepository {
+class RefreshTokenRepository {
     // Crear un nuevo refresh token //
     async create(tokenHash, userId, expires_at){
         return await RefreshToken.create({ 
@@ -36,11 +36,11 @@ export default class RefreshTokenRepository {
     }
 
     // Obtener todos los tokens de un usuario //
-    async findActiveByUserId(userId){
+    async findActiveByUserId(id_usuario){
         const now = new Date();
         return await RefreshToken.findAll({
             where: { 
-                id_usuario: userId,
+                id_usuario: id_usuario,
                 revoked_at: null,
                 expires_at: {
                     [db.Sequelize.Op.gt]: now
@@ -61,3 +61,6 @@ export default class RefreshTokenRepository {
         });
     }
 }
+
+const refreshTokenRepo = new RefreshTokenRepository();
+export default refreshTokenRepo;

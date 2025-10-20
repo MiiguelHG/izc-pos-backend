@@ -1,6 +1,7 @@
 import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
 
+
 const Visitante = db.visitante;
 
 class VisitanteRepository extends BaseRepository {
@@ -61,4 +62,5 @@ class VisitanteRepository extends BaseRepository {
     }
 
 }
-export default VisitanteRepository;
+const visitanteRepository = new VisitanteRepository();
+export default visitanteRepository;

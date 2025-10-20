@@ -1,15 +1,19 @@
-import RefreshTokenRepository from "../repositories/refreshTokenRepository.js";
+//import RefreshTokenRepository from "../repositories/refreshTokenRepository.js";
+import refreshTokenRepo from "../repositories/refreshTokenRepository.js";
+import { sendSuccess } from "../utils/responseFormater.js";
 
-const refreshTokenRepo = new RefreshTokenRepository();
+//const refreshTokenRepo = new RefreshTokenRepository();
+
 export class RefreshTokenController {
     // Obtener todos los tokens activos de un usuario //
     static async getUserTokens(req, res){
         try{
-            const userId = req.userId;
-            const tokens = await refreshTokenRepo.findActiveByUserId(userId);
-            res.json(tokens);
+            const id_usuario = req.id_usuario;
+            const tokens = await refreshTokenRepo.findActiveByUserId(id_usuario);
+            sendSuccess(200, "User tokens retrieved successfully.", tokens, res);
+            // res.json(tokens);
         }catch(error){
-            return res.status(500).json({ message: "Error al obtener tokens del usuario." });
+            sendError(res, 500, "Error al obtener tokens del usuario.");
         }
     }
 
@@ -20,12 +24,12 @@ export class RefreshTokenController {
             const revoked = await refreshTokenRepo.revoke(token);
 
             if(!revoked)
-                return res.status(404).json({ message: "Token no encontrado." });
+                sendError(res, 404, "Token not found.");
 
-            return res.json({ message: "Token revocado correctamente." });
+            sendSuccess(res, 200, "Token revoked successfully.");
         }catch(error){
-            console.error("Error al revocar el token:", error);
-            return res.status(500).json({ message: "Error al revocar el token." });
+            console.error("Error revoking token:", error);
+            sendError(res, 500, "Error al revocar el token.");
         }
     }
 
@@ -33,10 +37,11 @@ export class RefreshTokenController {
     static async cleanupExpiredTokens(req, res){
         try{
             const deletedCount = await refreshTokenRepo.deleteExpiredTokens();
-            res.json({ message: `Deleted ${deletedCount} expired tokens.` });
+            sendSuccess(res, 200, `Deleted ${deletedCount} expired tokens.`);
+            // res.json({ message: `Deleted ${deletedCount} expired tokens.` });
         }catch(error){
-            console.error("Error al limpiar tokens expirados:", error);
-            return res.status(500).json({ message: "Error al limpiar tokens expirados." });
+            console.error("Error cleaning up expired tokens:", error);
+            sendError(res, 500, "Error al limpiar tokens expirados.");
         }
     }
 }

@@ -1,14 +1,18 @@
-import ProductoRepository from "../repositories/productoRepository.js";
+//import ProductoRepository from "../repositories/productoRepository.js";
+import productoRepository from "../repositories/productoRepository.js";
+import { sendSuccess } from "../utils/responseFormater.js";
 
-const productoRepository = new ProductoRepository();
+
+//const productoRepository = new ProductoRepository();
+
 
 export class ProductoController {
     static async getAllProductos(req, res) {
         try {
             const productos = await productoRepository.findAllProductos();
-            return res.json(productos);
+            return sendSuccess(res, 200, "Productos obtenidos correctamente.", productos);
         } catch(error) {
-            return res.status(500).json({ message: "Error al obtener productos." });
+            return sendError(res, 500, "Error al obtener productos.");
         }
     }
 
@@ -16,10 +20,10 @@ export class ProductoController {
         try {
             const producto = await productoRepository.findById(req.params.id);
             if(!producto)
-                return res.status(404).json({ message: "Producto no encontrado." });
-            return res.json(producto);
+                return sendError(res, 404, "Producto no encontrado.");
+            return sendSuccess(res, 200, "Producto obtenido correctamente.", producto);
         } catch(error) {
-            return res.status(500).json({ message: "Error al obtener producto por ID." });
+            return sendError(res, 500, "Error al obtener producto por ID.");
         }
     }
 
@@ -29,13 +33,13 @@ export class ProductoController {
 
             // Validar campos requeridos
             if(!nombre || !precio) {
-                return res.status(400).json({ message: "Nombre y precio son obligatorios." });
+                return sendError(res, 400, "Nombre y precio son obligatorios.");
             }
 
             // Validar si ya existe un producto con ese nombre
             const existing = await productoRepository.findByName(nombre);
             if(existing) {
-                return res.status(400).json({ message: "Ya existe un producto con ese nombre." });
+                return sendError(res, 400, "Ya existe un producto con ese nombre.");
             }
 
             const newProduct = await productoRepository.createProduct({ 
@@ -43,9 +47,9 @@ export class ProductoController {
                 precio, 
                 descripcion 
             });
-            return res.status(201).json(newProduct);
+            return sendSuccess(res, 201, "Producto creado correctamente.", newProduct);
         } catch(error) {
-            return res.status(500).json({ message: "Error al crear producto." });
+            return sendError(res, 500, "Error al crear producto.");
         }
     }
 
@@ -54,16 +58,16 @@ export class ProductoController {
             const { nombre, precio, descripcion } = req.body;
             const producto = await productoRepository.findById(req.params.id);
             if(!producto)
-                return res.status(404).json({ message: "Producto no encontrado." });
+                return sendError(res, 404, "Producto no encontrado.");
             
             const updatedProduct = await productoRepository.updateProduct(req.params.id, { 
                 nombre, 
                 precio, 
                 descripcion 
             });
-            return res.json(updatedProduct);
+            return sendSuccess(res, 200, "Producto actualizado correctamente.", updatedProduct);
         } catch(error) {
-            return res.status(500).json({ message: "Error al actualizar producto." });
+            return sendError(res, 500, "Error al actualizar producto.");
         }
     }
 
@@ -71,12 +75,12 @@ export class ProductoController {
         try {
             const producto = await productoRepository.findById(req.params.id);
             if(!producto)
-                return res.status(404).json({ message: "Producto no encontrado." });
+                return sendError(res, 404, "Producto no encontrado.");
             
             await productoRepository.deleteProduct(req.params.id);
-            return res.json({ message: "Producto eliminado correctamente." });
+            return sendSuccess(res, 200, "Producto eliminado correctamente.");
         } catch(error) {
-            return res.status(500).json({ message: "Error al eliminar producto." });
+            return sendError(res, 500, "Error al eliminar producto.");
         }
     }
 }

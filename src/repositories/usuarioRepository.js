@@ -2,7 +2,7 @@ import db from "../models/index.js";
 import bcrypt from "bcryptjs";
 import BaseRepository from "./baseRepository.js";
 
-export default class UsuarioRepository extends BaseRepository {
+class UsuarioRepository extends BaseRepository {
     constructor(){
         super(db.usuario);
     }
@@ -17,9 +17,9 @@ export default class UsuarioRepository extends BaseRepository {
             include: [{ model: db.rol, as: "rol" }] });
     }
 
-    async createUser({nombre, email, password, rolId}){
+    async createUser({nombre, email, password, id_rol}){
         const hashed = bcrypt.hashSync(password, 10);
-        return await this.model.create({ nombre, email, password: hashed, rolId });
+        return await this.model.create({ nombre, email, password: hashed, id_rol });
     }
 
     async validatePassword(user, password){
@@ -27,5 +27,5 @@ export default class UsuarioRepository extends BaseRepository {
     }
 }
 
-
-
+const usuarioRepo = new UsuarioRepository();
+export default usuarioRepo;

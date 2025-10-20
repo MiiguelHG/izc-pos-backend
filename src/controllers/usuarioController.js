@@ -1,5 +1,4 @@
-import UsuarioRepository from "../repositories/usuarioRepository.js";
-const usuarioRepo = new UsuarioRepository();
+import usuarioRepo from "../repositories/usuarioRepository.js";
 
 export class UsuarioController {
     // Obtener todos los usuarios (solo admin)
@@ -20,9 +19,9 @@ export class UsuarioController {
         try {
             const { id } = req.params;
 
-            // Solo admin o el propio usuario puede acceder
-            if (req.user.rol.name !== "admin" && req.user.id !== parseInt(id))
-                return res.status(403).json({ message: "Access denied." });
+            // // Solo admin o el propio usuario puede acceder
+            // if (req.user.rol.name !== "admin" && req.user.id !== parseInt(id))
+            //     return res.status(403).json({ message: "Access denied." });
 
             const user = await usuarioRepo.findById(id, {
                 include: ["rol"],
@@ -61,8 +60,8 @@ export class UsuarioController {
             const { id } = req.params;
             const { nombre, email, password, activo, rolId } = req.body;
 
-            if (req.user.rol.name !== "admin" && req.user.id !== parseInt(id))
-                return res.status(403).json({ message: "Access denied." });
+            // if (req.user.rol.name !== "admin" && req.user.id !== parseInt(id))
+            //     return res.status(403).json({ message: "Access denied." });
 
             const data = { nombre, email, rolId };
             if (password) data.password = password;
@@ -81,8 +80,8 @@ export class UsuarioController {
         try {
             const { id } = req.params;
 
-            if (req.user.rol.name !== "admin")
-                return res.status(403).json({ message: "Access denied." });
+            // if (req.user.rol.name !== "admin")
+            //     return res.status(403).json({ message: "Access denied." });
 
             await usuarioRepo.delete(id);
             res.json({ message: "User deleted successfully!" });
