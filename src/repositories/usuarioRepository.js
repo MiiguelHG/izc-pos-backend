@@ -2,7 +2,7 @@ import db from "../models/index.js";
 import bcrypt from "bcryptjs";
 import BaseRepository from "./baseRepository.js";
 
-export default class UsuarioRepository extends BaseRepository {
+class UsuarioRepository extends BaseRepository {
     constructor(){
         super(db.usuario);
     }
@@ -26,6 +26,9 @@ export default class UsuarioRepository extends BaseRepository {
         return bcrypt.compareSync(password, user.password);
     }
 }
+
+const usuarioRepo = new UsuarioRepository();
+export default usuarioRepo;
 
 
 

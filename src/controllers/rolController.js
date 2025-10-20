@@ -1,14 +1,17 @@
-import RolRepository from "../repositories/rolRepository.js";
+import rolRepository from "../repositories/rolRepository.js";
+import { sendSuccess } from "../utils/responseFormater.js";
+//import RolRepository from "../repositories/rolRepository.js";
 
-const rolRepository = new RolRepository();
+//const rolRepository = new RolRepository();
 
 export class RolController {
     static async getAllRoles(req, res) {
         try{
             const roles = await rolRepository.findAllRoles();
-            return res.json(roles);
+            sendSuccess(res, 200, "Roles retrieved successfully.", roles);
+            // return res.json(roles);
         }catch(error){
-            return res.status(500).json({ message: "Error al obtener roles." });
+            sendError(res, 500, "Error al obtener roles.");
         }
     }
 
@@ -16,10 +19,10 @@ export class RolController {
         try{
             const rol = await rolRepository.findById(req.params.id);
             if(!rol)
-                return res.status(404).json({ message: "Rol not found." });
-            return res.json(rol);
+                sendError(res, 404, "Rol not found.");
+            sendSuccess(res, 200, "Rol retrieved successfully.", rol);
         }catch(error){
-            return res.status(500).json({ message: "Error al obtener rol por ID." });
+            sendError(res, 500, "Error al obtener rol por ID.");
         }
     }
 
@@ -27,39 +30,40 @@ export class RolController {
         try{
             const { name, description } = req.body;
 
-            const existing = await rolRepository.findByName(name);
-            if(existing){
-                return res.status(400).json({ message: "Role name already exists." });
-            }
+            // const existing = await rolRepository.findByName(name);
+            // if(existing){
+            //     return res.status(400).json({ message: "Role name already exists." });
+            // }
             const newRole = await rolRepository.createRole({ name, description });
-            return res.status(201).json(newRole);
+            sendSuccess(res, 201, "Role created successfully.", newRole);
         }catch(error){
-            return res.status(500).json({ message: "Error al crear rol." });
+            sendError(res, 500, "Error al crear rol.");
         }
     }
 
     static async updateRole(req, res) {
         try{
             const { name, description } = req.body;
-            const role = await rolRepository.findById(req.params.id);
-            if(!role)
-                return res.status(404).json({ message: "Rol not found." });
-            const updatedRole = await rolRepository.updateRole(req.params.id, { name, description });
-            return res.json(updatedRole);
+            const updated = await rolRepository.updateRole(req.params.id, name, description);
+
+            if(!updated)
+                sendError(res, 404, "Rol not found.");
+            sendSuccess(res, 200, "Rol updated successfully.", updated);
         }catch(error){
-            return res.status(500).json({ message: "Error al actualizar rol." });
+            sendError(res, 500, "Error al actualizar rol.");
         }
     }
 
     static async deleteRole(req, res) {
         try{
-            const role = await rolRepository.findById(req.params.id);
-            if(!role)
-                return res.status(404).json({ message: "Rol not found." });
-            await rolRepository.deleteRole(req.params.id);
-            return res.json({ message: "Role deleted successfully." });
+           const deleted = await rolRepository.deleteRole(req.params.id);
+           if(!deleted){
+                sendError(res, 404, "Rol not found.");
+                // return res.status(404).json({ message: "Rol not found." });
+           }
+           sendSuccess(res, 200, "Role deleted successfully.");
         }catch(error){
-            return res.status(500).json({ message: "Error al eliminar rol." });
+            sendError(res, 500, "Error al eliminar rol.");
         }
     }
 }

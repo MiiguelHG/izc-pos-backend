@@ -1,34 +1,35 @@
 import jwt from "jsonwebtoken";
-import UsuarioRepository from "../repositories/usuarioRepository.js";
-import RefreshTokenRepository from "../repositories/refreshTokenRepository.js";
+// import UsuarioRepository from "../repositories/usuarioRepository.js";
+// import RefreshTokenRepository from "../repositories/refreshTokenRepository.js";
+import usuarioRepo from "../repositories/usuarioRepository.js";
+import refreshTokenRepo from "../repositories/refreshTokenRepository.js";
+import { sendSuccess, sendError } from "../utils/responseFormater.js";
 import crypto from "crypto";
 
 
-const usuarioRepo = new UsuarioRepository();
-const refreshTokenRepo = new RefreshTokenRepository();
+// const usuarioRepo = new UsuarioRepository();
+// const refreshTokenRepo = new RefreshTokenRepository();
 
 export class AuthController {
     static async register(req, res) {
         try{
             const { nombre, email, password, id_rol } = req.body;
 
-            const existing = await usuarioRepo.findByEmail(email);
-            if(existing)
-                return res.status(400).json({ message: "Email is already in use!" });
+            // const existing = await usuarioRepo.findByEmail(email);
+            // if(existing)
+            //     return res.status(400).json({ message: "Email is already in use!" });
 
             const user = await usuarioRepo.createUser({ nombre, email, password, id_rol });
 
-            res.status(201).json({
-                message: "User registered successfully!",
-                user: {
-                    id: user.id,
-                    nombre: user.nombre,
-                    email: user.email,
-                    id_rol: user.id_rol,
-                },
+            sendSuccess(res, 201, "User registered successfully!", {
+                id: user.id,
+                nombre: user.nombre,
+                email: user.email,
+                id_rol: user.id_rol,
             });
         }catch(error){
-            res.status(500).json({ message: error.message });
+            sendError(res, 500, error.message);
+            // res.status(500).json({ message: error.message });
         }
     }
 
@@ -38,14 +39,18 @@ export class AuthController {
 
             const user = await usuarioRepo.findByEmail(email);
             if(!user)
-                return res.status(404).json({ message: "User Not found." });
+                sendError(res, 404, "User Not found.");
+                // return res.status(404).json({ message: "User Not found." });
 
             const passwordIsValid = await usuarioRepo.validatePassword(user, password);
             if(!passwordIsValid)
-                return res.status(401).json({
-                    accessToken: null,
-                    message: "Invalid Password!",
+                sendError(res, 401, "Invalid Password!", {
+                accessToken: null,
                 });
+                // return res.status(401).json({
+                //     accessToken: null,
+                //     message: "Invalid Password!",
+                // });
 
             //Tokens
             const accesToken = jwt.sign(
@@ -64,8 +69,7 @@ export class AuthController {
             const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
             await refreshTokenRepo.create(tokenHash, user.id, expiresAt);
 
-            res.json({
-                message: "Login successful!",
+            sendSuccess(res, 200, "Login successful!", {
                 accesToken,
                 refreshToken,
                 user: {
@@ -75,8 +79,20 @@ export class AuthController {
                     id_rol: user.id_rol,
                 },
             });
+            // res.json({
+            //     message: "Login successful!",
+            //     accesToken,
+            //     refreshToken,
+            //     user: {
+            //         id: user.id,
+            //         nombre: user.nombre,
+            //         email: user.email,
+            //         id_rol: user.id_rol,
+            //     },
+            // });
         }catch(error){
-            res.status(500).json({ message: error.message });
+            sendError(res, 500, error.message);
+            // res.status(500).json({ message: error.message });
         }
     }
 
@@ -87,7 +103,8 @@ export class AuthController {
             console.log("Token", refreshToken)
 
             if (!refreshToken)
-                return res.status(400).json({ message: "Refresh token required!" });
+                sendError(res, 400, "Refresh token required!");
+                // return res.status(400).json({ message: "Refresh token required!" });
 
             const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
             const storedToken = await refreshTokenRepo.findByToken(tokenHash);
@@ -95,14 +112,14 @@ export class AuthController {
             console.log(storedToken);
 
             if (!storedToken)
-                return res.status(403).json({ message: "Invalid refresh token!" });
+                sendError(res, 403, "Invalid refresh token!");
 
             if (storedToken.revoked_at)
-                return res.status(403).json({ message: "Refresh token has been revoked!" });
+                sendError(res, 403, "Refresh token has been revoked!");
 
             if (new Date() > storedToken.expires_at) {
                 await refreshTokenRepo.revoke(tokenHash);
-                return res.status(403).json({ message: "Refresh token expired!" });
+                sendError(res, 403, "Refresh token expired!");
             }
 
             // Verificar JWT del refresh token
@@ -111,12 +128,12 @@ export class AuthController {
                 payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
             } catch {
                 await refreshTokenRepo.revoke(tokenHash);
-                return res.status(403).json({ message: "Invalid refresh token signature!" });
+                sendError(res, 403, "Invalid refresh token signature!");
             }
 
             const user = await usuarioRepo.findById(payload.id);
             if (!user)
-                return res.status(404).json({ message: "User not found!" });
+                sendError(res, 404, "User not found!");
 
             // Generar nuevo access token
             const newAccessToken = jwt.sign(
@@ -143,7 +160,7 @@ export class AuthController {
                 refreshToken: newRefreshToken,
             });
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            sendError(res, 500, error.message);
         }
     }
 
@@ -152,19 +169,19 @@ export class AuthController {
             const { refreshToken } = req.body;
 
             if (!refreshToken)
-                return res.status(400).json({ message: "Refresh token required!" });
+                sendError(res, 400, "Refresh token required!");
 
             const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
             const token = await refreshTokenRepo.findByToken(tokenHash);
 
             if (!token)
-                return res.status(404).json({ message: "Refresh token not found!" });
+                sendError(res, 404, "Refresh token not found!");
 
             await refreshTokenRepo.revoke(tokenHash);
 
             res.json({ message: "Logout successful. Refresh token revoked." });
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            sendError(res, 500, error.message);
         }
     }
 }
