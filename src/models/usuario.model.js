@@ -1,5 +1,3 @@
-import { hashSync } from "bcryptjs";
-
 export default (sequelize, Sequelize) => {
     const Usuario = sequelize.define("usuarios", {
         id: {
