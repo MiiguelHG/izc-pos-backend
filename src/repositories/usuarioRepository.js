@@ -29,6 +29,3 @@ class UsuarioRepository extends BaseRepository {
 
 const usuarioRepo = new UsuarioRepository();
 export default usuarioRepo;
-
-
-

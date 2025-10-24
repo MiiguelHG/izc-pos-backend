@@ -1,15 +1,21 @@
-import express from 'express';
 import dotenv from 'dotenv';
+dotenv.config();
+
+import express from 'express';
 import cors from 'cors';
+
 
 import db from './src/models/index.js';
 import authRoutes from './src/routes/authRoutes.js';
 import refreshTokenRoutes from './src/routes/refreshTokenRoutes.js';
 import rolRoutes from './src/routes/rolesRoutes.js';
 import usuarioRoutes from './src/routes/usuarioRoutes.js';
+import eventoRoutes from './src/routes/eventoRoutes.js'; 
+import productoRoutes from './src/routes/productoRoutes.js';
+import visitanteRoutes from './src/routes/visitanteRoutes.js';
 import { initRoles } from './src/utils/initRoles.js';
 
-dotenv.config();
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,6 +48,18 @@ app.use('/api/roles', rolRoutes);
 
 // --  Rutas de usuarios --
 app.use('/api/usuarios', usuarioRoutes);
+
+// -- Rutas de refresh tokens --
+app.use('/api/tokens', refreshTokenRoutes);
+
+// -- Rutas de evento --
+app.use('/api/eventos', eventoRoutes);
+
+// -- Rutas de producto --
+app.use('/api/productos', productoRoutes);
+
+// -- Rutas de visitante --
+app.use('/api/visitantes', visitanteRoutes);
 
 // Sincronizar la base de datos e iniciar el servidor
 // Configurar opciones de sincronización según el entorno

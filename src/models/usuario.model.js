@@ -1,4 +1,4 @@
-import { hashSync } from "bcrypt";
+import { hashSync } from "bcryptjs";
 
 export default (sequelize, Sequelize) => {
     const Usuario = sequelize.define("usuarios", {
@@ -19,11 +19,12 @@ export default (sequelize, Sequelize) => {
         password: {
             type: Sequelize.TEXT,
             allowNull: false
-        }, 
+        },
         activo: {
             type: Sequelize.BOOLEAN,
             defaultValue: true
         },
+        
     });
 
     return Usuario;
