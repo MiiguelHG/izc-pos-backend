@@ -1,27 +1,39 @@
-export default class BaseRepository {
-    constructor(model){
-        this.model = model;
+import BaseRepository from "./baseRepository.js";
+import db from "../models/index.js";
+
+const Rol = db.rol;
+
+class RolRepository extends BaseRepository {
+    constructor() {
+        super(Rol);
     }
 
-    async findAll(options = {}){
-        return await this.model.findAll(options);
+    async findByName(name){
+        return await this.model.findOne({ where: { name } });
     }
 
-    async findById(id, options = {}){
-        return await this.model.findByPk(id, options);
+    async findById(id){
+        return await this.model.findByPk(id);
     }
 
-    async create(data){
+    async findAllRoles(){
+        return await this.model.findAll();
+    }
+
+    async createRole(data){
         return await this.model.create(data);
     }
 
-    async update(options = {}, data = {}){
-        const instance = await this.model.update(data, { where: options });
-        return instance[0] > 0;
+    async updateRole(id, name, description){
+        const role = await this.update({id: id}, {name, description});
+        return role;
     }
 
-    async delete(options = {}){
-        const instance = await this.model.destroy({ where: options });
-        return instance > 0;
+    async deleteRole(id){
+        const role = await this.delete({id: id});
+        return role;
     }
 }
+
+const rolRepository = new RolRepository();
+export default rolRepository;
