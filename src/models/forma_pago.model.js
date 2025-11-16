@@ -1,16 +1,18 @@
+import { DataTypes } from "sequelize";
+
 export default (sequelize, Sequelize) => {
     const FormaPago = sequelize.define("formas_pago", {
         id: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        forma_pago: {
-            type: Sequelize.STRING,
+        nombre: {
+            type: DataTypes.STRING,
             allowNull: false
         },
         descripcion: {
-            type: Sequelize.STRING,
+            type: DataTypes.STRING,
             allowNull: true
         },
     });

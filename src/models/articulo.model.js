@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 
-export default (sequelize, Sequelize) => {
-    const Rol = sequelize.define("roles", {
+export default (sequelize, Sequelize) => { 
+    const Articulo = sequelize.define("articulos", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -15,7 +15,14 @@ export default (sequelize, Sequelize) => {
             type: DataTypes.STRING,
             allowNull: true
         },
+        precioEstandar: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: false
+        },
+        tipo: {
+            type: DataTypes.ENUM('boleto' , 'producto', 'servicio'),
+        }
     });
 
-    return Rol;
-};
+    return Articulo;
+ }

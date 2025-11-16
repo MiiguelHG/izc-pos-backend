@@ -1,32 +1,62 @@
+import { DataTypes } from "sequelize";
+
 export default (sequelize, Sequelize) => {
-    const ReservaEvento = sequelize.define("reservas_evento", {
+    const ReservaEvento = sequelize.define("reserva_eventos", {
         id: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        cantidad: {
-            type: Sequelize.INTEGER,
+        responsable: {
+            type: DataTypes.STRING,
             allowNull: false
         },
-        fecha_reserva: {
-            type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW,
+        contactoResponsable: {
+            type: DataTypes.STRING,
             allowNull: false
         },
-        cantidad_asistentes: {
-            type: Sequelize.INTEGER,
+        fechaReserva: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW
+        },
+        fechaInicio: {
+            type: DataTypes.DATE,
+            allowNull: false
+        },
+        fechaFin: {
+            type: DataTypes.DATE,
             allowNull: false
         },
         total: {
-            type: Sequelize.DECIMAL(10, 2),
+            type: DataTypes.DECIMAL(10, 2),
             allowNull: false
         },
         estado: {
-            type: Sequelize.ENUM("reservado", "cancelado", "asistido", "pagado"),
+            type: DataTypes.ENUM("reservado", "cancelado", "asistido"),
             allowNull: false,
             defaultValue: "reservado"
         },
+        usuarioId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        museoId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        articuloId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        visitanteId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        formaPagoId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        }
     });
 
     return ReservaEvento;

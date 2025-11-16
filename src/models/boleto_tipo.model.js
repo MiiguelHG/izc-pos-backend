@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 
 export default (sequelize, Sequelize) => {
-    const Usuario = sequelize.define("usuarios", {
+    const BoletoTipo = sequelize.define("boleto_tipos", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -11,25 +11,23 @@ export default (sequelize, Sequelize) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        email: {
+        descipcion: {
             type: DataTypes.STRING,
-            allowNull: false,
-            unique: true
+            allowNull: true
         },
-        password: {
-            type: DataTypes.TEXT,
+        descuento: {
+            type: DataTypes.DECIMAL(5, 2),
             allowNull: false
         },
-        activo: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: true
+        precio_final: {
+            type: DataTypes.DECIMAL(5, 2),
+            allowNull: false
         },
-        rolId: {
+        articuloId: {
             type: DataTypes.INTEGER,
             allowNull: false
         }
-        
     });
 
-    return Usuario;
-};
+    return BoletoTipo;
+}
