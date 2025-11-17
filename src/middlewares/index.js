@@ -1,4 +1,4 @@
-import * as authJwt from "./authJwt.js";
-import * as verifySignUp from "./verifySignUp.js";
+import { authJwt } from "./authJwt";
+import { verifySignUp } from "./verifySignUp";
 
-export default { authJwt, verifySignUp };
+export { authJwt, verifySignUp };

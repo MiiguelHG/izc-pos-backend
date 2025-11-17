@@ -2,11 +2,11 @@ import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
 
 
-const Visitante = db.visitante;
+const { visitante } = db;
 
 class VisitanteRepository extends BaseRepository {
     constructor() {
-        super(Visitante);
+        super(visitante);
     }
 
     async findByName(nombre){
@@ -14,11 +14,11 @@ class VisitanteRepository extends BaseRepository {
     }
 
     async findById(id){
-        return await this.model.findByPk(id);
+        return await this.findById(id);
     }
 
     async findAllVisitantes(){
-        return await this.model.findAll();
+        return await this.findAll();
     }
      
     async findByEmail(email){
@@ -46,7 +46,7 @@ class VisitanteRepository extends BaseRepository {
     }
 
     async createVisitor(data){
-        return await this.model.create(data);
+        return await this.create(data);
     }
 
     async updateVisitor(id, data){
@@ -62,5 +62,4 @@ class VisitanteRepository extends BaseRepository {
     }
 
 }
-const visitanteRepository = new VisitanteRepository();
-export default visitanteRepository;
+export const visitanteRepository = new VisitanteRepository();

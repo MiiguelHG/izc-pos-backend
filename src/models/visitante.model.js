@@ -1,59 +1,61 @@
+import { DataTypes } from "sequelize";
+
 export default (sequelize, Sequelize) => {
     const Visitante = sequelize.define("visitantes", {
         id: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
         nombre: {
-            type: Sequelize.STRING,
-            allowNull: false
+            type: DataTypes.STRING,
+            allowNull: false,
         },
-        apellido: {
-            type: Sequelize.STRING,
-            allowNull: false
-        },
-        email: {
-            type: Sequelize.STRING,
-            allowNull: true,
-            unique: true
-        },
-        telefono: {
-            type: Sequelize.STRING,
-            allowNull: true
+        edad: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
         },
         cp: {
-            type: Sequelize.INTEGER,
-            allowNull: true
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        estado: {
+            type: DataTypes.STRING,
+            allowNull: false
         },
         pais: {
-            type: Sequelize.STRING,
-            allowNull: true
+            type: DataTypes.STRING,
+            allowNull: false
         },
-        genero: {
-            type: Sequelize.STRING,
-            allowNull: true
+        cantidadHombres: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        fecha_registro: {
-            type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW
+        cantidadMujeres: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        grupo: {
-            type: Sequelize.BOOLEAN,
-            defaultValue: false
+        cantidadOtros: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        cantidad_hombres: {
-            type: Sequelize.INTEGER,
-            allowNull: true
-        }, 
-        cantidad_mujeres: {
-            type: Sequelize.INTEGER,
-            allowNull: true
+        totalVisitantes: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         },
-        total_visitantes: {
-            type: Sequelize.INTEGER,
-            allowNull: true
+        fechaRegistro: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW
         },
+        museoId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        usuarioId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        }
     });
 
     return Visitante;

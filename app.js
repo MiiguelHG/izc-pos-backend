@@ -7,7 +7,7 @@ import authRoutes from './src/routes/authRoutes.js';
 import refreshTokenRoutes from './src/routes/refreshTokenRoutes.js';
 import rolRoutes from './src/routes/rolesRoutes.js';
 import usuarioRoutes from './src/routes/usuarioRoutes.js';
-import { initRoles } from './src/utils/initRoles.js';
+import { runSeeders } from './src/seeders/index.js';
 
 dotenv.config();
 
@@ -34,14 +34,14 @@ app.get('/', (req, res) => {
 // --  Rutas de autenticación --
 app.use('/api/auth', authRoutes);
 
-// --  Rutas de tokens --
-app.use('/api/tokens', refreshTokenRoutes);
+// // --  Rutas de tokens --
+// app.use('/api/tokens', refreshTokenRoutes);
 
-// --  Rutas de roles --
-app.use('/api/roles', rolRoutes);
+// // --  Rutas de roles --
+// app.use('/api/roles', rolRoutes);
 
-// --  Rutas de usuarios --
-app.use('/api/usuarios', usuarioRoutes);
+// // --  Rutas de usuarios --
+// app.use('/api/usuarios', usuarioRoutes);
 
 // Sincronizar la base de datos e iniciar el servidor
 // Configurar opciones de sincronización según el entorno
@@ -56,7 +56,7 @@ db.sequelize.sync(syncOptions).then(async () => {
     console.log('Database synchronized successfully');
 
     // Inicializar roles por defecto
-    await initRoles(db);
+    await runSeeders();
 
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);

@@ -2,35 +2,21 @@
 import { Sequelize } from "sequelize";
 
 import sequelize from "../config/database.js";
-import boleto_emitido from "./boleto_emitido.model.js";
-import evento from "./evento.model.js";
-import forma_pago from "./forma_pago.model.js";
-import producto from "./producto.model.js";
-import refresh_token from "./refresh_tokens.model.js";
-import reserva_evento from "./reserva_evento.model.js";
-import rol from "./rol.model.js";
-import tipo_boleto from "./tipo_boleto.model.js";
-import tipo_evento from "./tipo_evento.model.js";
-import usuario from "./usuario.model.js";
-import venta_boleto from "./venta_boleto.model.js";
-import venta_producto from "./venta_producto.model.js";
-import venta_producto_detalle from "./venta_producto_detalle.model.js";
-import visitante from "./visitante.model.js";
-import dbConfig from "../config/database.js";
-// import dotenv from "dotenv";
-// dotenv.config();
-
-// Inicializar la conexion a la base de datos
-// const sequelize = new Sequelize(
-//     dbConfig.DB, 
-//     dbConfig.USER, 
-//     dbConfig.PASSWORD, 
-//     {
-//     host: dbConfig.HOST,
-//     dialect: dbConfig.DIALECT,
-//     port: dbConfig.PORT,
-//     }
-// );
+import articuloModel from "./articulo.model.js";
+import usuarioModel from "./usuario.model.js";
+import rolModel from "./rol.model.js";
+import refreshTokenModel from "./refresh_tokens.model.js";
+import boletoTipoModel from "./boleto_tipo.model.js";
+import boletoVentaModel from "./boleto_venta.model.js";
+import boletoEmitidoModel from "./boleto_emitido.model.js";
+import reservaEventoModel from "./reserva_evento.model.js";
+import productoDetalleModel from "./producto_detalle.model.js";
+import productoVentaModel from "./producto_venta.model.js";
+import museoModel from "./museo.model.js";
+import formaPagoModel from "./forma_pago.model.js";
+import visitanteModel from "./visitante.model.js";
+import museoHasUsuarioModel from "./museo_has_usuario.model.js";
+import museoHasArticuloModel from "./museo_has_articulo.model.js";
 
 // Definir el objeto de la base de datos
 const db = {};
@@ -38,82 +24,149 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.usuario = usuario(sequelize, Sequelize);
-db.rol = rol(sequelize, Sequelize);
-db.boleto_emitido = boleto_emitido(sequelize, Sequelize);
-db.evento = evento(sequelize, Sequelize);
-db.tipo_boleto = tipo_boleto(sequelize, Sequelize);
-db.tipo_evento = tipo_evento(sequelize, Sequelize);
-db.forma_pago = forma_pago(sequelize, Sequelize);
-db.producto = producto(sequelize, Sequelize);
-db.refresh_tokens = refresh_token(sequelize, Sequelize);
-db.reserva_evento = reserva_evento(sequelize, Sequelize);
-db.venta_boleto = venta_boleto(sequelize, Sequelize);
-db.venta_producto = venta_producto(sequelize, Sequelize);
-db.venta_producto_detalle = venta_producto_detalle(sequelize, Sequelize);
-db.visitante = visitante(sequelize, Sequelize);
+db.usuario = usuarioModel(sequelize, Sequelize);
+db.rol = rolModel(sequelize, Sequelize);
+db.articulo = articuloModel(sequelize, Sequelize);
+db.refreshToken = refreshTokenModel(sequelize, Sequelize);
+db.boletoTipo = boletoTipoModel(sequelize, Sequelize);
+db.boletoVenta = boletoVentaModel(sequelize, Sequelize);
+db.boletoEmitido = boletoEmitidoModel(sequelize, Sequelize);
+db.reservaEvento = reservaEventoModel(sequelize, Sequelize);
+db.productoDetalle = productoDetalleModel(sequelize, Sequelize);
+db.productoVenta = productoVentaModel(sequelize, Sequelize);
+db.museo = museoModel(sequelize, Sequelize);
+db.formaPago = formaPagoModel(sequelize, Sequelize);
+db.visitante = visitanteModel(sequelize, Sequelize);
+db.museoHasUsuario = museoHasUsuarioModel(sequelize, Sequelize);
+db.museoHasArticulo = museoHasArticuloModel(sequelize, Sequelize);
 
 // Relaciones entre tablas
 
 //Relacion usuario - rol (N:1) (Revisado)
-db.usuario.belongsTo(db.rol, {foreignKey: "id_rol", as: "rol"});
-db.rol.hasMany(db.usuario, {foreignKey: "id_rol", as: "usuarios"});
+db.usuario.belongsTo(db.rol, {foreignKey: "rolId", as: "rol"});
+db.rol.hasMany(db.usuario, {foreignKey: "rolId", as: "usuarios"});
 
 //Relacion usuario - refreshtoken (1:N) (Revisado)
-db.usuario.hasMany(db.refresh_tokens, {foreignKey:"id_usuario"});
-db.refresh_tokens.belongsTo(db.usuario, {foreignKey:"id_usuario"});
+db.usuario.hasMany(db.refreshToken, {foreignKey:"usuarioId"});
+db.refreshToken.belongsTo(db.usuario, {foreignKey:"usuarioId"});
 
-//Relacion usuario - ventaboleto (1:N) (Revisado)
-db.usuario.hasMany(db.venta_boleto, {foreignKey: "id_usuario"});
-db.venta_boleto.belongsTo(db.usuario, {foreignKey: "id_usuario"});
+// Relaciones de articulos----------------------------------------
+// Relacion articulo - boleto_tipo (1:N) (Revisado)
+db.articulo.hasMany(db.boletoTipo, {foreignKey: "articuloId"});
+db.boletoTipo.belongsTo(db.articulo, {foreignKey: "articuloId"});
 
-//Relacion usuario - ventaproducto (1:N) Revisado
-db.usuario.hasMany(db.venta_producto, {foreignKey: "id_usuario"});
-db.venta_producto.belongsTo(db.usuario, {foreignKey: "id_usuario"});
+// Relacion articulo - reserva_evento (1:N) (Revisado)
+db.articulo.hasMany(db.reservaEvento, {foreignKey: "articuloId"});
+db.reservaEvento.belongsTo(db.articulo, {foreignKey: "articuloId"});
 
-//Relacion visitante - ventaboleto (1:N) Revisado
-db.visitante.hasMany(db.venta_boleto, {foreignKey: "id_visitante"});
-db.venta_boleto.belongsTo(db.visitante, {foreignKey: "id_visitante"});
+// Relacion articulo - producto_detalle (1:N) (Revisado)
+db.articulo.hasMany(db.productoDetalle, {foreignKey: "articuloId"});
+db.productoDetalle.belongsTo(db.articulo, {foreignKey: "articuloId"});
+//------------------------------------------------------------------
 
-//Relacion visitante - reservaevento (1:N) Revisado
-db.visitante.hasMany(db.reserva_evento, {foreignKey: "id_visitante"});
-db.reserva_evento.belongsTo(db.visitante, {foreignKey: "id_visitante"});
+// Relaciones de boletos--------------------------------------------
+// Reclacion boleto_tipo - boleto_venta (1:N) (Revisado)
+db.boletoTipo.hasMany(db.boletoVenta, {foreignKey: "boletoTipoId"});
+db.boletoVenta.belongsTo(db.boletoTipo, {foreignKey: "boletoTipoId"});
 
-//Relacion visitante - venta producto (1:N) Revisado
-db.visitante.hasMany(db.venta_producto, {foreignKey: "id_visitante"});
-db.venta_producto.belongsTo(db.visitante, {foreignKey: "id_visitante"});
+// Relacion boleto_venta - boleto_emitido (1:N) (Revisado)
+db.boletoVenta.hasMany(db.boletoEmitido, {foreignKey: "boletoVentaId"});
+db.boletoEmitido.belongsTo(db.boletoVenta, {foreignKey: "boletoVentaId"});
 
-//Relacion venta boleto - boleto emitido (1:N) (Revisado)
-db.venta_boleto.hasMany(db.boleto_emitido, { foreignKey: "id_ventaBoleto", onDelete: "CASCADE" });
-db.boleto_emitido.belongsTo(db.venta_boleto, { foreignKey: "id_ventaBoleto" });
+// Relacion boleto_emitido - museo (N:1) (Revisado)
+db.boletoEmitido.belongsTo(db.museo, {foreignKey: "museoId"});
+db.museo.hasMany(db.boletoEmitido, {foreignKey: "museoId"});
 
-//Relacion boleto emitido - tipo de boleto (N:1) (Revisado)
-db.tipo_boleto.hasMany(db.boleto_emitido, { foreignKey: "id_tipoBoleto" });
-db.boleto_emitido.belongsTo(db.tipo_boleto, { foreignKey: "id_tipoBoleto" });
+// Relacion boleto_emitido - usuario (N:1) (Revisado)
+db.boletoEmitido.belongsTo(db.usuario, {foreignKey: "usuarioId"});
+db.usuario.hasMany(db.boletoEmitido, {foreignKey: "usuarioId"});
 
-//Relacion venta boleto - forma pago (N:1) Revisado
-db.forma_pago.hasMany(db.venta_boleto, { foreignKey: "id_formaPago" });
-db.venta_boleto.belongsTo(db.forma_pago, { foreignKey: "id_formaPago" });
+// Relacion boleto_emitido - forma_pago (N:1) (Revisado)
+db.boletoEmitido.belongsTo(db.formaPago, {foreignKey: "formaPagoId"});
+db.formaPago.hasMany(db.boletoEmitido, {foreignKey: "formaPagoId"});
 
-//Relacion venta producto - forma de pago (N:1) Revisado
-db.forma_pago.hasMany(db.venta_producto, { foreignKey: "id_formaPago" });
-db.venta_producto.belongsTo(db.forma_pago, { foreignKey: "id_formaPago" });
+// Relacion boleto_emitido - visitante (N:1) (Revisado)
+db.boletoEmitido.belongsTo(db.visitante, {foreignKey: "visitanteId"});
+db.visitante.hasMany(db.boletoEmitido, {foreignKey: "visitanteId"});
+//------------------------------------------------------------------
 
-//Relacion venta producto - venta producto detalle (1:N) Revisado
-db.venta_producto.hasMany(db.venta_producto_detalle, {foreignKey: "id_ventaProducto"});
-db.venta_producto_detalle.belongsTo(db.venta_producto, {foreignKey: "id_ventaProducto"});
+// Relaciones de reserva evento--------------------------------------
+// Relacion reserva_evento - museo (N:1) (Revisado)
+db.reservaEvento.belongsTo(db.museo, {foreignKey: "museoId"});
+db.museo.hasMany(db.reservaEvento, {foreignKey: "museoId"});
 
-//Relacion venta producto detalle - producto (1:N) Revisado
-db.venta_producto_detalle.hasMany(db.producto, {foreignKey: "id_producto"});
-db.producto.belongsTo(db.venta_producto_detalle, {foreignKey: "id_producto"});
+// Relacion reserva_evento - usuario (N:1) (Revisado)
+db.reservaEvento.belongsTo(db.usuario, {foreignKey: "usuarioId"});
+db.usuario.hasMany(db.reservaEvento, {foreignKey: "usuarioId"});
 
-//Relacion evento - tipo evento (N:1) Revisado
-db.evento.belongsTo(db.tipo_evento, {foreignKey: "id_tipoevento"});
-db.tipo_evento.hasMany(db.evento, {foreignKey: "id_tipoevento"});
+// Relacion reserva_evento - forma_pago (N:1) (Revisado)
+db.reservaEvento.belongsTo(db.formaPago, {foreignKey: "formaPagoId"});
+db.formaPago.hasMany(db.reservaEvento, {foreignKey: "formaPagoId"});
 
-//Relacion evento - reserva evento (1:N) Revisado
-db.reserva_evento.belongsTo(db.evento, {foreignKey: "id_evento"});
-db.evento.hasMany(db.reserva_evento, {foreignKey: "id_evento"});
+// Relacion reserva_evento - visitante (N:1) (Revisado)
+db.reservaEvento.belongsTo(db.visitante, {foreignKey: "visitanteId"});
+db.visitante.hasMany(db.reservaEvento, {foreignKey: "visitanteId"});
+//------------------------------------------------------------------
+
+// Relaciones de productos-------------------------------------------
+// Relacion producto_detalle - producto_venta (1:N) (Revisado)
+db.productoDetalle.hasMany(db.productoVenta, {foreignKey: "productoDetalleId"});
+db.productoVenta.belongsTo(db.productoDetalle, {foreignKey: "productoDetalleId"});
+
+// Relacion producto_venta - museo (N:1) (Revisado)
+db.productoVenta.belongsTo(db.museo, {foreignKey: "museoId"});
+db.museo.hasMany(db.productoVenta, {foreignKey: "museoId"});
+
+// Relacion producto_venta - usuario (N:1) (Revisado)
+db.productoVenta.belongsTo(db.usuario, {foreignKey: "usuarioId"});
+db.usuario.hasMany(db.productoVenta, {foreignKey: "usuarioId"});
+
+// Relacion producto_venta - forma_pago (N:1) (Revisado)
+db.productoVenta.belongsTo(db.formaPago, {foreignKey: "formaPagoId"});
+db.formaPago.hasMany(db.productoVenta, {foreignKey: "formaPagoId"});
+//------------------------------------------------------------------
+
+// Relaciones visitante ----------------------------------------------
+// Relacion visitante - museo (N:1) (Revisado)
+db.visitante.belongsTo(db.museo, {foreignKey: "museoId"});
+db.museo.hasMany(db.visitante, {foreignKey: "museoId"});
+
+// Relacion visitante - usuario (N:1) (Revisado)
+db.visitante.belongsTo(db.usuario, {foreignKey: "usuarioId"});
+db.usuario.hasMany(db.visitante, {foreignKey: "usuarioId"});
+//------------------------------------------------------------------
+
+// Relaciones museos --------------------------------------------------
+// Relacion museo - usuario (N:M) (Revisado)
+db.museo.belongsToMany(db.usuario, {
+    through: db.museoHasUsuario,
+    foreignKey: "museoId",
+    otherKey: "usuarioId",
+    as: "usuarios"
+});
+
+db.usuario.belongsToMany(db.museo, {
+    through: db.museoHasUsuario,
+    foreignKey: "usuarioId",
+    otherKey: "museoId",
+    as: "museos"
+});
+
+// Relacion museo - articulo (N:M) (Revisado)
+db.museo.belongsToMany(db.articulo, {
+    through: db.museoHasArticulo,
+    foreignKey: "museoId",
+    otherKey: "articuloId",
+    as: "articulos"
+});
+
+db.articulo.belongsToMany(db.museo, {
+    through: db.museoHasArticulo,
+    foreignKey: "articuloId",
+    otherKey: "museoId",
+    as: "museos"
+});
+//------------------------------------------------------------------
 
 db.ROLES = ["user", "admin", "moderator"];
 

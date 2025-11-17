@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 
-export default (sequelize, Sequelize) => {
-    const Rol = sequelize.define("roles", {
+export default (sequelize, Sequelize) => { 
+    const Museo = sequelize.define("museos", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -11,7 +11,11 @@ export default (sequelize, Sequelize) => {
             type: DataTypes.STRING,
             allowNull: false
         },
+        ubicacion: {
+            type: DataTypes.STRING,
+            allowNull: true
+        }
     });
 
-    return Rol;
-};
+    return Museo;
+ }

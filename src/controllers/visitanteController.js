@@ -1,6 +1,5 @@
-
 import visitanteRepository from "../repositories/visitanteRepository.js";
-import { sendSuccess } from "../utils/responseFormater.js";
+import { sendSuccess, sendError } from "../utils/responseFormater.js";
 //import VisitanteRepository from "../repositories/visitanteRepository.js";
 
 
@@ -10,6 +9,11 @@ export class VisitanteController {
     static async getAllVisitantes(req, res) {
         try {
             const visitantes = await visitanteRepository.findAllVisitantes();
+
+            if (!visitantes || visitantes.length === 0) {
+                return sendSuccess(res, 200, "No se encontraron visitantes.");
+            }
+
             return sendSuccess(res, 200, "Visitantes obtenidos correctamente.", visitantes);
         } catch(error) {
             return sendError(res, 500, "Error al obtener visitantes.");
@@ -68,17 +72,16 @@ export class VisitanteController {
     static async createVisitor(req, res) {
         try {
             const { 
-                nombre, 
-                apellido, 
-                email, 
-                telefono, 
-                cp, 
-                pais, 
-                genero,
-                grupo,
-                cantidad_hombres,
-                cantidad_mujeres,
-                total_visitantes
+                nombre,
+                edad,
+                cp,
+                estado,
+                pais,
+                cantidadHombres,
+                cantidadMujeres,
+                cantidadOtros,
+                totalVisitantes,
+                fechaRegistro,
             } = req.body;
 
             // Validar campos obligatorios
@@ -126,16 +129,15 @@ export class VisitanteController {
 
             const newVisitor = await visitanteRepository.createVisitor({ 
                 nombre, 
-                apellido, 
-                email, 
-                telefono, 
-                cp, 
-                pais, 
-                genero,
-                grupo: grupo || false,
-                cantidad_hombres,
-                cantidad_mujeres,
-                total_visitantes
+                edad,
+                cp,
+                estado,
+                pais,
+                cantidadHombres,
+                cantidadMujeres,
+                cantidadOtros,
+                totalVisitantes,
+                fechaRegistro
             });
             return sendSuccess(res, 201, "Visitante creado correctamente.", newVisitor);
         } catch(error) {

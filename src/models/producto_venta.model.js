@@ -1,40 +1,26 @@
 import { DataTypes } from "sequelize";
 
 export default (sequelize, Sequelize) => {
-    const BoletoEmitido = sequelize.define("boletos_emitidos", {
+    const ProductoVenta = sequelize.define("producto_ventas", {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        codigoQr: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true
-        },
         total: {
-            type: DataTypes.DECIMAL(7, 2),
+            type: DataTypes.DECIMAL(10, 2),
             allowNull: false
         },
-        fechaEmision: {
+        fechaVenta: {
             type: DataTypes.DATE,
-            allowNull: false,
+            allowNull: false, 
             defaultValue: DataTypes.NOW
-        },
-        estado: {
-            type: DataTypes.ENUM('activo', 'usado', 'cancelado'),
-            allowNull: false,
-            defaultValue: 'activo'
-        },
-        usuarioId: {
-            type: DataTypes.INTEGER,
-            allowNull: false
         },
         museoId: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        visitanteId: {
+        usuarioId: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
@@ -44,5 +30,5 @@ export default (sequelize, Sequelize) => {
         }
     });
 
-    return BoletoEmitido;
-};
+    return ProductoVenta;
+}

@@ -1,32 +1,34 @@
+import { DataTypes } from "sequelize";
+
 export default (sequelize, Sequelize) => {
     const RefreshToken = sequelize.define("refresh_tokens", {
         id: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
-        token_hash: {
-            type: Sequelize.STRING,
+        token: {
+            type: DataTypes.STRING,
             allowNull: false,
             unique: true
         },
-        created_at: {
-            type: Sequelize.DATE,
-            defaultValue: Sequelize.NOW
+        createdAt: {
+            type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW
 
         },
-        expires_at: {
-            type: Sequelize.DATE,
+        expiresAt: {
+            type: DataTypes.DATE,
             allowNull: false
         },
-        revoked_at: {
-            type: Sequelize.DATE,
+        revokedAt: {
+            type: DataTypes.DATE,
             allowNull: true
         },
-        replaced_by_token: {
-            type: Sequelize.INTEGER,
-            allowNull: true
-        },
+        usuarioId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        }
 
     });
 
