@@ -1,11 +1,11 @@
 import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
 
-const Rol = db.rol;
+const { rol } = db;
 
 class RolRepository extends BaseRepository {
     constructor() {
-        super(Rol);
+        super(rol);
     }
 
     async findByName(name){
@@ -21,7 +21,13 @@ class RolRepository extends BaseRepository {
     }
 
     async createRole(data){
-        return await this.model.create(data);
+        return await this.create(data);
+    }
+
+    async findOrCreateRole(nombre) {
+        return await this.model.findOrCreate({
+            where: { nombre },
+        })
     }
 
     async updateRole(id, name, description){
@@ -35,5 +41,4 @@ class RolRepository extends BaseRepository {
     }
 }
 
-const rolRepository = new RolRepository();
-export default rolRepository;
+export const rolRepository = new RolRepository();

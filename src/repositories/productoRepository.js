@@ -1,3 +1,7 @@
+
+// ESTE REPOSITORIO YA NO VA A FUNCIONAR
+
+
 import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
 

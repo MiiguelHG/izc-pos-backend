@@ -1,4 +1,5 @@
 import { DataTypes } from "sequelize";
+import bcrypt from "bcryptjs";
 
 export default (sequelize, Sequelize) => {
     const Usuario = sequelize.define("usuarios", {
@@ -30,6 +31,24 @@ export default (sequelize, Sequelize) => {
         }
         
     });
+
+    // Hooks para hashear la contraseña antes de crear o actualizar un usuario
+    Usuario.beforeCreate(async (user) => {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+    });
+
+    Usuario.beforeUpdate(async (user) => {
+        if (user.changed('password')) {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(user.password, salt);
+        }
+    });
+
+    // Metodo para validar la contraseña
+    Usuario.prototype.validatePassword = async function(password) {
+        return await bcrypt.compare(password, this.password);
+    };
 
     return Usuario;
 };

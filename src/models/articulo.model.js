@@ -21,6 +21,7 @@ export default (sequelize, Sequelize) => {
         },
         tipo: {
             type: DataTypes.ENUM('boleto' , 'producto', 'servicio'),
+            allowNull: false
         }
     });
 

@@ -25,6 +25,3 @@ export default class BaseRepository {
         return instance > 0;
     }
 }
-
-// const baseRepository = new BaseRepository();
-// export default baseRepository;

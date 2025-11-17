@@ -1,12 +1,10 @@
-// import UsuarioRepository from "../repositories/usuarioRepository.js";
-// const usuarioRepo = new UsuarioRepository();
-import usuarioRepo from "../repositories/usuarioRepository.js";
+import { usuarioRepository } from "../repositories/index.js";
 
 export class UsuarioController {
     // Obtener todos los usuarios (solo admin)
     static async getAll(req, res) {
         try {
-            const users = await usuarioRepo.findAll({
+            const users = await usuarioRepository.findAll({
                 include: ["rol"],
                 attributes: { exclude: ["password"] }
             });
@@ -25,7 +23,7 @@ export class UsuarioController {
             // if (req.user.rol.name !== "admin" && req.user.id !== parseInt(id))
             //     return res.status(403).json({ message: "Access denied." });
 
-            const user = await usuarioRepo.findById(id, {
+            const user = await usuarioRepository.findById(id, {
                 include: ["rol"],
                 attributes: { exclude: ["password"] }
             });
@@ -42,7 +40,7 @@ export class UsuarioController {
     // Perfil del usuario autenticado
     static async getProfile(req, res) {
         try {
-            const user = await usuarioRepo.findById(req.user.id, {
+            const user = await usuarioRepository.findById(req.user.id, {
                 include: ["rol"],
                 attributes: { exclude: ["password"] }
             });
@@ -70,7 +68,7 @@ export class UsuarioController {
             if (req.user.rol.name === "admin" && activo !== undefined)
                 data.activo = activo;
 
-            const updated = await usuarioRepo.update(id, data);
+            const updated = await usuarioRepository.update(id, data);
             res.json({ message: "User updated successfully!", updated });
         } catch (error) {
             res.status(500).json({ message: error.message });
@@ -85,7 +83,7 @@ export class UsuarioController {
             // if (req.user.rol.name !== "admin")
             //     return res.status(403).json({ message: "Access denied." });
 
-            await usuarioRepo.delete(id);
+            await usuarioRepository.delete(id);
             res.json({ message: "User deleted successfully!" });
         } catch (error) {
             res.status(500).json({ message: error.message });

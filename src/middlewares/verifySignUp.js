@@ -1,48 +1,46 @@
-import db from "../models/index.js";
-import { sendSuccess, sendError } from "../utils/responseFormater.js";
+import { usuarioRepository } from "../repositories/index.js";
+import { sendError } from "../utils/responseFormater.js";
 
 const {usuario: Usuario, rol: Rol} = db;
 
 // Verificar si el nombre o email ya existen //
-export default class verifySignUp{
+export class verifySignUp{
     static async checkDuplicateUsernameOrEmail(req, res, next){
+        const { nombre, email } = req.body;
+
         try{
-            const userByUsername = await Usuario.findOne({
-                where: { nombre: req.body.nombre },
-            });
+            const userByUsername = await usuarioRepository.findByAttribute("nombre", nombre);
+
             if(userByUsername){
-                sendError(res, 400, "Failed! Username is already in use!");
+                return sendError(res, 400, "Failed! Username is already in use!");
             }
-            const userByEmail = await Usuario.findOne({
-                where: { email: req.body.email },
-            });
+            const userByEmail = await usuarioRepository.findByAttribute("email", email);
+            
             if(userByEmail){
-                sendError(res, 400, "Failed! Email is already in use!");
+                return sendError(res, 400, "Failed! Email is already in use!");
             }
             next();
         }catch(error){
-            console.error("Error checking duplicate username or email:", error);
-            sendError(res, 500, error.message);
+            return sendError(res, 500, `Error checking for duplicate username or email: ${error.message}`);
         }
     };
 
     static async checkRolesExists(req, res, next){
         try{
-            const { id_rol } = req.body;
+            const { rolId } = req.body;
 
-            if(!id_rol){
-                return next();
-            }
+            // if(!rolId){
+            //     return next();
+            // }
 
-            const existingRole = await Rol.findByPk(id_rol);
+            const existingRole = await Rol.findByPk(rolId);
             if(!existingRole){
-                sendError(res, 400, `El rol con ID ${id_rol} no existe`);
-                // return res.status(400).json({ message: `El rol con ID ${id_rol} no existe` });
+                return sendError(res, 400, `El rol con ID ${rolId} no existe`);
             }
+
             next();
         }catch(error){
-            console.error("Error en checkRoleExists", error);
-            sendError(res, 500, "Error verificando el rol");
+             return sendError(res, 500, `Error verificando el rol: ${error.message}`);
         }
     };
 }

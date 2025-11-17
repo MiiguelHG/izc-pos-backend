@@ -1,28 +1,54 @@
 import db from "../models/index.js";
-const RefreshToken = db.refresh_tokens;
+import BaseRepository from "./baseRepository.js";
 
-class RefreshTokenRepository {
+const { refreshToken } = db;
+
+class RefreshTokenRepository extends BaseRepository{
+    constructor(){
+        super(refreshToken);
+    }
+
     // Crear un nuevo refresh token //
-    async create(tokenHash, userId, expires_at){
-        return await RefreshToken.create({ 
-            token_hash: tokenHash, 
-            id_usuario: userId, 
-            expires_at: expires_at, 
+    async create(tokenHash, userId, expiresAt){
+        return await refreshToken.create({ 
+            token: tokenHash, 
+            usuarioId: userId, 
+            expiresAt: expiresAt, 
         });
     }
 
     // Buscar un token por su valor //
-    async findByToken(tokenHash){
-        return await RefreshToken.findOne({ 
-            where: { token_hash: tokenHash }, 
+    async findByToken(token){
+        return await refreshToken.findOne({ 
+            where: { token: token }, 
         });
     }
 
-    // Eliminar un token específico //
-    async delete(tokenHash){
-        return await RefreshToken.destroy({ 
-            where: { token_hash: tokenHash }, 
+    // Obtener todos los tokens de un usuario //
+    async findActiveByUserId(usuarioId){
+        const now = new Date();
+        return await refreshToken.findAll({
+            where: { 
+                usuarioId: usuarioId,
+                revokedAt: null,
+                expiresAt: {
+                    [db.Sequelize.Op.gt]: now
+                }
+            },
         });
+    }
+
+    // Actualizar un token
+    async updateRefreshToken(oldTokenHash, newTokenHash, newExpiresAt){
+        return await this.update(
+            { token: oldTokenHash },
+            { token: newTokenHash, expires_at: newExpiresAt }
+        );
+    }
+
+    // Eliminar un token específico //
+    async delete(token){
+        return await this.delete({token: token});
     }
 
     // Revocar un token //
@@ -35,19 +61,6 @@ class RefreshTokenRepository {
         return token;
     }
 
-    // Obtener todos los tokens de un usuario //
-    async findActiveByUserId(id_usuario){
-        const now = new Date();
-        return await RefreshToken.findAll({
-            where: { 
-                id_usuario: id_usuario,
-                revoked_at: null,
-                expires_at: {
-                    [db.Sequelize.Op.gt]: now
-                }
-            },
-        });
-    }
 
     // Limpiar los tokens expirados //
     async deleteExpiredTokens(){
@@ -62,5 +75,4 @@ class RefreshTokenRepository {
     }
 }
 
-const refreshTokenRepo = new RefreshTokenRepository();
-export default refreshTokenRepo;
+export const refreshTokenRepository = new RefreshTokenRepository();
