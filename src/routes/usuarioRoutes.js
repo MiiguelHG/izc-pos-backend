@@ -1,6 +1,6 @@
 import express from "express";
 import { UsuarioController } from "../controllers/usuarioController.js";
-import authJwt from "../middlewares/authJwt.js";
+import { authJwt } from "../middlewares/index.js";
 
 const router = express.Router();
 

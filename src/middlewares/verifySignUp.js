@@ -1,8 +1,6 @@
 import { usuarioRepository } from "../repositories/index.js";
 import { sendError } from "../utils/responseFormater.js";
 
-const {usuario: Usuario, rol: Rol} = db;
-
 // Verificar si el nombre o email ya existen //
 export class verifySignUp{
     static async checkDuplicateUsernameOrEmail(req, res, next){
