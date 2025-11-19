@@ -91,9 +91,9 @@ db.usuario.hasMany(db.boletoEmitido, {foreignKey: "usuarioId"});
 db.boletoEmitido.belongsTo(db.formaPago, {foreignKey: "formaPagoId"});
 db.formaPago.hasMany(db.boletoEmitido, {foreignKey: "formaPagoId"});
 
-// Relacion boleto_emitido - visitante (N:1) (Revisado)
+// Relacion boleto_emitido - visitante (1:1) (Revisado)
 db.boletoEmitido.belongsTo(db.visitante, {foreignKey: "visitanteId"});
-db.visitante.hasMany(db.boletoEmitido, {foreignKey: "visitanteId"});
+db.visitante.hasOne(db.boletoEmitido, {foreignKey: "visitanteId"});
 //------------------------------------------------------------------
 
 // Relaciones de reserva evento--------------------------------------
@@ -109,9 +109,9 @@ db.usuario.hasMany(db.reservaEvento, {foreignKey: "usuarioId"});
 db.reservaEvento.belongsTo(db.formaPago, {foreignKey: "formaPagoId"});
 db.formaPago.hasMany(db.reservaEvento, {foreignKey: "formaPagoId"});
 
-// Relacion reserva_evento - visitante (N:1) (Revisado)
+// Relacion reserva_evento - visitante (1:1) (Revisado)
 db.reservaEvento.belongsTo(db.visitante, {foreignKey: "visitanteId"});
-db.visitante.hasMany(db.reservaEvento, {foreignKey: "visitanteId"});
+db.visitante.hasOne(db.reservaEvento, {foreignKey: "visitanteId"});
 //------------------------------------------------------------------
 
 // Relaciones de productos-------------------------------------------

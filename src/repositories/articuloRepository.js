@@ -1,4 +1,4 @@
-import BaseRepository from "./baseRepository";
+import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
 
 const { articulo } = db;
