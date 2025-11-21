@@ -27,10 +27,6 @@ class UsuarioRepository extends BaseRepository {
             ]
         });
     }
-
-    async createUser({nombre, email, password, rolId}){
-        return await this.create({ nombre, email, password, rolId });
-    }
 }
 
 export const usuarioRepository = new UsuarioRepository();
