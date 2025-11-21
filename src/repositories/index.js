@@ -4,6 +4,7 @@ import { rolRepository } from "./rolRepository.js";
 import { refreshTokenRepository } from "./refreshTokenRepository.js";
 import { museoRepository } from "./museoRepository.js";
 import { museoUsuarioRepository } from "./museoUsuarioRepository.js";
+import { boletoTipoRepository } from "./boletoTipoRepository.js";
 
 export {
     usuarioRepository,
@@ -11,5 +12,6 @@ export {
     refreshTokenRepository,
     museoRepository,
     articuloRepository,
-    museoUsuarioRepository
+    museoUsuarioRepository,
+    boletoTipoRepository
 }
