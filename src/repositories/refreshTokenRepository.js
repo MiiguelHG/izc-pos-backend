@@ -8,15 +8,6 @@ class RefreshTokenRepository extends BaseRepository{
         super(refreshToken);
     }
 
-    // Crear un nuevo refresh token //
-    async create(tokenHash, userId, expiresAt){
-        return await refreshToken.create({ 
-            token: tokenHash, 
-            usuarioId: userId, 
-            expiresAt: expiresAt, 
-        });
-    }
-
     // Buscar un token por su valor //
     async findByToken(token){
         return await refreshToken.findOne({ 
@@ -36,19 +27,6 @@ class RefreshTokenRepository extends BaseRepository{
                 }
             },
         });
-    }
-
-    // Actualizar un token
-    async updateRefreshToken(oldTokenHash, newTokenHash, newExpiresAt){
-        return await this.update(
-            { token: oldTokenHash },
-            { token: newTokenHash, expires_at: newExpiresAt }
-        );
-    }
-
-    // Eliminar un token específico //
-    async delete(token){
-        return await this.delete({token: token});
     }
 
     // Revocar un token //

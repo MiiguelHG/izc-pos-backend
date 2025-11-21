@@ -1,4 +1,4 @@
-import { usuarioRepository } from "../repositories/index.js";
+import { usuarioRepository, rolRepository } from "../repositories/index.js";
 import { sendError } from "../utils/responseFormater.js";
 
 // Verificar si el nombre o email ya existen //
@@ -27,11 +27,8 @@ export class verifySignUp{
         try{
             const { rolId } = req.body;
 
-            // if(!rolId){
-            //     return next();
-            // }
+            const existingRole = await rolRepository.findById(rolId);
 
-            const existingRole = await Rol.findByPk(rolId);
             if(!existingRole){
                 return sendError(res, 400, `El rol con ID ${rolId} no existe`);
             }
