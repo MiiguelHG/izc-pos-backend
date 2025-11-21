@@ -8,8 +8,8 @@ class MuseoRepository extends BaseRepository {
         super(museo);
     }
 
-    async createMuseo({nombre, ubicacion, descripcion}){
-        return await this.create({ nombre, ubicacion, descripcion });
+    async createMuseo({nombre, ubicacion}){
+        return await this.create({ nombre, ubicacion});
     }
 }
 

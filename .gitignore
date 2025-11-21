@@ -1,3 +1,7 @@
 node_modules/
 .github/
 .env
+
+src/controllers/museoController.js
+src/routes/museoRoutes.js
+src/repositories/museoRepository.js
