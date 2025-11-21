@@ -1,11 +1,11 @@
 import { articuloRepository } from "../repositories/index.js";
-import { sendError, sendSuccess } from "../utils/responseHandler.js";
+import { sendError, sendSuccess } from "../utils/responseFormater.js";
 
 export class ArticuloController {
     static async createArticulo(req, res) {
         try {
-            const { nombre, precio, descripcion, tipo } = req.body;
-            const newArticulo = await articuloRepository.createArticulo({ nombre, precio, descripcion, tipo });
+            const { nombre, descripcion, precioEstandar, tipo } = req.body;
+            const newArticulo = await articuloRepository.create({ nombre, descripcion, precioEstandar, tipo });
             return sendSuccess(res, 201, "Artículo creado exitosamente.", newArticulo);
         } catch (error) {
             return sendError(res, 500, `Error al crear artículo: ${error.message}`);
@@ -14,7 +14,7 @@ export class ArticuloController {
 
     static async getArticulo(req, res) {
         try {
-            const articulos = await articuloRepository.getArticulo();
+            const articulos = await articuloRepository.findAll();
             return sendSuccess(res, 200, "Artículos recuperados exitosamente.", articulos);
         } catch (error) {
             return sendError(res, 500, `Error al obtener artículos: ${error.message}`);
@@ -35,12 +35,15 @@ export class ArticuloController {
 
     static async updateArticulo(req, res) {
         try {
-            const updateData = req.body;
-            const updatedArticulo = await articuloRepository.updateArticulo(req.params.id, updateData);
+            const { nombre, descripcion, precioEstandar, tipo } = req.body;
+            const updatedArticulo = await articuloRepository.update(
+                {id: req.params.id, nombre}, 
+                {descripcion, precioEstandar, tipo}
+            );
             if (!updatedArticulo) {
                 return sendError(res, 404, "Artículo no encontrado.");
             }
-            return sendSuccess(res, 200, "Artículo actualizado exitosamente.", updatedArticulo);
+            return sendSuccess(res, 200, "Artículo actualizado exitosamente.", nombre, descripcion, precioEstandar, tipo);
         } catch (error) {
             return sendError(res, 500, `Error al actualizar artículo: ${error.message}`);
         }
@@ -48,7 +51,7 @@ export class ArticuloController {
 
     static async deleteArticulo(req, res) {
         try {
-            const deleted = await articuloRepository.deleteArticulo(req.params.id);
+            const deleted = await articuloRepository.delete({id: req.params.id});
             if (!deleted) {
                 return sendError(res, 404, "Artículo no encontrado.");
             }
