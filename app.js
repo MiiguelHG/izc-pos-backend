@@ -8,6 +8,7 @@ import refreshTokenRoutes from './src/routes/refreshTokenRoutes.js';
 import rolRoutes from './src/routes/rolesRoutes.js';
 import usuarioRoutes from './src/routes/usuarioRoutes.js';
 import boletoTipoRoutes from './src/routes/boletoTipoRoutes.js';
+import museoRoutes from './src/routes/museoRoutes.js';
 import { runSeeders } from './src/seeders/index.js';
 
 dotenv.config();
@@ -46,6 +47,9 @@ app.use('/api/auth', authRoutes);
 
 // --  Rutas de tipos de boleto --
 app.use('/api/boleto-tipos', boletoTipoRoutes);
+
+// -- Rutas de museos --
+app.use('/api/museos', museoRoutes);
 
 // Sincronizar la base de datos e iniciar el servidor
 // Configurar opciones de sincronización según el entorno
