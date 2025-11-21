@@ -39,8 +39,8 @@ app.use('/api/auth', authRoutes);
 // // --  Rutas de tokens --
 // app.use('/api/tokens', refreshTokenRoutes);
 
-// // --  Rutas de roles --
-// app.use('/api/roles', rolRoutes);
+// --  Rutas de roles --
+app.use('/api/roles', rolRoutes);
 
 // // --  Rutas de usuarios --
 // app.use('/api/usuarios', usuarioRoutes);
