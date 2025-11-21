@@ -8,13 +8,12 @@ class ArticuloRepository extends BaseRepository {
         super(articulo);
     }
 
-    async createArticulo({ nombre, precio, descripcion, tipo }) {
-        return await this.create({
-            nombre,
-            precioEstandar: precio,
-            descripcion,
-            tipo
-        });
+    async getArticuloById(id) {
+        return await this.findById(id);
+    }
+    
+    async obtenerPorTipo(tipo) {
+        return await this.findAll({ where: { tipo } });
     }
 }
 
