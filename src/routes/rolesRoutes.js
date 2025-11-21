@@ -4,11 +4,13 @@ import  { authJwt } from "../middlewares/index.js";
 
 const router = express.Router();
 
+router.use(authJwt.verifyToken);
+
 // Solo los administradores pueden gestionar roles
-router.get("/", [authJwt.verifyToken, authJwt.isAdmin], RolController.getAllRoles);
-router.get("/:id", [authJwt.verifyToken, authJwt.isAdmin], RolController.getById);
-router.post("/", [authJwt.verifyToken, authJwt.isAdmin], RolController.createRole);
-router.put("/:id", [authJwt.verifyToken, authJwt.isAdmin], RolController.updateRole);
-router.delete("/:id", [authJwt.verifyToken, authJwt.isAdmin], RolController.deleteRole);
+router.get("/", RolController.getAllRoles);
+router.get("/:id", RolController.getById);
+router.post("/", RolController.createRole);
+router.put("/:id", RolController.updateRole);
+router.delete("/:id", RolController.deleteRole);
 
 export default router;
