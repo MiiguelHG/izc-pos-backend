@@ -7,7 +7,7 @@ export class AuthController {
         try{
             const { nombre, email, password, rolId , museosIds} = req.body;
 
-            const user = await usuarioRepository.createUser({ nombre, email, password, rolId });
+            const user = await usuarioRepository.create({ nombre, email, password, rolId });
 
             if (!user) {
                 return sendError(res, 400, "Error creating user.");
@@ -53,6 +53,9 @@ export class AuthController {
             const accessToken = generateAccessToken(user);
             const refreshToken = generateRefreshToken(user);
 
+            // Guardar el refresh token en la base de datos //
+            const newRefreshToken = await refreshTokenRepository.create({ token: refreshToken, usuarioId: user.id, expiresAt: new Date(Date.now() + 7*24*60*60*1000) });
+
             const museosUsuario = await museoUsuarioRepository.findMuseosByUser(user);
 
             return sendSuccess(res, 200, "Login successful!", {
@@ -62,7 +65,7 @@ export class AuthController {
                 rolId: user.rolId,
                 museos: museosUsuario,
                 accessToken,
-                refreshToken
+                refreshToken: newRefreshToken.token
             });
         } catch(error) {
             return sendError(res, 500, `Error logging in: ${error.message}`);
@@ -80,7 +83,10 @@ export class AuthController {
 
             // Rotacion de refresh token
             const newRefreshToken = generateRefreshToken(user);
-            const isRefreshTokenUpdated = await refreshTokenRepository.updateRefreshToken(refreshToken, newRefreshToken, new Date(Date.now() + 7*24*60*60*1000));
+            
+            const isRefreshTokenUpdated = await refreshTokenRepository.update({ token: refreshToken },
+                { token: newRefreshToken, expiresAt: new Date(Date.now() + 7*24*60*60*1000) }
+            );
 
             if (!isRefreshTokenUpdated) {
                 return sendError(res, 403, "Invalid refresh token!");

@@ -1,0 +1,85 @@
+import { sendError, sendSuccess } from '../utils/responseFormater.js';
+import { museoRepository } from '../repositories/index.js';
+
+export class MuseoController {
+  static async createMuseo(req, res) {
+    try {
+      const { nombre, ubicacion } = req.body;
+
+      const newMuseo = await museoRepository.create({ nombre, ubicacion });
+
+      if (!newMuseo) {
+        return sendError(res, 400, 'No se pudo crear el museo');
+      }
+
+      return sendSuccess(res, 201, 'Museo creado exitosamente', newMuseo);
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+
+  static async getAllMuseos(req, res) {
+    try {
+      const museos = await museoRepository.findAll();
+
+      if (!museos || museos.length === 0) {
+        return sendError(res, 404, 'No se encontraron museos');
+      }
+
+      return sendSuccess(res, 200, 'Museos obtenidos exitosamente', museos);
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+
+  static async getMuseoById(req, res) {
+    try {
+      const { id } = req.params;
+
+      const museo = await museoRepository.findById(id);
+
+      if (!museo) {
+        return sendError(res, 404, 'Museo no encontrado');
+      }
+
+      return sendSuccess(res, 200, 'Museo obtenido exitosamente', museo);
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+
+  static async updateMuseo(req, res) {
+    try {
+      const { id } = req.params;
+      const { nombre, ubicacion } = req.body;
+
+      const updated = await museoRepository.update({ id }, { nombre, ubicacion });
+
+      if (!updated) {
+        return sendError(res, 400, 'No se pudo actualizar el museo');
+      }
+
+      // Tal vez se pueda devolver el museo actualizado aquí, pero no es obligatorio
+
+      return sendSuccess(res, 200, 'Museo actualizado exitosamente');
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+
+  static async deleteMuseo(req, res) {
+    try {
+      const { id } = req.params;
+
+      const deleted = await museoRepository.delete({ id });
+      
+      if (!deleted) {
+        return sendError(res, 400, 'No se pudo eliminar el museo');
+      }
+
+      return sendSuccess(res, 200, 'Museo eliminado exitosamente', deleted);
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+}

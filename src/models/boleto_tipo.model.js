@@ -11,7 +11,7 @@ export default (sequelize, Sequelize) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        descipcion: {
+        descripcion: {
             type: DataTypes.STRING,
             allowNull: true
         },
@@ -19,7 +19,7 @@ export default (sequelize, Sequelize) => {
             type: DataTypes.DECIMAL(5, 2),
             allowNull: false
         },
-        precio_final: {
+        precioFinal: {
             type: DataTypes.DECIMAL(5, 2),
             allowNull: false
         },
