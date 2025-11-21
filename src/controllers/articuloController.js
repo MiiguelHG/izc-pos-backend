@@ -6,6 +6,9 @@ export class ArticuloController {
         try {
             const { nombre, descripcion, precioEstandar, tipo } = req.body;
             const newArticulo = await articuloRepository.create({ nombre, descripcion, precioEstandar, tipo });
+            if(!newArticulo) {
+                return sendError(res, 400, "No se pudo crear el artículo.");
+            }
             return sendSuccess(res, 201, "Artículo creado exitosamente.", newArticulo);
         } catch (error) {
             return sendError(res, 500, `Error al crear artículo: ${error.message}`);
@@ -15,6 +18,9 @@ export class ArticuloController {
     static async getArticulo(req, res) {
         try {
             const articulos = await articuloRepository.findAll();
+            if(!articulos) {
+                return sendError(res, 404, "No se encontraron artículos.");
+            }
             return sendSuccess(res, 200, "Artículos recuperados exitosamente.", articulos);
         } catch (error) {
             return sendError(res, 500, `Error al obtener artículos: ${error.message}`);
@@ -38,7 +44,7 @@ export class ArticuloController {
             const { nombre, descripcion, precioEstandar, tipo } = req.body;
             const updatedArticulo = await articuloRepository.update(
                 {id: req.params.id, nombre}, 
-                {descripcion, precioEstandar, tipo}
+                {nombre, descripcion, precioEstandar, tipo}
             );
             if (!updatedArticulo) {
                 return sendError(res, 404, "Artículo no encontrado.");
