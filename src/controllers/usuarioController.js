@@ -1,16 +1,19 @@
-import { usuarioRepository } from "../repositories/index.js";
+import { usuarioRepository } from "#repositories/index.js";
+import { sendError, sendSuccess } from "#utils/responseFormater.js";
 
 export class UsuarioController {
     // Obtener todos los usuarios (solo admin)
     static async getAll(req, res) {
         try {
-            const users = await usuarioRepository.findAll({
-                include: ["rol"],
-                attributes: { exclude: ["password"] }
-            });
-            res.json(users);
+            const users = await usuarioRepository.findAllWithoutPassword();
+
+            if (!users || users.length === 0){
+                    return sendError(res, "No users found.", 404);
+            }
+
+            return sendSuccess(res,200, "Users retrieved successfully.", users);
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            sendError(res,500, `Error retrieving users: ${error.message}`);
         }
     }
 
@@ -19,38 +22,15 @@ export class UsuarioController {
         try {
             const { id } = req.params;
 
-            // // Solo admin o el propio usuario puede acceder
-            // if (req.user.rol.name !== "admin" && req.user.id !== parseInt(id))
-            //     return res.status(403).json({ message: "Access denied." });
+            const user = await usuarioRepository.findUserById(id);
 
-            const user = await usuarioRepository.findById(id, {
-                include: ["rol"],
-                attributes: { exclude: ["password"] }
-            });
+            if (!user) {
+                return sendError(res, "User not found.", 404);
+            }
 
-            if (!user)
-                return res.status(404).json({ message: "User not found." });
-
-            res.json(user);
+            return sendSuccess(res, 200, "User retrieved successfully.", user);
         } catch (error) {
-            res.status(500).json({ message: error.message });
-        }
-    }
-
-    // Perfil del usuario autenticado
-    static async getProfile(req, res) {
-        try {
-            const user = await usuarioRepository.findById(req.user.id, {
-                include: ["rol"],
-                attributes: { exclude: ["password"] }
-            });
-
-            if (!user)
-                return res.status(404).json({ message: "User not found." });
-
-            res.json(user);
-        } catch (error) {
-            res.status(500).json({ message: error.message });
+            sendError(res,500, `Error retrieving user: ${error.message}`);
         }
     }
 
@@ -60,18 +40,15 @@ export class UsuarioController {
             const { id } = req.params;
             const { nombre, email, password, activo, rolId } = req.body;
 
-            // if (req.user.rol.name !== "admin" && req.user.id !== parseInt(id))
-            //     return res.status(403).json({ message: "Access denied." });
+            const updatedUser = await usuarioRepository.update({ id }, { nombre, email, password, activo, rolId });
 
-            const data = { nombre, email, rolId };
-            if (password) data.password = password;
-            if (req.user.rol.name === "admin" && activo !== undefined)
-                data.activo = activo;
+            if (!updatedUser) {
+                return sendError(res, "User not found or could not be updated.", 404);
+            }
 
-            const updated = await usuarioRepository.update(id, data);
-            res.json({ message: "User updated successfully!", updated });
+            return sendSuccess(res, 200, "User updated successfully.", updatedUser);
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            return sendError(res,500, `Error updating user: ${error.message}`);
         }
     }
 
@@ -80,13 +57,15 @@ export class UsuarioController {
         try {
             const { id } = req.params;
 
-            // if (req.user.rol.name !== "admin")
-            //     return res.status(403).json({ message: "Access denied." });
+            const deleted = await usuarioRepository.delete({ id });
 
-            await usuarioRepository.delete(id);
-            res.json({ message: "User deleted successfully!" });
+            if (!deleted) {
+                return sendError(res, "User not found or could not be deleted.", 404);
+            }
+
+            return sendSuccess(res, 200, "User deleted successfully.");
         } catch (error) {
-            res.status(500).json({ message: error.message });
+            return sendError(res,500, `Error deleting user: ${error.message}`);
         }
     }
 }
