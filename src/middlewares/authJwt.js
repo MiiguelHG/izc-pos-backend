@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
-import db from "../models/index.js";
+//import db from "../models/index.js";
 import { sendError } from "../utils/responseFormater.js";
 import { usuarioRepository } from "../repositories/usuarioRepository.js";
 
 
-const { usuario: Usuario, rol: Rol } = db;
+// const { usuario: Usuario, rol: Rol } = db;
 
 export class authJwt {
   static async verifyToken(req, res, next){
@@ -40,10 +40,16 @@ export class authJwt {
 
   static async isAdmin(req, res, next) {
     try {
+
+      if (!req.user || !req.user.id) {
+        return sendError(res, 401, "Unauthorized! User information missing!");
+      }
+
       const user = await usuarioRepository.findUserById(req.user.id);
       if (!user) return sendError(res, 404, "User not found");
 
-      if (user.rol?.name !== "admin") {
+      const rolName = user.rol?.name;
+      if (typeof rolName !== "string" || rolName.trim().toLowerCase() !== "admin") {
         return sendError(res, 403, "Require Admin Role!");
       }
 
@@ -53,39 +59,40 @@ export class authJwt {
     }
   };
 
-  static async isModerator(req, res, next){
-    try{
-      const user = await Usuario.findByPk(req.user.id, {
-        include: [{ model: Rol, as: "rol" }],
-      });
-      if (!user) return sendError(res, 404, "User not found");
-
-      if (user.rol?.name === "moderator") {
-        next();
-        return;
+  static async isDirectorDeMuseos(req, res, next){
+    try {
+      if (!req.user || !req.user.id) {
+        return sendError(res, 401, "Unauthorized! User information missing!");
       }
 
-      sendError(res, 403, "Require Moderator Role!");
+      const user = await usuarioRepository.findUserById(req.user.id);
+      if (!user) return sendError(res, 404, "User not found");
+
+      const rolName = user.rol?.name;
+      if (typeof rolName !== "string" || rolName.trim().toLowerCase() !== "director de museos") {
+        return sendError(res, 403, "Require Director de Museos Role!");
+      }
+      next();
     } catch (error) {
-      sendError(res, 500, error.message);
+      return sendError(res, 500, error.message);
     }
   };
 
-  static async isModeratorOrAdmin(req, res, next) {
+  static async isOperador(req, res, next) {
     try {
-      const user = await Usuario.findByPk(req.user.id, {
-        include: [{ model: Rol, as: "rol" }],
-      });
-      if (!user) return sendError(res, 404, "User not found");
-
-      if (["admin", "moderator"].includes(user.rol?.name)) {
-        next();
-        return;
+      if (!req.user || !req.user.id) {
+        return sendError(res, 401, "Unauthorized! User information missing!");
       }
 
-      sendError(res, 403, "Require Moderator or Admin Role!");
+      const user = await usuarioRepository.findUserById(req.user.id);
+      if (!user) return sendError(res, 404, "User not found");
+      const rolName = user.rol?.name;
+      if (typeof rolName !== "string" || rolName.trim().toLowerCase() !== "operador") {
+        return sendError(res, 403, "Require Operador Role!");
+      }
+      next();
     } catch (error) {
-      sendError(res, 500, error.message);
+      return sendError(res, 500, error.message);
     }
   };
 
