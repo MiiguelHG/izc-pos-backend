@@ -4,6 +4,7 @@ import { rolRepository } from "./rolRepository.js";
 import { refreshTokenRepository } from "./refreshTokenRepository.js";
 import { museoRepository } from "./museoRepository.js";
 import { museoUsuarioRepository } from "./museoUsuarioRepository.js";
+import { formaPagoRepository } from "./formaPagoRepository.js";
 import { boletoTipoRepository } from "./boletoTipoRepository.js";
 
 export {
@@ -13,5 +14,6 @@ export {
     museoRepository,
     articuloRepository,
     museoUsuarioRepository,
+    formaPagoRepository,
     boletoTipoRepository
 }

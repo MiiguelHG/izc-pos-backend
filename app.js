@@ -7,6 +7,8 @@ import authRoutes from './src/routes/authRoutes.js';
 import refreshTokenRoutes from './src/routes/refreshTokenRoutes.js';
 import rolRoutes from './src/routes/rolesRoutes.js';
 import usuarioRoutes from './src/routes/usuarioRoutes.js';
+import articuloRoutes from './src/routes/articuloRoutes.js';
+import formaPagoRoutes from './src/routes/formaPagoRoutes.js';
 import boletoTipoRoutes from './src/routes/boletoTipoRoutes.js';
 import museoRoutes from './src/routes/museoRoutes.js';
 import { runSeeders } from './src/seeders/index.js';
@@ -35,6 +37,12 @@ app.get('/', (req, res) => {
 
 // --  Rutas de autenticación --
 app.use('/api/auth', authRoutes);
+
+// --  Rutas de artículos --
+app.use('/api/articulos', articuloRoutes);
+
+// --  Rutas de formas de pago --
+app.use('/api/formasPago', formaPagoRoutes);
 
 // // --  Rutas de tokens --
 // app.use('/api/tokens', refreshTokenRoutes);
