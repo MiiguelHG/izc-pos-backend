@@ -5,10 +5,10 @@ import { ArticuloController } from '../controllers/articuloController.js';
 const router = express.Router();
 
 router.get('/', ArticuloController.getArticulo);
+router.get('/tipo/:tipo', ArticuloController.obtenerPorTipo);
 router.get('/:id', ArticuloController.getArticuloById);
 router.post('/', ArticuloController.createArticulo);
 router.put('/:id', ArticuloController.updateArticulo);
 router.delete('/:id', ArticuloController.deleteArticulo);
-router.get('/tipo/:tipo', ArticuloController.obtenerPorTipo);
 
 export default router;

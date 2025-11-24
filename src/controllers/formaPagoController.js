@@ -6,6 +6,9 @@ export class FormaPagoController {
         try {
             const { nombre, descripcion } = req.body;
             const newFormaPago = await formaPagoRepository.create({ nombre, descripcion });
+            if(!newFormaPago) {
+                return sendError(res, 400, "No se pudo crear la forma de pago.");
+            }
             return sendSuccess(res, 201, "Forma de pago creada exitosamente.", newFormaPago);
         } catch (error) {
             return sendError(res, 500, `Error al crear forma de pago: ${error.message}`);
@@ -15,6 +18,9 @@ export class FormaPagoController {
     static async getFormasPago(req, res) {
         try {
             const formasPago = await formaPagoRepository.findAll();
+            if(!formasPago) {
+                return sendError(res, 404, "No se encontraron formas de pago.");
+            }
             return sendSuccess(res, 200, "Formas de pago recuperadas exitosamente.", formasPago);
         } catch (error) {
             return sendError(res, 500, `Error al obtener formas de pago: ${error.message}`);
