@@ -50,8 +50,8 @@ app.use('/api/formasPago', formaPagoRoutes);
 // --  Rutas de roles --
 app.use('/api/roles', rolRoutes);
 
-// // --  Rutas de usuarios --
-// app.use('/api/usuarios', usuarioRoutes);
+// --  Rutas de usuarios --
+app.use('/api/usuarios', usuarioRoutes);
 
 // --  Rutas de tipos de boleto --
 app.use('/api/boleto-tipos', boletoTipoRoutes);

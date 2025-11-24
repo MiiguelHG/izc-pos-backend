@@ -8,11 +8,25 @@ class UsuarioRepository extends BaseRepository {
         super(usuario);
     }
 
+    async findAllWithoutPassword() {
+        return await this.findAll({
+            attributes: { exclude: ["password"] },
+            include: [
+                { model: rol, as: "rol" },
+                { 
+                    model: museo, 
+                    as: "museos", 
+                    through: { attributes: [] }
+                }
+            ]
+        })
+    }
+
     async findUserById(id){
         return await this.findById(id, {
             include: [
                 { model: rol, as: "rol" },
-                { model: museo, as: "museos" }
+                { model: museo, as: "museos", through: { attributes: [] } }
             ],
             attributes: { exclude: ["password"] },
         });
