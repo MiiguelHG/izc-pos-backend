@@ -76,8 +76,8 @@ db.boletoTipo.hasMany(db.boletoVenta, {foreignKey: "boletoTipoId"});
 db.boletoVenta.belongsTo(db.boletoTipo, {foreignKey: "boletoTipoId"});
 
 // Relacion boleto_venta - boleto_emitido (1:N) (Revisado)
-db.boletoVenta.hasMany(db.boletoEmitido, {foreignKey: "boletoVentaId"});
-db.boletoEmitido.belongsTo(db.boletoVenta, {foreignKey: "boletoVentaId"});
+db.boletoVenta.belongsTo(db.boletoEmitido, {foreignKey: "boletoEmitidoId"});
+db.boletoEmitido.hasMany(db.boletoVenta, {foreignKey: "boletoEmitidoId"});
 
 // Relacion boleto_emitido - museo (N:1) (Revisado)
 db.boletoEmitido.belongsTo(db.museo, {foreignKey: "museoId"});
