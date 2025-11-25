@@ -143,20 +143,9 @@ db.usuario.hasMany(db.visitante, {foreignKey: "usuarioId"});
 //------------------------------------------------------------------
 
 // Relaciones museos --------------------------------------------------
-// Relacion museo - usuario (N:M) (Revisado)
-db.museo.belongsToMany(db.usuario, {
-    through: db.museoHasUsuario,
-    foreignKey: "museoId",
-    otherKey: "usuarioId",
-    as: "usuarios"
-});
-
-db.usuario.belongsToMany(db.museo, {
-    through: db.museoHasUsuario,
-    foreignKey: "usuarioId",
-    otherKey: "museoId",
-    as: "museos"
-});
+// Relacion museo - usuario (1:N) (Revisado)
+db.museo.hasMany(db.usuario, {foreignKey: "museoId"});
+db.usuario.belongsTo(db.museo, {foreignKey: "museoId"});
 
 // Relacion museo - articulo (N:M) (Revisado)
 db.museo.belongsToMany(db.articulo, {

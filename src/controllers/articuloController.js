@@ -43,13 +43,13 @@ export class ArticuloController {
         try {
             const { nombre, descripcion, precioEstandar, tipo } = req.body;
             const updatedArticulo = await articuloRepository.update(
-                {id: req.params.id, nombre}, 
+                {id: req.params.id}, 
                 {nombre, descripcion, precioEstandar, tipo}
             );
             if (!updatedArticulo) {
                 return sendError(res, 404, "Artículo no encontrado.");
             }
-            return sendSuccess(res, 200, "Artículo actualizado exitosamente.", nombre, descripcion, precioEstandar, tipo);
+            return sendSuccess(res, 200, "Artículo actualizado exitosamente.", updatedArticulo);
         } catch (error) {
             return sendError(res, 500, `Error al actualizar artículo: ${error.message}`);
         }

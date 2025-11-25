@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import { sendError } from "../utils/responseFormater.js";
 import { usuarioRepository } from "../repositories/usuarioRepository.js";
 
-
 // const { usuario: Usuario, rol: Rol } = db;
 
 export class authJwt {
