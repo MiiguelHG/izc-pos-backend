@@ -28,6 +28,10 @@ export default (sequelize, Sequelize) => {
         rolId: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        museoId: {
+            type: DataTypes.INTEGER,
+            allowNull: false
         }
         
     });

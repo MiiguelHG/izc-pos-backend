@@ -1,33 +1,15 @@
-import { usuarioRepository, refreshTokenRepository, museoRepository, museoUsuarioRepository } from "../repositories/index.js";
+import { usuarioRepository, refreshTokenRepository, museoRepository} from "../repositories/index.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/tokenUtils.js";
 import { sendSuccess, sendError } from "../utils/responseFormater.js";
 
 export class AuthController {
     static async register(req, res) {
         try{
-            const { nombre, email, password, rolId , museosIds} = req.body;
+            const { nombre, email, password, rolId , museoId} = req.body;
 
-            const user = await usuarioRepository.create({ nombre, email, password, rolId });
-
-            if (!user) {
-                return sendError(res, 400, "Error creating user.");
-            }
-
-            const userMuseos = await museoUsuarioRepository.createUserMuseo({museosIds, usuarioId: user.id});
-
-            if (!userMuseos) {
-                return sendError(res, 400, "Error associating museums to user.");
-            }
+            const user = await usuarioRepository.create({ nombre, email, password, rolId, museoId });
             
-            const museosUser = await museoUsuarioRepository.findMuseosByUser(user);
-            
-            return sendSuccess(res, 201, "User registered successfully!", {
-                id: user.id,
-                nombre: user.nombre,
-                email: user.email,
-                rolId: user.rolId,
-                museos: museosUser
-            });
+            return sendSuccess(res, 201, "User registered successfully!", {user});
         }catch(error){
             return sendError(res, 500, `Error registering user: ${error.message}`);
         }
@@ -56,14 +38,12 @@ export class AuthController {
             // Guardar el refresh token en la base de datos //
             const newRefreshToken = await refreshTokenRepository.create({ token: refreshToken, usuarioId: user.id, expiresAt: new Date(Date.now() + 7*24*60*60*1000) });
 
-            const museosUsuario = await museoUsuarioRepository.findMuseosByUser(user);
-
             return sendSuccess(res, 200, "Login successful!", {
                 id: user.id,
                 nombre: user.nombre,
                 email: user.email,
                 rolId: user.rolId,
-                museos: museosUsuario,
+                museoId: user.museoId,
                 accessToken,
                 refreshToken: newRefreshToken.token
             });

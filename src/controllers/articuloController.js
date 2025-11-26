@@ -41,11 +41,11 @@ export class ArticuloController {
 
     static async updateArticulo(req, res) {
         try {
+            const { id } = req.params;
             const { nombre, descripcion, precioEstandar, tipo } = req.body;
-            const updatedArticulo = await articuloRepository.update(
-                {id: req.params.id}, 
-                {nombre, descripcion, precioEstandar, tipo}
-            );
+
+            const updatedArticulo = await articuloRepository.update({id}, {nombre, descripcion, precioEstandar, tipo});
+            
             if (!updatedArticulo) {
                 return sendError(res, 404, "Artículo no encontrado.");
             }

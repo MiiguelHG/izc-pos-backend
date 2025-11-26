@@ -1,11 +1,8 @@
-import { usuarioRepository, museoUsuarioRepository} from "../repositories/index.js";
+import { usuarioRepository} from "../repositories/index.js";
 
-export const userSeeder = async (nombre, email, password, rolId, museosIds) => {
+export const userSeeder = async (nombre, email, password, rolId, museoId) => {
     try {
-        const usuario = await usuarioRepository.create({nombre, email, password, rolId});
-
-        const museosAsociados = await museoUsuarioRepository.createUserMuseo(museosIds, usuario.id);
-
+        const usuario = await usuarioRepository.create({nombre, email, password, rolId, museoId});
         console.log(`Usuario creado: ${usuario.nombre} con ID: ${usuario.id}`); 
     } catch (error) {
         console.log(`Error creando usuario: ${error.message}`);

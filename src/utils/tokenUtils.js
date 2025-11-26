@@ -8,7 +8,6 @@ export const generateAccessToken = (user) => {
     const nonce = crypto.randomBytes(16).toString("hex");
     return jwt.sign({
         id: user.id,
-        rol: user.rolId,
         nonce: nonce
     }, process.env.JWT_SECRET, { expiresIn: "15m" });
 };

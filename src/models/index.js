@@ -15,7 +15,6 @@ import productoVentaModel from "./producto_venta.model.js";
 import museoModel from "./museo.model.js";
 import formaPagoModel from "./forma_pago.model.js";
 import visitanteModel from "./visitante.model.js";
-import museoHasUsuarioModel from "./museo_has_usuario.model.js";
 import museoHasArticuloModel from "./museo_has_articulo.model.js";
 import visitanteDetalleModel from "./visitante_detalle.model.js";
 
@@ -38,7 +37,6 @@ db.productoVenta = productoVentaModel(sequelize, Sequelize);
 db.museo = museoModel(sequelize, Sequelize);
 db.formaPago = formaPagoModel(sequelize, Sequelize);
 db.visitante = visitanteModel(sequelize, Sequelize);
-db.museoHasUsuario = museoHasUsuarioModel(sequelize, Sequelize);
 db.museoHasArticulo = museoHasArticuloModel(sequelize, Sequelize);
 db.visitanteDetalle = visitanteDetalleModel(sequelize, Sequelize);
 
@@ -143,7 +141,7 @@ db.usuario.hasMany(db.visitante, {foreignKey: "usuarioId"});
 //------------------------------------------------------------------
 
 // Relaciones museos --------------------------------------------------
-// Relacion museo - usuario (1:N) (Revisado)
+// Relacion museo - usuario (1:N) (Corregido)
 db.museo.hasMany(db.usuario, {foreignKey: "museoId"});
 db.usuario.belongsTo(db.museo, {foreignKey: "museoId"});
 

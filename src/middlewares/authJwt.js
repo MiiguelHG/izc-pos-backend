@@ -27,7 +27,7 @@ export class authJwt {
 
       next();
     } catch (jwtError) {
-      if (jwtError.name === 'TokenExiredError') {
+      if (jwtError.name === 'TokenExpiredError') {
         return sendError(res, 401, "Unauthorized! Access Token was expired!");
       } else if (jwtError.name === 'JsonWebTokenError') {
         return sendError(res, 401, "Unauthorized! Invalid Access Token!");
@@ -41,11 +41,16 @@ export class authJwt {
     return async (req, res, next) => {
       try{
 
-          if (!req.user || !req.user.rol?.name){
+          if (!req.user){
             return sendError(res, 401, "Unauthorized! User information missing!");
           }
 
-          const rolName = req.user.rol?.name.trim().toLowerCase();
+          const role =
+            req.user.rol?.nombre ||
+            req.user.rol?.dataValues?.nombre ||
+            req.user.dataValues?.rol?.dataValues?.nombre;
+
+          const rolName = role.trim().toLowerCase();  
           if(rolName !== rolRequerido.trim().toLowerCase()){
               return sendError(res, 403, `Require ${rolRequerido} Role!`);
           }
