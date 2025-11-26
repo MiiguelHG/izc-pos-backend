@@ -2,6 +2,9 @@ import { rolSeeder } from "./rolSeeder.js";
 import { userSeeder } from "./userSeeder.js";
 import { museoSeeder } from "./museoSeeder.js";
 import { articuloSeeder } from "./articuloSeeder.js";
+import { boletoTipoSeeder } from "./boletoTipoSeeder.js";
+import { boletoEmitidoSeeder } from "./boletoEmitidoSeeder.js";
+import { boletoVentaSeeder } from "./boletoVentaSeeder.js";
 
 export const runSeeders = async () => {
     try {
@@ -14,6 +17,8 @@ export const runSeeders = async () => {
         await userSeeder("ana", "ana@example.com", "password123", 2, [2]);
 
         await articuloSeeder("Entrada General", "Acceso general al museo", 100.00, "boleto");
+
+        console.log("\n✅ Todos los seeders se ejecutaron exitosamente");
     } catch (error) {
         console.log(`Error runing seeders: ${error}`)
     }
