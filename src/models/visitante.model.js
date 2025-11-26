@@ -11,6 +11,10 @@ export default (sequelize, Sequelize) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        edad: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
         cp: {
             type: DataTypes.INTEGER,
             allowNull: false
@@ -21,6 +25,18 @@ export default (sequelize, Sequelize) => {
         },
         pais: {
             type: DataTypes.STRING,
+            allowNull: false
+        },
+        cantidadHombres: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        cantidadMujeres: {
+            type: DataTypes.INTEGER,
+            allowNull: false
+        },
+        cantidadOtros: {
+            type: DataTypes.INTEGER,
             allowNull: false
         },
         totalVisitantes: {
