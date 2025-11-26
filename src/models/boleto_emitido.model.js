@@ -7,11 +7,11 @@ export default (sequelize, Sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
-        codigoQr: {
-            type: DataTypes.STRING,
-            allowNull: false,
-            unique: true
-        },
+        // codigoQr: {
+        //     type: DataTypes.STRING,
+        //     allowNull: false,
+        //     unique: true
+        // },
         total: {
             type: DataTypes.DECIMAL(7, 2),
             allowNull: false

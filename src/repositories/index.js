@@ -5,6 +5,9 @@ import { refreshTokenRepository } from "./refreshTokenRepository.js";
 import { museoRepository } from "./museoRepository.js";
 import { formaPagoRepository } from "./formaPagoRepository.js";
 import { boletoTipoRepository } from "./boletoTipoRepository.js";
+import { boletoVentaRepository } from "./boletoVentaRepository.js";
+import { boletoEmitidoRepository } from "./boletoEmitidoRepository.js";
+import { visitanteRepository } from "./visitanteRepository.js";
 
 export {
     usuarioRepository,
@@ -13,5 +16,8 @@ export {
     museoRepository,
     articuloRepository,
     formaPagoRepository,
-    boletoTipoRepository
+    boletoTipoRepository,
+    boletoVentaRepository,
+    boletoEmitidoRepository,
+    visitanteRepository
 }

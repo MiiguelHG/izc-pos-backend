@@ -1,5 +1,5 @@
 import express from "express";
-import { BoletoTipoController } from "../controllers/boletoTipoController.js";
+import { BoletoTipoController } from "#controllers/boletoTipoController.js";
 
 const router = express.Router();
 

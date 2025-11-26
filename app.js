@@ -11,6 +11,8 @@ import articuloRoutes from './src/routes/articuloRoutes.js';
 import formaPagoRoutes from './src/routes/formaPagoRoutes.js';
 import boletoTipoRoutes from './src/routes/boletoTipoRoutes.js';
 import museoRoutes from './src/routes/museoRoutes.js';
+import boletoEmitidoRoutes from './src/routes/boletoEmitidoRoutes.js';
+import visitanteRoutes from './src/routes/visitanteRoutes.js';
 import { runSeeders } from './src/seeders/index.js';
 
 dotenv.config();
@@ -58,6 +60,12 @@ app.use('/api/boleto-tipos', boletoTipoRoutes);
 
 // -- Rutas de museos --
 app.use('/api/museos', museoRoutes);
+
+// -- Rutas de boletos emitidos --
+app.use('/api/boletos-emitidos', boletoEmitidoRoutes);
+
+// -- Rutas de visitantes --
+app.use('/api/visitantes', visitanteRoutes);
 
 // Sincronizar la base de datos e iniciar el servidor
 // Configurar opciones de sincronización según el entorno

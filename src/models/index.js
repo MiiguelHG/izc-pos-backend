@@ -16,7 +16,6 @@ import museoModel from "./museo.model.js";
 import formaPagoModel from "./forma_pago.model.js";
 import visitanteModel from "./visitante.model.js";
 import museoHasArticuloModel from "./museo_has_articulo.model.js";
-import visitanteDetalleModel from "./visitante_detalle.model.js";
 
 // Definir el objeto de la base de datos
 const db = {};
@@ -38,7 +37,6 @@ db.museo = museoModel(sequelize, Sequelize);
 db.formaPago = formaPagoModel(sequelize, Sequelize);
 db.visitante = visitanteModel(sequelize, Sequelize);
 db.museoHasArticulo = museoHasArticuloModel(sequelize, Sequelize);
-db.visitanteDetalle = visitanteDetalleModel(sequelize, Sequelize);
 
 // Relaciones entre tablas
 
@@ -49,10 +47,6 @@ db.rol.hasMany(db.usuario, {foreignKey: "rolId", as: "usuarios"});
 //Relacion usuario - refreshtoken (1:N) (Revisado)
 db.usuario.hasMany(db.refreshToken, {foreignKey:"usuarioId"});
 db.refreshToken.belongsTo(db.usuario, {foreignKey:"usuarioId"});
-
-// Relacion visitante - visitante_detalle (1:N) (Revisado)
-db.visitante.hasMany(db.visitanteDetalle, {foreignKey: "visitanteId"});
-db.visitanteDetalle.belongsTo(db.visitante, {foreignKey: "visitanteId"});
 
 // Relaciones de articulos----------------------------------------
 // Relacion articulo - boleto_tipo (1:N) (Revisado)
@@ -74,8 +68,8 @@ db.boletoTipo.hasMany(db.boletoVenta, {foreignKey: "boletoTipoId"});
 db.boletoVenta.belongsTo(db.boletoTipo, {foreignKey: "boletoTipoId"});
 
 // Relacion boleto_venta - boleto_emitido (1:N) (Revisado)
-db.boletoVenta.hasMany(db.boletoEmitido, {foreignKey: "boletoVentaId"});
-db.boletoEmitido.belongsTo(db.boletoVenta, {foreignKey: "boletoVentaId"});
+db.boletoVenta.belongsTo(db.boletoEmitido, {foreignKey: "boletoEmitidoId"});
+db.boletoEmitido.hasMany(db.boletoVenta, {foreignKey: "boletoEmitidoId"});
 
 // Relacion boleto_emitido - museo (N:1) (Revisado)
 db.boletoEmitido.belongsTo(db.museo, {foreignKey: "museoId"});
