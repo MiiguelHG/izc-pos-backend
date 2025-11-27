@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
-import db from "../models/index.js";
+//import db from "../models/index.js";
 import { sendError } from "../utils/responseFormater.js";
 import { usuarioRepository } from "../repositories/usuarioRepository.js";
 
-
-const { usuario: Usuario, rol: Rol } = db;
+// const { usuario: Usuario, rol: Rol } = db;
 
 export class authJwt {
   static async verifyToken(req, res, next){
@@ -28,7 +27,7 @@ export class authJwt {
 
       next();
     } catch (jwtError) {
-      if (jwtError.name === 'TokenExiredError') {
+      if (jwtError.name === 'TokenExpiredError') {
         return sendError(res, 401, "Unauthorized! Access Token was expired!");
       } else if (jwtError.name === 'JsonWebTokenError') {
         return sendError(res, 401, "Unauthorized! Invalid Access Token!");
@@ -38,57 +37,30 @@ export class authJwt {
     }
   };
 
-  static async isAdmin(req, res, next) {
-    try {
-      const user = await usuarioRepository.findUserById(req.user.id);
-      if (!user) return sendError(res, 404, "User not found");
+  static hasRole(rolRequerido){
+    return async (req, res, next) => {
+      try{
 
-      if (user.rol?.name !== "admin") {
-        return sendError(res, 403, "Require Admin Role!");
+          if (!req.user){
+            return sendError(res, 401, "Unauthorized! User information missing!");
+          }
+
+          const role =
+            req.user.rol?.nombre ||
+            req.user.rol?.dataValues?.nombre ||
+            req.user.dataValues?.rol?.dataValues?.nombre;
+
+          const rolName = role.trim().toLowerCase();  
+          if(rolName !== rolRequerido.trim().toLowerCase()){
+              return sendError(res, 403, `Require ${rolRequerido} Role!`);
+          }
+          next();
       }
-
-      next();
-    } catch (error) {
-      return sendError(res, 500, error.message);
-    }
-  };
-
-  static async isModerator(req, res, next){
-    try{
-      const user = await Usuario.findByPk(req.user.id, {
-        include: [{ model: Rol, as: "rol" }],
-      });
-      if (!user) return sendError(res, 404, "User not found");
-
-      if (user.rol?.name === "moderator") {
-        next();
-        return;
+      catch(error){
+          return sendError(res, 500, `Error verificando rol: ${error.message}`);
       }
-
-      sendError(res, 403, "Require Moderator Role!");
-    } catch (error) {
-      sendError(res, 500, error.message);
-    }
-  };
-
-  static async isModeratorOrAdmin(req, res, next) {
-    try {
-      const user = await Usuario.findByPk(req.user.id, {
-        include: [{ model: Rol, as: "rol" }],
-      });
-      if (!user) return sendError(res, 404, "User not found");
-
-      if (["admin", "moderator"].includes(user.rol?.name)) {
-        next();
-        return;
-      }
-
-      sendError(res, 403, "Require Moderator or Admin Role!");
-    } catch (error) {
-      sendError(res, 500, error.message);
-    }
-  };
-
+    };
+  }
 }
 
 

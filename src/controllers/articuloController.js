@@ -49,7 +49,7 @@ export class ArticuloController {
             if (!updatedArticulo) {
                 return sendError(res, 404, "Artículo no encontrado.");
             }
-            return sendSuccess(res, 200, "Artículo actualizado exitosamente.", nombre, descripcion, precioEstandar, tipo);
+            return sendSuccess(res, 200, "Artículo actualizado exitosamente.", updatedArticulo);
         } catch (error) {
             return sendError(res, 500, `Error al actualizar artículo: ${error.message}`);
         }

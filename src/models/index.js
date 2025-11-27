@@ -15,7 +15,6 @@ import productoVentaModel from "./producto_venta.model.js";
 import museoModel from "./museo.model.js";
 import formaPagoModel from "./forma_pago.model.js";
 import visitanteModel from "./visitante.model.js";
-import museoHasUsuarioModel from "./museo_has_usuario.model.js";
 import museoHasArticuloModel from "./museo_has_articulo.model.js";
 
 // Definir el objeto de la base de datos
@@ -37,7 +36,6 @@ db.productoVenta = productoVentaModel(sequelize, Sequelize);
 db.museo = museoModel(sequelize, Sequelize);
 db.formaPago = formaPagoModel(sequelize, Sequelize);
 db.visitante = visitanteModel(sequelize, Sequelize);
-db.museoHasUsuario = museoHasUsuarioModel(sequelize, Sequelize);
 db.museoHasArticulo = museoHasArticuloModel(sequelize, Sequelize);
 
 // Relaciones entre tablas
@@ -137,20 +135,9 @@ db.usuario.hasMany(db.visitante, {foreignKey: "usuarioId"});
 //------------------------------------------------------------------
 
 // Relaciones museos --------------------------------------------------
-// Relacion museo - usuario (N:M) (Revisado)
-db.museo.belongsToMany(db.usuario, {
-    through: db.museoHasUsuario,
-    foreignKey: "museoId",
-    otherKey: "usuarioId",
-    as: "usuarios"
-});
-
-db.usuario.belongsToMany(db.museo, {
-    through: db.museoHasUsuario,
-    foreignKey: "usuarioId",
-    otherKey: "museoId",
-    as: "museos"
-});
+// Relacion museo - usuario (1:N) (Corregido)
+db.museo.hasMany(db.usuario, {foreignKey: "museoId"});
+db.usuario.belongsTo(db.museo, {foreignKey: "museoId"});
 
 // Relacion museo - articulo (N:M) (Revisado)
 db.museo.belongsToMany(db.articulo, {

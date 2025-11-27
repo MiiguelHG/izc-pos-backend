@@ -13,11 +13,7 @@ class UsuarioRepository extends BaseRepository {
             attributes: { exclude: ["password"] },
             include: [
                 { model: rol, as: "rol" },
-                { 
-                    model: museo, 
-                    as: "museos", 
-                    through: { attributes: [] }
-                }
+                { model: museo, as: "museo" }
             ]
         })
     }
@@ -26,7 +22,7 @@ class UsuarioRepository extends BaseRepository {
         return await this.findById(id, {
             include: [
                 { model: rol, as: "rol" },
-                { model: museo, as: "museos", through: { attributes: [] } }
+                { model: museo, as: "museo" }
             ],
             attributes: { exclude: ["password"] },
         });
@@ -37,7 +33,7 @@ class UsuarioRepository extends BaseRepository {
             where: { [attribute]: value }, 
             include: [
                 { model: rol, as: "rol" },
-                { model: museo, as: "museos" }
+                { model: museo, as: "museo" }
             ]
         });
     }

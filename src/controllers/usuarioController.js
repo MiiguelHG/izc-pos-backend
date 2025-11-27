@@ -38,9 +38,9 @@ export class UsuarioController {
     static async update(req, res) {
         try {
             const { id } = req.params;
-            const { nombre, email, password, activo, rolId } = req.body;
+            const { nombre, email, password, activo, rolId, museoId } = req.body;
 
-            const updatedUser = await usuarioRepository.update({ id }, { nombre, email, password, activo, rolId });
+            const updatedUser = await usuarioRepository.update({ id }, { nombre, email, password, activo, rolId, museoId });
 
             if (!updatedUser) {
                 return sendError(res, "User not found or could not be updated.", 404);

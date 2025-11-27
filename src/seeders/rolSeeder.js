@@ -1,6 +1,6 @@
 import { rolRepository } from "../repositories/index.js";
 
-const roles = ['admin', 'user', 'moderator'];
+const roles = ['admin', 'directorMuseo', 'operador'];
 
 export const rolSeeder = async () => {
     try {
