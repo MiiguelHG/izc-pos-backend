@@ -1,0 +1,56 @@
+import BaseRepository from "./baseRepository.js";
+import { productoDetalleRepository, articuloRepository } from "./index.js";
+import db from "../models/index.js";
+
+const { productoVenta, sequelize, productoDetalle } = db;
+
+class ProductoVentaRepository extends BaseRepository {
+    constructor() {
+        super(productoVenta);
+    }
+
+    async createVentaProductosCompleta({ total, carritoProductos, museoId, usuarioId, formaPagoId }) {
+        return await sequelize.transaction(async (t) => {
+            const nuevaVenta = await this.model.create({total, fechaVenta: new Date(), museoId, usuarioId, formaPagoId}, { transaction: t });
+            const detallesData = await Promise.all(carritoProductos.map(async (producto) => {
+                const articulo = await articuloRepository.findById(producto.articuloId);
+                if (!articulo) {
+                    throw new Error(`Artículo con ID ${producto.articuloId} no encontrado`);
+                }
+                
+                // Preparar los datos para el registro de ProductoDetalle
+                return {
+                    cantidad: producto.cantidad,
+                    subTotal: producto.cantidad * articulo.precioVenta,
+                    articuloId: producto.articuloId,
+                    productoVentaId: nuevaVenta.id
+                };
+            }));
+
+            const nuevosDetalles = await productoDetalleRepository.createMultiple(detallesData, { transaction: t });
+
+            return {
+                ...nuevaVenta.toJSON(),
+                detalles: nuevosDetalles
+            };
+        });
+    }
+
+    async findAllAndCount({limit = 10, offset =0}){
+        return await this.model.findAndCountAll({ limit, offset});
+    }
+
+    async findAllAndCountByMuseoId({museoId, limit = 10, offset =0}){
+        return await this.model.findAndCountAll({ where: { museoId }, limit, offset});
+    }
+
+    async findByIdWithChildren({id}) {
+        return await this.model.findByPk(id, {
+            include: [
+                {model : productoDetalle, as: 'producto_detalles'}
+            ]
+        });
+    }
+}
+
+export const productoVentaRepository = new ProductoVentaRepository();

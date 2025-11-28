@@ -1,6 +1,6 @@
 import express from "express";
 import { ProductoController } from "../controllers/productoController.js";
-import authJwt from "../middlewares/authJwt.js";
+import { authJwt } from "../middlewares/index.js";
 
 const router = express.Router();
 
@@ -9,8 +9,8 @@ router.get("/", [authJwt.verifyToken], ProductoController.getAllProductos);
 router.get("/:id", [authJwt.verifyToken], ProductoController.getById);
 
 // Rutas de gestión (admin)
-router.post("/", [authJwt.verifyToken, authJwt.isAdmin], ProductoController.createProduct);
-router.put("/:id", [authJwt.verifyToken, authJwt.isAdmin], ProductoController.updateProduct);
-router.delete("/:id", [authJwt.verifyToken, authJwt.isAdmin], ProductoController.deleteProduct);
+router.post("/", [authJwt.verifyToken], ProductoController.createProduct);
+router.put("/:id", [authJwt.verifyToken], ProductoController.updateProduct);
+router.delete("/:id", [authJwt.verifyToken], ProductoController.deleteProduct);
 
 export default router;
