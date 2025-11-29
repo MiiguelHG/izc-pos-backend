@@ -108,8 +108,8 @@ db.visitante.hasOne(db.reservaEvento, {foreignKey: "visitanteId"});
 
 // Relaciones de productos-------------------------------------------
 // Relacion producto_detalle - producto_venta (1:N) (Revisado)
-db.productoDetalle.hasMany(db.productoVenta, {foreignKey: "productoDetalleId"});
-db.productoVenta.belongsTo(db.productoDetalle, {foreignKey: "productoDetalleId"});
+db.productoVenta.hasMany(db.productoDetalle, {foreignKey: "productoVentaId"});
+db.productoDetalle.belongsTo(db.productoVenta, {foreignKey: "productoVentaId"});
 
 // Relacion producto_venta - museo (N:1) (Revisado)
 db.productoVenta.belongsTo(db.museo, {foreignKey: "museoId"});
