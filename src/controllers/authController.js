@@ -1,5 +1,5 @@
-import { usuarioRepository, refreshTokenRepository, museoRepository} from "../repositories/index.js";
-import { generateAccessToken, generateRefreshToken } from "../utils/tokenUtils.js";
+import { usuarioRepository, refreshTokenRepository} from "../repositories/index.js";
+import { generateAccessToken, generateRefreshToken, getExpirationFromToken } from "../utils/tokenUtils.js";
 import { sendSuccess, sendError } from "../utils/responseFormater.js";
 
 export class AuthController {
@@ -31,21 +31,32 @@ export class AuthController {
                 return sendError(res, 401, "Invalid Password!");
             }
 
+            //Quitar password del objeto user antes de enviar la respuesta
+            const newUser = {...user.dataValues};
+            delete newUser.password;
+
             //Tokens
             const accessToken = generateAccessToken(user);
             const refreshToken = generateRefreshToken(user);
 
+            const expirationRefreshToken = getExpirationFromToken(refreshToken);
+
             // Guardar el refresh token en la base de datos //
-            const newRefreshToken = await refreshTokenRepository.create({ token: refreshToken, usuarioId: user.id, expiresAt: new Date(Date.now() + 7*24*60*60*1000) });
+            const newRefreshToken = await refreshTokenRepository.create({ token: refreshToken, usuarioId: user.id, expiresAt: expirationRefreshToken });
+
+            // Enviar refresh token como cookie HTTP-only
+            res.cookie('refreshToken', newRefreshToken.token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // solo HTTPS en producción
+                sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+                // domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : 'localhost',
+                maxAge: expirationRefreshToken - new Date(),
+                path: '/'
+            });
 
             return sendSuccess(res, 200, "Login successful!", {
-                id: user.id,
-                nombre: user.nombre,
-                email: user.email,
-                rolId: user.rolId,
-                museoId: user.museoId,
-                accessToken,
-                refreshToken: newRefreshToken.token
+                user: newUser,
+                accessToken
             });
         } catch(error) {
             return sendError(res, 500, `Error logging in: ${error.message}`);
@@ -54,7 +65,8 @@ export class AuthController {
 
     static async refreshToken(req, res) {
         try {
-            const { refreshToken } = req.body;
+            // Leer refresh token desde la cookie
+            const refreshToken = req.cookies.refreshToken;
             const { user } = req;
 
             if (!refreshToken) {
@@ -63,18 +75,28 @@ export class AuthController {
 
             // Rotacion de refresh token
             const newRefreshToken = generateRefreshToken(user);
+            const expirationRefreshToken = getExpirationFromToken(newRefreshToken);
             
             const isRefreshTokenUpdated = await refreshTokenRepository.update({ token: refreshToken },
-                { token: newRefreshToken, expiresAt: new Date(Date.now() + 7*24*60*60*1000) }
+                { token: newRefreshToken, expiresAt: expirationRefreshToken }
             );
 
             if (!isRefreshTokenUpdated) {
                 return sendError(res, 403, "Invalid refresh token!");
             }
 
+            // Enviar nuevo refresh token como cookie
+            res.cookie('refreshToken', newRefreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+                // domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : 'localhost',
+                maxAge: expirationRefreshToken - new Date(),
+                path: '/'
+            });
+
             return sendSuccess(res, 200, "Token refreshed successfully!", {
-                accessToken: generateAccessToken(user),
-                refreshToken: newRefreshToken
+                accessToken: generateAccessToken(user)
             });
         } catch (error) {
             return sendError(res, 500, `Error refreshing token: ${error.message}`);
@@ -83,7 +105,8 @@ export class AuthController {
 
     static async logout(req, res) {
         try {
-            const { refreshToken } = req.body;
+            // Leer refresh token desde la cookie
+            const refreshToken = req.cookies.refreshToken;
 
             if (!refreshToken){
                 return sendError(res, 400, "Refresh token required!");
@@ -94,6 +117,15 @@ export class AuthController {
             if (!isRefreshTokenDeleted) {
                 return sendError(res, 404, "Refresh token not found!");
             }
+ 
+            // Eliminar la cookie
+            res.clearCookie('refreshToken', {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+                // domain: process.env.NODE_ENV === 'production' ? '.yourdomain.com' : 'localhost',
+                path: '/'
+            });
 
             return sendSuccess(res, 200, "Logged out successfully!");
         } catch (error) {
