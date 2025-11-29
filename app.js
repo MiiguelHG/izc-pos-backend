@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 
 import db from './src/models/index.js';
 import authRoutes from './src/routes/authRoutes.js';
@@ -22,9 +23,11 @@ const PORT = process.env.PORT || 3000;
 
 // Middlewares globales //
 const corsOptions = {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000'
+    origin: process.env.CORS_ORIGIN || 'http://localhost:4200',
+    credentials: true // Permitir envío de cookies
 };
 app.use(cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
