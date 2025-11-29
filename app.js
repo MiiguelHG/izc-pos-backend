@@ -14,6 +14,7 @@ import boletoTipoRoutes from './src/routes/boletoTipoRoutes.js';
 import museoRoutes from './src/routes/museoRoutes.js';
 import boletoEmitidoRoutes from './src/routes/boletoEmitidoRoutes.js';
 import visitanteRoutes from './src/routes/visitanteRoutes.js';
+import productoVentaRoutes from './src/routes/productoVentaRoutes.js';
 import { runSeeders } from './src/seeders/index.js';
 
 dotenv.config();
@@ -66,6 +67,9 @@ app.use('/api/museos', museoRoutes);
 
 // -- Rutas de boletos emitidos --
 app.use('/api/boletos-emitidos', boletoEmitidoRoutes);
+
+// -- Rutas de ventas de productos --
+app.use('/api/producto-ventas', productoVentaRoutes);
 
 // -- Rutas de visitantes --
 app.use('/api/visitantes', visitanteRoutes);
