@@ -1,6 +1,6 @@
 import { usuarioRepository, refreshTokenRepository} from "../repositories/index.js";
-import { generateAccessToken, generateRefreshToken, getExpirationFromToken } from "../utils/tokenUtils.js";
-import { sendSuccess, sendError } from "../utils/responseFormater.js";
+import { generateAccessToken, generateRefreshToken, getExpirationFromToken, getUserIdFromToken } from "#utils/tokenUtils.js";
+import { sendSuccess, sendError } from "#utils/responseFormater.js";
 
 export class AuthController {
     static async register(req, res) {
@@ -67,12 +67,14 @@ export class AuthController {
         try {
             // Leer refresh token desde la cookie
             const refreshToken = req.cookies.refreshToken;
-            const { user } = req;
 
             if (!refreshToken) {
                 return sendError(res, 400, "Refresh token required!");
             }
 
+            const userId = getUserIdFromToken(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+            const user = await usuarioRepository.findUserById(userId);
             // Rotacion de refresh token
             const newRefreshToken = generateRefreshToken(user);
             const expirationRefreshToken = getExpirationFromToken(newRefreshToken);
@@ -130,6 +132,16 @@ export class AuthController {
             return sendSuccess(res, 200, "Logged out successfully!");
         } catch (error) {
             return sendError(res, 500, `Error logging out: ${error.message}`);
+        }
+    }
+
+    static async getCurrentUser(req, res) {
+        try {
+            const { id, nombre, email, activo, museoId, usuarioId, museo, rol } = req.user;
+
+            return sendSuccess(res, 200, "Current user fetched successfully!", { id, nombre, email, activo, museoId, usuarioId, museo, rol });
+        } catch (error) {
+            return sendError(res, 500, `Error fetching current user: ${error.message}`);
         }
     }
 }

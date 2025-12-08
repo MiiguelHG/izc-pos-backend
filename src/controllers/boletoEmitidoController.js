@@ -1,4 +1,4 @@
-import { boletoEmitidoRepository } from "#repositories/index.js";
+import { boletoEmitidoRepository, visitanteRepository, museoRepository } from "#repositories/index.js";
 import { sendError, sendSuccess } from "#utils/responseFormater.js";
 
 export class BoletoEmitidoController {
@@ -12,7 +12,12 @@ export class BoletoEmitidoController {
         return sendError(res, 500, "Error al crear la venta de boletos");
       }
 
-      return sendSuccess(res, 201, "Venta de boletos creada exitosamente", nuevoBoletoEmitido);
+      const visitante = await visitanteRepository.findById(visitanteId);
+      const museo = await museoRepository.findById(museoId);
+
+      const boletoEmitido = { ...nuevoBoletoEmitido, visitante: { ...visitante.dataValues }, museo: { ...museo.dataValues } };
+
+      return sendSuccess(res, 201, "Venta de boletos creada exitosamente", boletoEmitido);
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error}`);
     }
