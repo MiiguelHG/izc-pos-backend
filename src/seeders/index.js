@@ -47,7 +47,7 @@ export const runSeeders = async () => {
         await productoDetalleSeeder(1, 100.00, 1, 1);
         await productoDetalleSeeder(1, 200.00, 2, 1);
 
-        await visitanteSeeder("Juan Pérez", 30, "12345", "Ciudad de México", "México", 1, 0, 0, 1, 1, 2);
+        await visitanteSeeder("Juan Pérez", 30, "12345", "México", "Ciudad de México", "Benito Juárez", 1, 0, 0, 1, 1, 2);
 
 
         console.log("\n✅ Todos los seeders se ejecutaron exitosamente");

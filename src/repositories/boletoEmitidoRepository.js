@@ -2,7 +2,7 @@ import BaseRepository from "./baseRepository.js";
 import { boletoTipoRepository, boletoVentaRepository } from "./index.js";
 import db from "../models/index.js";
 
-const { boletoEmitido, sequelize , boletoVenta} = db;
+const { boletoEmitido, sequelize , boletoVenta, visitante} = db;
 
 class BoletoEmitidoRepository extends BaseRepository {
   constructor() {
@@ -52,6 +52,11 @@ class BoletoEmitidoRepository extends BaseRepository {
   async findAllAndCountByMuseoId({ museoId, limit = 10, offset = 0 }) {
     return await this.model.findAndCountAll({ 
       where: { museoId },
+      include: [
+        { model: visitante, as: 'visitante' },
+        { model: boletoVenta, as: 'boleto_ventas' }
+      ],
+      order: [['fechaEmision', 'DESC']],
       limit, 
       offset 
     });

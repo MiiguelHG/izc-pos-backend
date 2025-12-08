@@ -1,13 +1,14 @@
 import { visitanteRepository } from "#repositories/index.js";
 
-export const visitanteSeeder = async (nombre, edad, cp, estado, pais, cantidadHombres, cantidadMujeres, cantidadOtros, totalVisitantes, museoId, usuarioId) => {
+export const visitanteSeeder = async (nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros, totalVisitantes, museoId, usuarioId) => {
   try {
     const visitante = await visitanteRepository.create({
       nombre,
       edad,
       cp,
-      estado,
       pais,
+      estado,
+      municipio,
       cantidadHombres,
       cantidadMujeres,
       cantidadOtros,

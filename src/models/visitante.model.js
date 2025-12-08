@@ -19,13 +19,17 @@ export default (sequelize, Sequelize) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
-        estado: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
         pais: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        estado: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        municipio: {
+            type: DataTypes.STRING,
+            allowNull: true
         },
         cantidadHombres: {
             type: DataTypes.INTEGER,
