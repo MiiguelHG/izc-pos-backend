@@ -5,13 +5,27 @@ export class UsuarioController {
     // Obtener todos los usuarios (solo admin)
     static async getAll(req, res) {
         try {
-            const users = await usuarioRepository.findAllWithoutPassword();
+            const limit = 10;
+            const page = parseInt(req.query.page) || 1;
+            const offset = (page - 1) * limit;
 
-            if (!users || users.length === 0){
+            const { rows, count } = await usuarioRepository.findAllWithoutPassword({ limit, offset });
+
+            if (count === 0) {
                     return sendError(res, "No users found.", 404);
             }
 
-            return sendSuccess(res,200, "Users retrieved successfully.", users);
+            const totalPages = Math.ceil(count / limit);
+
+            return sendSuccess(res,200, "Users retrieved successfully.", {
+                data: rows,
+                meta: {
+                    totalItems: count,
+                    currentPage: page,
+                    totalPages,
+                    pageSize: limit
+                }
+            });
         } catch (error) {
             sendError(res,500, `Error retrieving users: ${error.message}`);
         }

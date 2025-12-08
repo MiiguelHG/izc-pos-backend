@@ -48,7 +48,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/articulos', articuloRoutes);
 
 // --  Rutas de formas de pago --
-app.use('/api/formasPago', formaPagoRoutes);
+app.use('/api/formas-pago', formaPagoRoutes);
 
 // // --  Rutas de tokens --
 // app.use('/api/tokens', refreshTokenRoutes);

@@ -8,13 +8,15 @@ class UsuarioRepository extends BaseRepository {
         super(usuario);
     }
 
-    async findAllWithoutPassword() {
-        return await this.findAll({
+    async findAllWithoutPassword({limit = 10, offset = 0}) {
+        return await this.model.findAndCountAll({
             attributes: { exclude: ["password"] },
             include: [
                 { model: rol, as: "rol" },
                 { model: museo, as: "museo" }
-            ]
+            ],
+            limit,
+            offset
         })
     }
 

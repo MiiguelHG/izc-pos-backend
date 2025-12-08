@@ -1,9 +1,6 @@
-import jwt from "jsonwebtoken";
-//import db from "../models/index.js";
-import { sendError } from "../utils/responseFormater.js";
-import { usuarioRepository } from "../repositories/usuarioRepository.js";
-
-// const { usuario: Usuario, rol: Rol } = db;
+import { sendError } from "#utils/responseFormater.js";
+import { getUserIdFromToken } from "#utils/tokenUtils.js";
+import { usuarioRepository } from "../repositories/index.js";
 
 export class authJwt {
   static async verifyToken(req, res, next){
@@ -15,9 +12,9 @@ export class authJwt {
 
     try {
       const cleanToken = token.split(" ")[1];
-      const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET);
+      const userId = getUserIdFromToken(cleanToken, process.env.JWT_SECRET);
 
-      const user = await usuarioRepository.findUserById(decoded.id);
+      const user = await usuarioRepository.findUserById(userId);
 
       if (!user) {
           return sendError(res, 401, "Unauthorized!");
