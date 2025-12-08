@@ -79,8 +79,9 @@ export class VisitanteController {
                 nombre,
                 edad,
                 cp,
-                estado,
                 pais,
+                estado,
+                municipio,
                 cantidadHombres,
                 cantidadMujeres,
                 cantidadOtros,
@@ -94,7 +95,7 @@ export class VisitanteController {
                 return sendError(res, 400, "El total de visitantes debe ser mayor a cero.");
             }
 
-            const newVisitante = await visitanteRepository.create({nombre, edad, cp, estado, pais, cantidadHombres, cantidadMujeres, cantidadOtros, totalVisitantes, museoId, usuarioId});
+            const newVisitante = await visitanteRepository.create({nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros, totalVisitantes, museoId, usuarioId});
             
             if(!newVisitante){
                 return sendError(res, 500, "No se pudo crear el visitante.");
@@ -113,8 +114,9 @@ export class VisitanteController {
                 nombre,
                 edad,
                 cp,
-                estado,
                 pais,
+                estado,
+                municipio,
                 cantidadHombres,
                 cantidadMujeres,
                 cantidadOtros,
@@ -126,7 +128,7 @@ export class VisitanteController {
                 return sendError(res, 400, "El total de visitantes debe ser mayor a cero.");
             }
 
-            const updated = await visitanteRepository.update({id}, {nombre, edad, cp, estado, pais, cantidadHombres, cantidadMujeres, cantidadOtros, totalVisitantes});
+            const updated = await visitanteRepository.update({id}, {nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros, totalVisitantes});
 
             if(!updated){
                 return sendError(res, 404, "Visitante no encontrado o no se pudo actualizar.");

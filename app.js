@@ -15,6 +15,7 @@ import museoRoutes from './src/routes/museoRoutes.js';
 import boletoEmitidoRoutes from './src/routes/boletoEmitidoRoutes.js';
 import visitanteRoutes from './src/routes/visitanteRoutes.js';
 import productoVentaRoutes from './src/routes/productoVentaRoutes.js';
+import dipomexRoutes from './src/routes/dipomexRoutes.js';
 import { runSeeders } from './src/seeders/index.js';
 
 dotenv.config();
@@ -73,6 +74,9 @@ app.use('/api/producto-ventas', productoVentaRoutes);
 
 // -- Rutas de visitantes --
 app.use('/api/visitantes', visitanteRoutes);
+
+// -- Rutas de Dipomex --
+app.use('/api/dipomex', dipomexRoutes);
 
 // Sincronizar la base de datos e iniciar el servidor
 // Configurar opciones de sincronización según el entorno
