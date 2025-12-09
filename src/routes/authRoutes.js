@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post("/register", [authJwt.verifyToken, authJwt.hasRole("admin"), verifySignUp.checkDuplicateUsernameOrEmail, verifySignUp.checkRolesExists], AuthController.register);
 
+router.get("/me", authJwt.verifyToken, AuthController.getCurrentUser);
 router.post("/login", AuthController.login);
 router.put("/refresh", AuthController.refreshToken);
 router.post("/logout", AuthController.logout);

@@ -20,13 +20,27 @@ export class MuseoController {
 
   static async getAllMuseos(req, res) {
     try {
-      const museos = await museoRepository.findAll();
+      const limit = 10;
+      const page = parseInt(req.query.page) || 1;
+      const offset = (page - 1) * limit;
 
-      if (!museos || museos.length === 0) {
+      const { rows, count } = await museoRepository.findAndCountAll({ limit, offset });
+
+      if (!rows || rows.length === 0) {
         return sendError(res, 404, 'No se encontraron museos');
       }
 
-      return sendSuccess(res, 200, 'Museos obtenidos exitosamente', museos);
+      const totalPages = Math.ceil(count / limit);
+
+      return sendSuccess(res, 200, 'Museos obtenidos exitosamente', {
+        data: rows,
+        meta: {
+          totalItems: count,
+          currentPage: page,
+          totalPages,
+          pageSize: limit
+        }
+      });
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
@@ -61,7 +75,7 @@ export class MuseoController {
 
       // Tal vez se pueda devolver el museo actualizado aquí, pero no es obligatorio
 
-      return sendSuccess(res, 200, 'Museo actualizado exitosamente');
+      return sendSuccess(res, 200, 'Museo actualizado exitosamente', updated);
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }

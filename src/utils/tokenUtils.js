@@ -24,3 +24,8 @@ export const getExpirationFromToken = (token) => {
     const decoded = jwt.decode(token);
     return decoded && decoded.exp ? new Date(decoded.exp * 1000) : null;
 }
+
+export const getUserIdFromToken = (token, secret) => {
+    const decoded = jwt.verify(token, secret);
+    return decoded && decoded.id ? decoded.id : null;
+}

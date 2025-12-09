@@ -2,7 +2,6 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-// import swaggerUI from 'swagger-ui-express';
 
 import db from './src/models/index.js';
 import authRoutes from './src/routes/authRoutes.js';
@@ -17,6 +16,7 @@ import boletoEmitidoRoutes from './src/routes/boletoEmitidoRoutes.js';
 import visitanteRoutes from './src/routes/visitanteRoutes.js';
 import productoVentaRoutes from './src/routes/productoVentaRoutes.js';
 import reservaEventoRoutes from './src/routes/reservaEventoRoutes.js';
+import dipomexRoutes from './src/routes/dipomexRoutes.js';
 import { runSeeders } from './src/seeders/index.js';
 
 dotenv.config();
@@ -34,10 +34,6 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Documentación Swagger
-// import swaggerDocument from './swagger.json';
-// app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
-
 // Rutas //
 // Ruta simple de test
 app.get('/', (req, res) => {
@@ -54,7 +50,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/articulos', articuloRoutes);
 
 // --  Rutas de formas de pago --
-app.use('/api/formasPago', formaPagoRoutes);
+app.use('/api/formas-pago', formaPagoRoutes);
 
 // // --  Rutas de tokens --
 // app.use('/api/tokens', refreshTokenRoutes);
@@ -82,6 +78,9 @@ app.use('/api/reservas-evento', reservaEventoRoutes);
 
 // -- Rutas de visitantes --
 app.use('/api/visitantes', visitanteRoutes);
+
+// -- Rutas de Dipomex --
+app.use('/api/dipomex', dipomexRoutes);
 
 // Sincronizar la base de datos e iniciar el servidor
 // Configurar opciones de sincronización según el entorno
