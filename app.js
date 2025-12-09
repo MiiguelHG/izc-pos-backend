@@ -17,6 +17,8 @@ import visitanteRoutes from './src/routes/visitanteRoutes.js';
 import productoVentaRoutes from './src/routes/productoVentaRoutes.js';
 import reservaEventoRoutes from './src/routes/reservaEventoRoutes.js';
 import dipomexRoutes from './src/routes/dipomexRoutes.js';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 import { runSeeders } from './src/seeders/index.js';
 
 dotenv.config();
@@ -33,6 +35,31 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Swagger setup
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'IZC POS Backend API',
+            version: '1.0.0',
+            description: 'API documentation for IZC POS backend'
+        },
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
+                }
+            }
+        }
+    },
+    apis: ['./src/routes/*.js', './src/controllers/*.js']
+};
+
+const specs = swaggerJsdoc(swaggerOptions);
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Rutas //
 // Ruta simple de test

@@ -61,6 +61,20 @@ class ReservaEventoRepository extends BaseRepository {
         return count === 0;
     }
 
+    async conflictosReserva(articuloId, museoId, fechaInicio, fechaFin, id) {
+        return await this.model.count({
+            where: {
+                articuloId,
+                museoId,
+                id: { [Op.ne]: id },
+                [Op.and]: [
+                    { fechaInicio: { [Op.lt]: fechaFin } },
+                    { fechaFin: { [Op.gt]: fechaInicio } }
+                ]
+            }
+        });
+    }
+
     async cancelarEvento(id){
         return await this.update({ id }, { estado: 'cancelado' });
     }

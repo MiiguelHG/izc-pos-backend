@@ -1,4 +1,5 @@
 import express from "express";
+import { validarReserva, validarActualizacionReserva } from "#middlewares/reservaEventoMiddleware.js";
 import { ReservaEventoController } from "#controllers/reservaEventoController.js";
 
 const router = express.Router();
@@ -22,10 +23,10 @@ router.post("/:id/asistido", ReservaEventoController.marcarComoAsistido);
 
 // Create (authenticated users)
 router.get("/",ReservaEventoController.getReservasEvento);
-router.post("/", ReservaEventoController.createReservaEvento);
+router.post("/", validarReserva, ReservaEventoController.createReservaEvento);
 
 // Update / Delete (admin)
-router.put("/:id", ReservaEventoController.updateReservaEvento);
+router.put("/:id", validarActualizacionReserva, ReservaEventoController.updateReservaEvento);
 router.delete("/:id", ReservaEventoController.deleteReservaEvento);
 
 // Fetch by ID (siempre la ÚLTIMA ruta dinámica)

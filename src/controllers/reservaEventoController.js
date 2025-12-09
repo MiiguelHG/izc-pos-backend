@@ -1,16 +1,14 @@
 import { reservaEventoRepository } from "#repositories/index.js";
-import { ReservaEventoService } from "../services/reservaEventoService.js";
 import { sendSuccess, sendError } from "#utils/responseFormater.js";
 
 export class ReservaEventoController {
     static async createReservaEvento(req, res) {
         try {
-            const newReserva =  await ReservaEventoService.crearReserva(req.body);
-            const reserva = await reservaEventoRepository.create(newReserva);
+            const newReserva =  await reservaEventoRepository.create(req.reservaData);
             if (!newReserva) {
                 return sendError(res, 400, "No se pudo crear la reserva de evento.");
             }
-            return sendSuccess(res, 201, "Reserva de evento creada exitosamente.", reserva);
+            return sendSuccess(res, 201, "Reserva de evento creada exitosamente.", newReserva);
         } catch (error) {
             return sendError(res, 500, `Error al crear reserva de evento: ${error.message}`);
         }
@@ -43,7 +41,7 @@ export class ReservaEventoController {
     static async updateReservaEvento(req, res){
         try{
             const { id } = req.params
-            const updatedReserva = await ReservaEventoService.actualizarReserva(id, req.body);
+            const updatedReserva = await reservaEventoRepository.update({ id }, req.reservaActualizada);
 
             if (!updatedReserva) {
                 return sendError(res, 404, "Reserva de evento no encontrada o no se pudo actualizar.");
