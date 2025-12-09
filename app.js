@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+// import swaggerUI from 'swagger-ui-express';
 
 import db from './src/models/index.js';
 import authRoutes from './src/routes/authRoutes.js';
@@ -15,6 +16,7 @@ import museoRoutes from './src/routes/museoRoutes.js';
 import boletoEmitidoRoutes from './src/routes/boletoEmitidoRoutes.js';
 import visitanteRoutes from './src/routes/visitanteRoutes.js';
 import productoVentaRoutes from './src/routes/productoVentaRoutes.js';
+import reservaEventoRoutes from './src/routes/reservaEventoRoutes.js';
 import { runSeeders } from './src/seeders/index.js';
 
 dotenv.config();
@@ -31,6 +33,10 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Documentación Swagger
+// import swaggerDocument from './swagger.json';
+// app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 // Rutas //
 // Ruta simple de test
@@ -70,6 +76,9 @@ app.use('/api/boletos-emitidos', boletoEmitidoRoutes);
 
 // -- Rutas de ventas de productos --
 app.use('/api/producto-ventas', productoVentaRoutes);
+
+// -- Rutas de reservas de eventos --
+app.use('/api/reservas-evento', reservaEventoRoutes);
 
 // -- Rutas de visitantes --
 app.use('/api/visitantes', visitanteRoutes);

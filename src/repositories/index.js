@@ -10,6 +10,7 @@ import { boletoEmitidoRepository } from "./boletoEmitidoRepository.js";
 import { visitanteRepository } from "./visitanteRepository.js";
 import { productoDetalleRepository } from "./productoDetalleRepository.js";
 import { productoVentaRepository } from "./productoVentaRepository.js";
+import { reservaEventoRepository } from "./reservaEventoRepository.js";
 
 export {
     usuarioRepository,
@@ -23,5 +24,6 @@ export {
     boletoEmitidoRepository,
     visitanteRepository,
     productoDetalleRepository,
-    productoVentaRepository
+    productoVentaRepository,
+    reservaEventoRepository
 }

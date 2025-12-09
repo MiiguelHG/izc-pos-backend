@@ -21,6 +21,7 @@ export const runSeeders = async () => {
 
         await articuloSeeder("Entrada General", "Acceso general al museo", 100.00, "boleto");
         await articuloSeeder("Guía Audiovisual", "Dispositivo de guía audiovisual", 50.00, "artículo");
+        await articuloSeeder("Taller de Pintura", "Taller práctico de pintura", 200.00, "evento");
 
         await formaPagoSeeder("Efectivo", "Pago en efectivo");
 
