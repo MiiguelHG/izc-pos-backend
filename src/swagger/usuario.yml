@@ -1,0 +1,246 @@
+components:
+  schemas:
+    UsuarioBase:
+      type: object
+      required:
+        - nombre
+        - email
+        - password
+        - rolId
+      properties:
+        nombre:
+          type: string
+          example: "Juan Pérez"
+        email:
+          type: string
+          format: email
+          example: "juan@example.com"
+        password:
+          type: string
+          format: password
+          example: "password123"
+        activo:
+          type: boolean
+          default: true
+          example: true
+        rolId:
+          type: integer
+          example: 1
+        museoId:
+          type: integer
+          nullable: true
+          example: 1
+
+    UsuarioResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Juan Pérez"
+        email:
+          type: string
+          format: email
+          example: "juan@example.com"
+        activo:
+          type: boolean
+          example: true
+        rolId:
+          type: integer
+          example: 1
+        museoId:
+          type: integer
+          nullable: true
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaginatedUsersResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 1
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsuarioResponse'
+        meta:
+          type: object
+          properties:
+            totalItems:
+              type: integer
+            currentPage:
+              type: integer
+            totalPages:
+              type: integer
+            pageSize:
+              type: integer
+
+paths:
+  /api/usuarios:
+    get:
+      summary: Get all users (paginated)
+      description: Retrieve a paginated list of all users (admin only)
+      tags:
+        - Usuarios
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number (default 1, 10 items per page)
+      responses:
+        200:
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUsersResponse'
+        404:
+          description: No users found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/usuarios/{id}:
+    get:
+      summary: Get user by ID
+      description: Retrieve a specific user by ID (admin or owner only)
+      tags:
+        - Usuarios
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: User ID
+      responses:
+        200:
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/UsuarioResponse'
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update user
+      description: Update an existing user by ID (admin or owner only)
+      tags:
+        - Usuarios
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioBase'
+            example:
+              nombre: "Juan Pérez Actualizado"
+              email: "juannuevo@example.com"
+              password: "newpassword123"
+              activo: true
+              rolId: 2
+              museoId: 2
+      responses:
+        200:
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/UsuarioResponse'
+        404:
+          description: User not found or could not be updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete user
+      description: Delete an existing user by ID (admin only)
+      tags:
+        - Usuarios
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: User ID
+      responses:
+        200:
+          description: User deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        404:
+          description: User not found or could not be deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
