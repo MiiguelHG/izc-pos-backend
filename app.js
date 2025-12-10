@@ -36,29 +36,8 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Swagger setup
-const swaggerOptions = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'IZC POS Backend API',
-            version: '1.0.0',
-            description: 'API documentation for IZC POS backend'
-        },
-        components: {
-            securitySchemes: {
-                bearerAuth: {
-                    type: 'http',
-                    scheme: 'bearer',
-                    bearerFormat: 'JWT'
-                }
-            }
-        }
-    },
-    apis: ['./src/routes/*.js', './src/controllers/*.js']
-};
-
-const specs = swaggerJsdoc(swaggerOptions);
+// Configuración de Swagger
+import specs from './src/swagger/swagger.js';
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Rutas //

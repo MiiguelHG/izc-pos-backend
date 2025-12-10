@@ -1,0 +1,265 @@
+components:
+  schemas:
+    ProductoVentaItem:
+      type: object
+      required:
+        - productoId
+        - cantidad
+      properties:
+        productoId:
+          type: integer
+          example: 1
+        cantidad:
+          type: integer
+          example: 2
+    CreateVentaProductosCompleta:
+      type: object
+      required:
+        - total
+        - carritoProductos
+        - museoId
+        - usuarioId
+        - formaPagoId
+      properties:
+        total:
+          type: number
+          format: float
+          example: 91.00
+        carritoProductos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductoVentaItem'
+        museoId:
+          type: integer
+          example: 1
+        usuarioId:
+          type: integer
+          example: 2
+        formaPagoId:
+          type: integer
+          example: 1
+
+    ProductoVentaResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        total:
+          type: number
+          format: float
+          example: 91.00
+        museoId:
+          type: integer
+          example: 1
+        usuarioId:
+          type: integer
+          example: 2
+        formaPagoId:
+          type: integer
+          example: 1
+        fechaVenta:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: "Error message"
+        data:
+          type: string
+          nullable: true
+
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 1
+        message:
+          type: string
+          example: "Success message"
+        data:
+          type: object
+
+    PaginatedResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 1
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            ventas:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductoVentaResponse'
+            pagination:
+              type: object
+              properties:
+                totalItems:
+                  type: integer
+                currentPage:
+                  type: integer
+                totalPages:
+                  type: integer
+                pageSize:
+                  type: integer
+
+paths:
+  /api/producto-ventas:
+    post:
+      summary: Create a complete product sale (venta de productos)
+      description: Create a new product sale with multiple items (carrito de productos)
+      tags:
+        - ProductoVentas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVentaProductosCompleta'
+            example:
+              total: 91.00
+              carritoProductos:
+                - productoId: 1
+                  cantidad: 2
+                - productoId: 3
+                  cantidad: 1
+              museoId: 1
+              usuarioId: 2
+              formaPagoId: 1
+      responses:
+        201:
+          description: Venta creada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        400:
+          description: Bad request - Invalid data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      summary: Get paginated list of product sales
+      description: Retrieve all product sales with pagination support
+      tags:
+        - ProductoVentas
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 1
+          description: Page number (default 1, 10 items per page)
+      responses:
+        200:
+          description: Lista de ventas recuperada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse'
+        404:
+          description: No se encontraron ventas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/producto-ventas/{id}:
+    get:
+      summary: Get a product sale by ID
+      description: Retrieve a specific product sale with all its details and line items
+      tags:
+        - ProductoVentas
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Product sale ID
+      responses:
+        200:
+          description: Venta encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        404:
+          description: Venta no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/producto-ventas/museo/{museoId}:
+    get:
+      summary: Get product sales filtered by museum ID
+      description: Retrieve paginated list of product sales for a specific museum
+      tags:
+        - ProductoVentas
+      parameters:
+        - in: path
+          name: museoId
+          required: true
+          schema:
+            type: integer
+          description: Museum ID to filter sales
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 1
+          description: Page number (default 1, 10 items per page)
+      responses:
+        200:
+          description: Ventas por museo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse'
+        404:
+          description: No se encontraron ventas para este museo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

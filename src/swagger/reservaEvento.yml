@@ -1,0 +1,651 @@
+components:
+  schemas:
+    ReservaEventoBase:
+      type: object
+      required:
+        - responsable
+        - contactoResponsable
+        - fechaInicio
+        - fechaFin
+        - total
+        - estado
+        - usuarioId
+        - museoId
+        - articuloId
+        - visitanteId
+        - formaPagoId
+      properties:
+        responsable:
+          type: string
+          example: "Juan García"
+        contactoResponsable:
+          type: string
+          example: "555-1234567"
+        fechaInicio:
+          type: string
+          format: date-time
+          example: "2025-12-11T18:00:00"
+        fechaFin:
+          type: string
+          format: date-time
+          example: "2025-12-11T21:00:00"
+        total:
+          type: number
+          format: float
+          example: 1500.00
+        estado:
+          type: string
+          enum: ["reservado", "cancelado", "asistido"]
+          example: "reservado"
+        usuarioId:
+          type: integer
+          example: 1
+        museoId:
+          type: integer
+          example: 1
+        articuloId:
+          type: integer
+          example: 1
+        visitanteId:
+          type: integer
+          example: 1
+        formaPagoId:
+          type: integer
+          example: 1
+
+    ReservaEventoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        responsable:
+          type: string
+          example: "Juan García"
+        contactoResponsable:
+          type: string
+          example: "555-1234567"
+        fechaReserva:
+          type: string
+          format: date-time
+        fechaInicio:
+          type: string
+          format: date-time
+        fechaFin:
+          type: string
+          format: date-time
+        total:
+          type: number
+          format: float
+          example: 1500.00
+        estado:
+          type: string
+          enum: ["reservado", "cancelado", "asistido"]
+          example: "reservado"
+        usuarioId:
+          type: integer
+        museoId:
+          type: integer
+        articuloId:
+          type: integer
+        visitanteId:
+          type: integer
+        formaPagoId:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    DisponibilidadResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 1
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            disponible:
+              type: boolean
+              example: true
+
+    ContagioResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 1
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            count:
+              type: integer
+              example: 5
+
+paths:
+  /api/reservas-evento:
+    get:
+      summary: Get all event reservations
+      description: Retrieve a list of all event reservations
+      tags:
+        - ReservasEvento
+      responses:
+        200:
+          description: Reservas de eventos recuperadas exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservaEventoResponse'
+        404:
+          description: No se encontraron reservas de eventos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create event reservation
+      description: Create a new event reservation with validation
+      tags:
+        - ReservasEvento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservaEventoBase'
+            example:
+              responsable: "Juan García"
+              contactoResponsable: "555-1234567"
+              fechaInicio: "2025-12-11T18:00:00"
+              fechaFin: "2025-12-11T21:00:00"
+              total: 1500.00
+              estado: "reservado"
+              usuarioId: 1
+              museoId: 1
+              articuloId: 1
+              visitanteId: 1
+              formaPagoId: 1
+      responses:
+        201:
+          description: Reserva de evento creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ReservaEventoResponse'
+        400:
+          description: Bad request - Invalid reservation data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reservas-evento/{id}:
+    get:
+      summary: Get reservation by ID
+      description: Retrieve a specific event reservation by ID
+      tags:
+        - ReservasEvento
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Reservation ID
+      responses:
+        200:
+          description: Reserva de evento recuperada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ReservaEventoResponse'
+        404:
+          description: Reserva de evento no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update event reservation
+      description: Update an existing event reservation by ID
+      tags:
+        - ReservasEvento
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Reservation ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservaEventoBase'
+      responses:
+        200:
+          description: Reserva de evento actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ReservaEventoResponse'
+        404:
+          description: Reserva de evento no encontrada o no se pudo actualizar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete event reservation
+      description: Delete an existing event reservation by ID
+      tags:
+        - ReservasEvento
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Reservation ID
+      responses:
+        200:
+          description: Reserva de evento eliminada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        404:
+          description: Reserva de evento no encontrada o no se pudo eliminar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reservas-evento/rango-fechas:
+    get:
+      summary: Get reservations by date range
+      description: Retrieve reservations within a specific date range
+      tags:
+        - ReservasEvento
+      parameters:
+        - in: query
+          name: fechaInicio
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Start date (YYYY-MM-DD)
+        - in: query
+          name: fechaFin
+          required: true
+          schema:
+            type: string
+            format: date
+          description: End date (YYYY-MM-DD)
+      responses:
+        200:
+          description: Reservas obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservaEventoResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reservas-evento/contar/{fecha}:
+    get:
+      summary: Count reservations by day
+      description: Get the count of reservations for a specific day
+      tags:
+        - ReservasEvento
+      parameters:
+        - in: path
+          name: fecha
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Date in format YYYY-MM-DD
+      responses:
+        200:
+          description: Conteo de reservas por día obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContagioResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reservas-evento/disponibilidad:
+    get:
+      summary: Check availability
+      description: Validate if a time slot is available for an article and museum
+      tags:
+        - ReservasEvento
+      parameters:
+        - in: query
+          name: articuloId
+          required: true
+          schema:
+            type: integer
+          description: Article ID
+        - in: query
+          name: museoId
+          required: true
+          schema:
+            type: integer
+          description: Museum ID
+        - in: query
+          name: fechaInicio
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: Start datetime
+        - in: query
+          name: fechaFin
+          required: true
+          schema:
+            type: string
+            format: date-time
+          description: End datetime
+      responses:
+        200:
+          description: Disponibilidad verificada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisponibilidadResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reservas-evento/dia/{fecha}:
+    get:
+      summary: Get reservations by day
+      description: Retrieve all reservations for a specific day
+      tags:
+        - ReservasEvento
+      parameters:
+        - in: path
+          name: fecha
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Date in format YYYY-MM-DD
+      responses:
+        200:
+          description: Reservas obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservaEventoResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reservas-evento/museo/{museoId}:
+    get:
+      summary: Get reservations by museum
+      description: Retrieve all reservations for a specific museum
+      tags:
+        - ReservasEvento
+      parameters:
+        - in: path
+          name: museoId
+          required: true
+          schema:
+            type: integer
+          description: Museum ID
+      responses:
+        200:
+          description: Reservas obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservaEventoResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reservas-evento/articulo/{articuloId}:
+    get:
+      summary: Get reservations by article
+      description: Retrieve all reservations for a specific article
+      tags:
+        - ReservasEvento
+      parameters:
+        - in: path
+          name: articuloId
+          required: true
+          schema:
+            type: integer
+          description: Article ID
+      responses:
+        200:
+          description: Reservas obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ReservaEventoResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reservas-evento/{id}/cancelar:
+    post:
+      summary: Cancel event reservation
+      description: Cancel an event reservation by changing its status to "cancelado"
+      tags:
+        - ReservasEvento
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Reservation ID
+      responses:
+        200:
+          description: Reserva de evento cancelada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ReservaEventoResponse'
+        404:
+          description: Reserva de evento no encontrada o no se pudo cancelar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/reservas-evento/{id}/asistido:
+    post:
+      summary: Mark reservation as attended
+      description: Mark an event reservation as attended by changing its status to "asistido"
+      tags:
+        - ReservasEvento
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Reservation ID
+      responses:
+        200:
+          description: Reserva de evento marcada como asistido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ReservaEventoResponse'
+        404:
+          description: Reserva de evento no encontrada o no se pudo marcar como asistido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

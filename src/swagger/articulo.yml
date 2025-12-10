@@ -1,0 +1,320 @@
+components:
+  schemas:
+    ArticuloBase:
+      type: object
+      required:
+        - nombre
+        - precioEstandar
+        - tipo
+      properties:
+        nombre:
+          type: string
+          example: "Entrada General"
+        descripcion:
+          type: string
+          nullable: true
+          example: "Acceso general al museo"
+        precioEstandar:
+          type: number
+          format: float
+          example: 150.00
+        tipo:
+          type: string
+          enum: ["boleto", "producto", "servicio"]
+          example: "boleto"
+
+    ArticuloResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Entrada General"
+        descripcion:
+          type: string
+          nullable: true
+          example: "Acceso general al museo"
+        precioEstandar:
+          type: number
+          format: float
+          example: 150.00
+        tipo:
+          type: string
+          enum: ["boleto", "producto", "servicio"]
+          example: "boleto"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 0
+        message:
+          type: string
+          example: "Error message"
+        data:
+          type: string
+          nullable: true
+
+    SuccessResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 1
+        message:
+          type: string
+          example: "Success message"
+        data:
+          type: object
+
+paths:
+  /api/articulos:
+    get:
+      summary: Get all articles (artículos)
+      description: Retrieve a list of all articles in the system
+      tags:
+        - Articulos
+      responses:
+        200:
+          description: Artículos recuperados exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ArticuloResponse'
+        404:
+          description: No se encontraron artículos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      summary: Create a new article
+      description: Create a new article with name, description, price and type
+      tags:
+        - Articulos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticuloBase'
+            example:
+              nombre: "Entrada General"
+              descripcion: "Acceso general al museo"
+              precioEstandar: 150.00
+              tipo: "boleto"
+      responses:
+        201:
+          description: Artículo creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ArticuloResponse'
+        400:
+          description: Bad request - No se pudo crear el artículo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/articulos/{id}:
+    get:
+      summary: Get article by ID
+      description: Retrieve a specific article by its ID
+      tags:
+        - Articulos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Article ID
+      responses:
+        200:
+          description: Artículo recuperado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ArticuloResponse'
+        404:
+          description: Artículo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update an article
+      description: Update an existing article by ID
+      tags:
+        - Articulos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Article ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticuloBase'
+            example:
+              nombre: "Entrada General Actualizada"
+              descripcion: "Acceso general al museo - Updated"
+              precioEstandar: 175.00
+              tipo: "boleto"
+      responses:
+        200:
+          description: Artículo actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ArticuloResponse'
+        404:
+          description: Artículo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      summary: Delete an article
+      description: Delete an existing article by ID
+      tags:
+        - Articulos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Article ID
+      responses:
+        200:
+          description: Artículo eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        404:
+          description: Artículo no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/articulos/tipo/{tipo}:
+    get:
+      summary: Get articles by type
+      description: Retrieve all articles filtered by type (boleto, producto, servicio)
+      tags:
+        - Articulos
+      parameters:
+        - in: path
+          name: tipo
+          required: true
+          schema:
+            type: string
+            enum: ["boleto", "producto", "servicio"]
+          description: Article type to filter
+      responses:
+        200:
+          description: Artículos recuperados exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 1
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ArticuloResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
