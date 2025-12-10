@@ -19,9 +19,12 @@ class ProductoVentaRepository extends BaseRepository {
                 }
                 
                 // Preparar los datos para el registro de ProductoDetalle
+                const cantidadNum = Number(producto.cantidad);
+                const precioNum = Number(articulo.precioEstandar ?? articulo.precioVenta ?? 0);
+
                 return {
-                    cantidad: producto.cantidad,
-                    subTotal: producto.cantidad * articulo.precioVenta,
+                    cantidad: cantidadNum,
+                    subTotal: cantidadNum * precioNum,
                     articuloId: producto.articuloId,
                     productoVentaId: nuevaVenta.id
                 };

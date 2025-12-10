@@ -10,6 +10,7 @@ import { boletoEmitidoRepository } from "./boletoEmitidoRepository.js";
 import { visitanteRepository } from "./visitanteRepository.js";
 import { productoDetalleRepository } from "./productoDetalleRepository.js";
 import { productoVentaRepository } from "./productoVentaRepository.js";
+import { reservaEventoRepository } from "./reservaEventoRepository.js";
 import { DipomexRepository } from "./dipomexRepository.js";
 
 export {
@@ -25,5 +26,6 @@ export {
     visitanteRepository,
     productoDetalleRepository,
     productoVentaRepository,
+    reservaEventoRepository,
     DipomexRepository
 }

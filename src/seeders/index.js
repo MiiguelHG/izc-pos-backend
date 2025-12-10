@@ -34,6 +34,7 @@ export const runSeeders = async () => {
 
         await articuloSeeder("Entrada General", "Acceso general al museo", 100.00, "boleto");
         await articuloSeeder("Guía Audiovisual", "Dispositivo de guía audiovisual", 50.00, "artículo");
+        await articuloSeeder("Taller de Pintura", "Taller práctico de pintura", 200.00, "evento");
 
         await boletoTipoSeeder("Estandar", "Boleto estándar para adultos", 0.00, 100.00, 1);
         await boletoTipoSeeder("Menor de edad", "Boleto para menores de edad", 0.50, 50.00, 1);
