@@ -1,5 +1,6 @@
 import { sendError, sendSuccess } from '../utils/responseFormater.js';
 import { museoRepository } from '../repositories/index.js';
+import db from '../models/index.js';
 
 export class MuseoController {
   static async createMuseo(req, res) {
@@ -92,6 +93,103 @@ export class MuseoController {
       }
 
       return sendSuccess(res, 200, 'Museo eliminado exitosamente', deleted);
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+
+  static async getArticulosByMuseoId(req, res) {
+    try {
+      const { id } = req.params;
+  
+      const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+      const pageSize = Math.max(parseInt(req.query.pageSize, 10) || 10, 1);
+      const offset = (page - 1) * pageSize;
+
+      const articulos = await museoRepository.getArticulosByMuseo(id, { limit: pageSize, offset });
+
+      const total = await museoRepository.countRelaciones(id)
+      const totalPages = Math.max(Math.ceil(total / pageSize), 1);
+
+      return sendSuccess(res, 200, 'Artículos obtenidos exitosamente', {
+        data: articulos,
+        meta: {
+          totalItems: total,
+          currentPage: page,
+          totalPages,
+          pageSize
+        }
+      });
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+
+  static async getMuseosByArticulos(req, res){
+    try{
+      const { articuloId } = req.params;
+      const museos = await museoRepository.getMuseosByArticulos(articuloId);
+      return sendSuccess(res, 200, 'Museos obtenidos exitosamente', museos);
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+
+  static async addArticulo(req, res){
+    try{
+      const { id } = req.params;
+      const articuloId = req.params.articuloId || req.body.articuloId;
+      const result = await museoRepository.addArticulo(id, articuloId);
+      if (!result || result.success === false) {
+        return sendError(res, 400, result?.error || 'No se pudo agregar el artículo');
+      }
+      return sendSuccess(res, 200, 'Artículo agregado exitosamente', result.data);
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+
+  static async removeArticulo(req, res){
+    try{
+      const { id } = req.params;
+      const articuloId = req.params.articuloId || req.body.articuloId;
+      const result = await museoRepository.removeArticulo(id, articuloId);
+      if (!result || result.success === false) {
+        return sendError(res, 400, result?.error || 'No se pudo remover el artículo');
+      }
+      return sendSuccess(res, 200, 'Artículo removido exitosamente', result.data);
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+
+  static async setArticulos(req, res){
+    try{
+      const { id } = req.params;
+      // Aceptar ambas variantes por compatibilidad con peticiones existentes
+      const articuloIds = req.body.articuloIds ?? req.body.articulosIds;
+
+      if (!Array.isArray(articuloIds)) {
+        return sendError(res, 400, 'Se requiere `articuloIds` como array en el body');
+      }
+
+      const result = await museoRepository.setArticulos(id, articuloIds);
+      // Si el repositorio aún usa throw en lugar de patrón {success,..}, result puede ser true
+      if (result && (result.success === false)) {
+        return sendError(res, 400, result.error || 'No se pudieron establecer artículos');
+      }
+      return sendSuccess(res, 200, 'Artículos establecidos exitosamente', result?.data ?? true);
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+
+  static async hasArticulo(req, res){
+    try{
+      const { id } = req.params;
+      const { articuloId } = req.body;
+      const hasRel = await museoRepository.hasArticulo(id, articuloId);
+      return sendSuccess(res, 200, 'Verificación realizada exitosamente', { hasArticulo: hasRel });
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
