@@ -17,6 +17,7 @@ import visitanteRoutes from './src/routes/visitanteRoutes.js';
 import productoVentaRoutes from './src/routes/productoVentaRoutes.js';
 import reservaEventoRoutes from './src/routes/reservaEventoRoutes.js';
 import dipomexRoutes from './src/routes/dipomexRoutes.js';
+import museoHasArticuloRoutes from './src/routes/museoHasArticuloRoutes.js';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { runSeeders } from './src/seeders/index.js';
@@ -87,6 +88,9 @@ app.use('/api/visitantes', visitanteRoutes);
 
 // -- Rutas de Dipomex --
 app.use('/api/dipomex', dipomexRoutes);
+
+// -- Rutas de Museo <-> Articulo --
+app.use('/api/museo-has-articulos', museoHasArticuloRoutes);
 
 // Sincronizar la base de datos e iniciar el servidor
 // Configurar opciones de sincronización según el entorno

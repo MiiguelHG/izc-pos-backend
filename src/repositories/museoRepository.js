@@ -1,7 +1,7 @@
 import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
 
-const { museo,  } = db;
+const { museo, articulo } = db;
 
 class MuseoRepository extends BaseRepository {
     constructor(){
@@ -14,6 +14,15 @@ class MuseoRepository extends BaseRepository {
             offset
         });
     }
+
 }
 
 export const museoRepository = new MuseoRepository();
+
+    
+
+    
+
+    
+
+    

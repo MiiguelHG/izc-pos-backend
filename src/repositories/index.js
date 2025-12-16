@@ -12,6 +12,7 @@ import { productoDetalleRepository } from "./productoDetalleRepository.js";
 import { productoVentaRepository } from "./productoVentaRepository.js";
 import { reservaEventoRepository } from "./reservaEventoRepository.js";
 import { DipomexRepository } from "./dipomexRepository.js";
+import { museoHasArticuloRepository } from "./museoHasArticuloRepository.js";
 
 export {
     usuarioRepository,
@@ -27,5 +28,6 @@ export {
     productoDetalleRepository,
     productoVentaRepository,
     reservaEventoRepository,
+    museoHasArticuloRepository,
     DipomexRepository
 }
