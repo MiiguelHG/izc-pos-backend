@@ -19,6 +19,7 @@ import reservaEventoRoutes from './src/routes/reservaEventoRoutes.js';
 import dipomexRoutes from './src/routes/dipomexRoutes.js';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import specs from './src/swagger/swagger.js';
 import { runSeeders } from './src/seeders/index.js';
 
 dotenv.config();
@@ -37,7 +38,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Configuración de Swagger
-import specs from './src/swagger/swagger.js';
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Rutas //

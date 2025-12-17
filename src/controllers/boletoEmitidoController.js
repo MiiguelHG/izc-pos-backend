@@ -84,7 +84,7 @@ export class BoletoEmitidoController {
       const totalPages = Math.ceil(count / limit);
 
       return sendSuccess(res, 200, "Boletos emitidos encontrados", { 
-        rows: rows,
+        data: rows,
         meta: {
           totalItems: count,
           currentPage: page,

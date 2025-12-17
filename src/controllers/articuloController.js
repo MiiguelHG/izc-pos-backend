@@ -17,11 +17,27 @@ export class ArticuloController {
 
     static async getArticulo(req, res) {
         try {
-            const articulos = await articuloRepository.findAll();
-            if(!articulos) {
+            const limit = 10;
+            const page = parseInt(req.query.page) || 1;
+            const offset = (page - 1) * limit;
+            const tipo = req.query.tipo || '';
+
+            const { rows, count } = await articuloRepository.findAndCountAll({ seleccion: tipo, limit, offset });
+            
+            if (!rows || count === 0) {
                 return sendError(res, 404, "No se encontraron artículos.");
             }
-            return sendSuccess(res, 200, "Artículos recuperados exitosamente.", articulos);
+            const totalPages = Math.ceil(count / limit);
+
+            return sendSuccess(res, 200, "Artículos recuperados exitosamente.", {
+                data: rows,
+                meta: {
+                    totalItems: count,
+                    currentPage: page,
+                    totalPages,
+                    pageSize: limit
+                }
+            });
         } catch (error) {
             return sendError(res, 500, `Error al obtener artículos: ${error.message}`);
         }
