@@ -9,6 +9,7 @@ import { productoVentaSeeder } from "./productoVentaSeeder.js";
 import { productoDetalleSeeder } from "./productoDetalleSeeder.js";
 import { formaPagoSeeder } from "./formaPagoSeeder.js";
 import { visitanteSeeder } from "./visitanteSeeder.js";
+import { museoHasArticuloSeeder } from "./museoHasArticuloSeeder.js";
 
 export const runSeeders = async () => {
     try {
@@ -43,7 +44,14 @@ export const runSeeders = async () => {
         await articuloSeeder("Camiseta del Museo", "Camiseta con el logo del museo", 25.00, "producto");
         await articuloSeeder("Taller de Pintura", "Taller práctico de pintura", 200.00, "servicio");
         await articuloSeeder("Visita Guiada", "Recorrido guiado por el museo", 150.00, "servicio");
-            await articuloSeeder("Conferencia Especial", "Conferencia sobre arte y cultura", 120.00, "servicio");
+        await articuloSeeder("Conferencia Especial", "Conferencia sobre arte y cultura", 120.00, "servicio");
+
+        await museoHasArticuloSeeder(2, 3);
+        await museoHasArticuloSeeder(2, 4);
+        await museoHasArticuloSeeder(2, 5);
+        await museoHasArticuloSeeder(2, 6);
+        await museoHasArticuloSeeder(2, 10);
+        await museoHasArticuloSeeder(2, 11);
 
         await boletoTipoSeeder("Estandar", "Boleto estándar para adultos", 0, 100.00, 1);
         await boletoTipoSeeder("Menor de edad", "Boleto para menores de edad", 50, 50.00, 1);

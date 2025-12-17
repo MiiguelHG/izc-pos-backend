@@ -1,7 +1,7 @@
 import BaseRepository from "./baseRepository.js";
 import db from "#models/index.js";
 
-const { museoHasArticulo } = db;
+const { museoHasArticulo, articulo } = db;
 
 class MuseoHasArticuloRepository extends BaseRepository {
     constructor() {
@@ -28,13 +28,16 @@ class MuseoHasArticuloRepository extends BaseRepository {
         }
     }
 
-    async countRelaciones(museoId){
-        return await this.model.count({ where: { museoId } });
-    }
-
-    async getArticulosByMuseo(museoId, { limit = 10, offset = 0 } = {}) {
-        return await db.articulo.findAll({
-            include: [{ model: db.museo, as: 'museos', where: { id: museoId }, attributes: [] }],
+    async getArticulosByMuseo({museoId, tipo, limit = 10, offset = 0 }) {
+        return await articulo.findAndCountAll({
+            where: tipo ? { tipo: tipo } : {},
+            include: [
+                { 
+                    model: db.museo, as: 'museos', 
+                    where: { id: museoId }, 
+                    attributes: [] 
+                }
+            ],
             limit,
             offset
         });

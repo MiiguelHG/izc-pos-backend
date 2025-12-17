@@ -9,7 +9,7 @@ router.get('/', MuseoHasArticuloController.getAllAssociations);
 router.post('/', MuseoValidationMiddleware.validateMuseoExists, MuseoHasArticuloController.addArticuloToMuseo);
 
 router.get('/museo/:id', MuseoValidationMiddleware.validateMuseoExists, MuseoHasArticuloController.getByMuseo);
-router.get('/museo/:id/articulos', MuseoValidationMiddleware.validateMuseoExists, MuseoHasArticuloController.getArticulosByMuseoId);
+router.get('/museo/:id/articulos/:tipo', MuseoValidationMiddleware.validateMuseoExists, MuseoHasArticuloController.getArticulosByMuseoId);
 router.put('/museo/:id', MuseoValidationMiddleware.validateMuseoExists, MuseoHasArticuloController.setArticulosForMuseo);
 
 router.get('/articulo/:id', MuseoHasArticuloController.getByArticulo);
