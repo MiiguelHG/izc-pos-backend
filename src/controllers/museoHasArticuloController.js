@@ -17,24 +17,23 @@ export class MuseoHasArticuloController {
 
     static async getArticulosByMuseoId(req, res) {
         try {
-          const { id } = req.params;
+          const { id, tipo } = req.params;
+          const limit = 10;
       
-          const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
-          const pageSize = Math.max(parseInt(req.query.pageSize, 10) || 10, 1);
-          const offset = (page - 1) * pageSize;
+          const page = parseInt(req.query.page) || 1;
+          const offset = (page - 1) * limit;
     
-          const articulos = await museoHasArticuloRepository.getArticulosByMuseo(id, { limit: pageSize, offset });
+          const { rows, count } = await museoHasArticuloRepository.getArticulosByMuseo({ museoId: id, tipo: tipo, limit, offset });
     
-          const total = await museoHasArticuloRepository.countRelaciones(id)
-          const totalPages = Math.max(Math.ceil(total / pageSize), 1);
+          const totalPages = Math.ceil(count / limit);
     
           return sendSuccess(res, 200, 'Artículos obtenidos exitosamente', {
-            data: articulos,
+            data: rows,
             meta: {
-              totalItems: total,
+              totalItems: count,
               currentPage: page,
               totalPages,
-              pageSize
+              pageSize: limit
             }
           });
         } catch (error) {
