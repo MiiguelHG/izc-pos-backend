@@ -33,13 +33,22 @@ export const runSeeders = async () => {
         await userSeeder("Ana", "ana@example.com", "123456", 3, 2);
 
         await articuloSeeder("Entrada General", "Acceso general al museo", 100.00, "boleto");
-        await articuloSeeder("Guía Audiovisual", "Dispositivo de guía audiovisual", 50.00, "artículo");
-        await articuloSeeder("Taller de Pintura", "Taller práctico de pintura", 200.00, "evento");
+        await articuloSeeder("Guía Audiovisual", "Dispositivo de guía audiovisual", 50.00, "producto");
+        await articuloSeeder("Café", "Bebida caliente", 15.00, "producto");
+        await articuloSeeder("Llavero", "Accesorio para llaves", 5.00, "producto");
+        await articuloSeeder("Catálogo del Museo", "Libro con información del museo", 30.00, "producto");
+        await articuloSeeder("Taza con Logo", "Taza con el logo del museo", 20.00, "producto");
+        await articuloSeeder("Postal", "Postal con imagen del museo", 3.00, "producto");
+        await articuloSeeder("Imán de Refrigerador", "Imán con diseño del museo", 4.00, "producto");
+        await articuloSeeder("Camiseta del Museo", "Camiseta con el logo del museo", 25.00, "producto");
+        await articuloSeeder("Taller de Pintura", "Taller práctico de pintura", 200.00, "servicio");
+        await articuloSeeder("Visita Guiada", "Recorrido guiado por el museo", 150.00, "servicio");
+            await articuloSeeder("Conferencia Especial", "Conferencia sobre arte y cultura", 120.00, "servicio");
 
-        await boletoTipoSeeder("Estandar", "Boleto estándar para adultos", 0.00, 100.00, 1);
-        await boletoTipoSeeder("Menor de edad", "Boleto para menores de edad", 0.50, 50.00, 1);
-        await boletoTipoSeeder("Mayor de edad", "Boleto para adultos", 0.50, 100.00, 1);
-        await boletoTipoSeeder("Estudiante", "Boleto con descuento para estudiantes", 0.30, 70.00, 1);
+        await boletoTipoSeeder("Estandar", "Boleto estándar para adultos", 0, 100.00, 1);
+        await boletoTipoSeeder("Menor de edad", "Boleto para menores de edad", 50, 50.00, 1);
+        await boletoTipoSeeder("Mayor de edad", "Boleto para adultos", 50, 100.00, 1);
+        await boletoTipoSeeder("Estudiante", "Boleto con descuento para estudiantes", 30, 70.00, 1);
 
         await formaPagoSeeder("Efectivo", "Pago en efectivo");
         await formaPagoSeeder("Tarjeta de crédito", "Pago con tarjeta de crédito");
