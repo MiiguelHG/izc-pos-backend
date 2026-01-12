@@ -1,0 +1,159 @@
+components:
+  schemas:
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "ADMIN"
+        descripcion:
+          type: string
+          example: "Administrador del sistema"
+
+    RoleCreate:
+      type: object
+      required:
+        - nombre
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+
+    RoleUpdate:
+      type: object
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+
+    PaginatedRole:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+paths:
+  /api/roles:
+    get:
+      summary: Listar roles
+      description: Obtiene una lista paginada de roles
+      tags:
+        - Role
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Lista paginada de roles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRole'
+
+    post:
+      summary: Crear rol
+      description: Crea un nuevo rol con nombre y descripción
+      tags:
+        - Role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleCreate'
+      responses:
+        201:
+          description: Rol creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        400:
+          description: Datos inválidos
+
+  /api/roles/{id}:
+    get:
+      summary: Obtener rol por id
+      description: Recupera un rol por su identificador
+      tags:
+        - Role
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Rol encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        404:
+          description: No encontrado
+
+    put:
+      summary: Actualizar rol
+      description: Actualiza un rol existente por ID
+      tags:
+        - Role
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleUpdate'
+      responses:
+        200:
+          description: Rol actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+        400:
+          description: Datos inválidos
+        404:
+          description: No encontrado
+
+    delete:
+      summary: Eliminar rol
+      description: Elimina un rol por su ID
+      tags:
+        - Role
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado correctamente
+        404:
+          description: No encontrado

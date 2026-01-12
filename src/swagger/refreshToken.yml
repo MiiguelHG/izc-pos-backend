@@ -1,0 +1,140 @@
+components:
+  schemas:
+    RefreshToken:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        token:
+          type: string
+          example: "dXNlci1yZWZyZXNoLXRva2Vu..."
+        usuarioId:
+          type: integer
+          example: 5
+        expires:
+          type: string
+          format: date-time
+          example: "2026-01-12T14:30:00-06:00"
+        revoked:
+          type: boolean
+          example: false
+
+    RefreshTokenCreateRequest:
+      type: object
+      required:
+        - token
+        - usuarioId
+      properties:
+        token:
+          type: string
+        usuarioId:
+          type: integer
+        expires:
+          type: string
+          format: date-time
+
+    RefreshTokenRevokeRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+
+    PaginatedRefreshToken:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/RefreshToken'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+paths:
+  /api/refresh-tokens:
+    get:
+      summary: Listar refresh tokens
+      description: Lista paginada de refresh tokens (uso administrativo)
+      tags:
+        - RefreshToken
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Lista de refresh tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRefreshToken'
+
+    post:
+      summary: Registrar refresh token
+      description: Almacena un refresh token para un usuario (si aplica)
+      tags:
+        - RefreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenCreateRequest'
+      responses:
+        201:
+          description: Refresh token creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshToken'
+        400:
+          description: Datos inválidos
+
+  /api/refresh-tokens/{id}:
+    delete:
+      summary: Eliminar refresh token por id
+      description: Elimina un refresh token por su identificador
+      tags:
+        - RefreshToken
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado correctamente
+        404:
+          description: No encontrado
+
+  /api/refresh-tokens/revoke:
+    post:
+      summary: Revocar refresh token
+      description: Marca un refresh token como revocado para evitar su uso
+      tags:
+        - RefreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRevokeRequest'
+      responses:
+        200:
+          description: Revocado correctamente
+        400:
+          description: Datos inválidos
+        404:
+          description: Token no encontrado

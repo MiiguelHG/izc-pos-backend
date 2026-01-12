@@ -1,0 +1,194 @@
+components:
+  schemas:
+    BoletoEmitido:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        codigo:
+          type: string
+          example: "BE-20250108-0001"
+        fechaEmision:
+          type: string
+          format: date-time
+          example: "2025-01-08T14:30:00-06:00"
+        precio:
+          type: number
+          format: float
+          example: 150.5
+        visitanteId:
+          type: integer
+          example: 12
+        eventoId:
+          type: integer
+          example: 5
+        formaPagoId:
+          type: integer
+          example: 2
+        estado:
+          type: string
+          example: "activo"
+
+    BoletoEmitidoCreate:
+      type: object
+      required:
+        - codigo
+        - fechaEmision
+        - precio
+      properties:
+        codigo:
+          type: string
+        fechaEmision:
+          type: string
+          format: date-time
+        precio:
+          type: number
+        visitanteId:
+          type: integer
+        eventoId:
+          type: integer
+        formaPagoId:
+          type: integer
+        estado:
+          type: string
+
+    BoletoEmitidoUpdate:
+      type: object
+      properties:
+        fechaEmision:
+          type: string
+          format: date-time
+        precio:
+          type: number
+        estado:
+          type: string
+
+    PaginatedBoletoEmitido:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoletoEmitido'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+paths:
+  /api/boleto-emitidos:
+    get:
+      summary: Listar boletos emitidos
+      description: Obtiene una lista paginada de boletos emitidos
+      tags:
+        - BoletoEmitido
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Página (default 1)
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: Tamaño de página (default 10)
+      responses:
+        200:
+          description: Lista paginada de boletos emitidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBoletoEmitido'
+
+    post:
+      summary: Crear boleto emitido
+      description: Registra un nuevo boleto emitido
+      tags:
+        - BoletoEmitido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoletoEmitidoCreate'
+      responses:
+        201:
+          description: Boleto creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoletoEmitido'
+        400:
+          description: Datos inválidos
+
+  /api/boleto-emitidos/{id}:
+    get:
+      summary: Obtener boleto por id
+      description: Recupera un boleto emitido por su identificador
+      tags:
+        - BoletoEmitido
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Boleto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoletoEmitido'
+        404:
+          description: No encontrado
+
+    put:
+      summary: Actualizar boleto
+      description: Actualiza los datos de un boleto emitido por ID
+      tags:
+        - BoletoEmitido
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoletoEmitidoUpdate'
+      responses:
+        200:
+          description: Boleto actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoletoEmitido'
+        400:
+          description: Datos inválidos
+        404:
+          description: No encontrado
+
+    delete:
+      summary: Eliminar boleto
+      description: Elimina un boleto emitido por su ID
+      tags:
+        - BoletoEmitido
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado correctamente
+        404:
+          description: No encontrado

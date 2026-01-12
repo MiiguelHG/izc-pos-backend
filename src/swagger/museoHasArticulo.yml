@@ -1,0 +1,216 @@
+components:
+  schemas:
+    ArticuloSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Vasija prehispánica"
+        codigo:
+          type: string
+          example: "ART-0001"
+
+    MuseoArticuloRelation:
+      type: object
+      properties:
+        museoId:
+          type: integer
+          example: 2
+        articuloId:
+          type: integer
+          example: 10
+
+    ArticulosUpdateRequest:
+      type: object
+      required:
+        - articuloIds
+      properties:
+        articuloIds:
+          type: array
+          items:
+            type: integer
+          example: [10, 11, 12]
+
+    PaginatedArticulos:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArticuloSummary'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+paths:
+  /api/museos/{museoId}/articulos:
+    get:
+      summary: Listar artículos de un museo
+      description: Obtiene los artículos asociados a un museo (paginado)
+      tags:
+        - MuseoArticulo
+      parameters:
+        - in: path
+          name: museoId
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Lista paginada de artículos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedArticulos'
+        404:
+          description: Museo no encontrado
+
+    post:
+      summary: Agregar artículos a un museo
+      description: Añade una o varias relaciones entre museo y artículos
+      tags:
+        - MuseoArticulo
+      parameters:
+        - in: path
+          name: museoId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticulosUpdateRequest'
+      responses:
+        201:
+          description: Artículos asociados correctamente
+        400:
+          description: Datos inválidos
+        404:
+          description: Museo o artículo no encontrado
+
+    put:
+      summary: Reemplazar artículos de un museo
+      description: Reemplaza la lista de artículos asociados al museo (operación idempotente)
+      tags:
+        - MuseoArticulo
+      parameters:
+        - in: path
+          name: museoId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArticulosUpdateRequest'
+      responses:
+        200:
+          description: Asociaciones actualizadas
+        400:
+          description: Datos inválidos
+        404:
+          description: Museo o artículo no encontrado
+
+  /api/museos/{museoId}/articulos/{articuloId}:
+    delete:
+      summary: Remover asociación museo-artículo
+      description: Elimina la asociación entre un museo y un artículo
+      tags:
+        - MuseoArticulo
+      parameters:
+        - in: path
+          name: museoId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: articuloId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Asociación eliminada
+        404:
+          description: Museo o artículo no encontrado
+
+    get:
+      summary: Verificar si un artículo está asociado al museo
+      description: Comprueba si un artículo está asociado a un museo
+      tags:
+        - MuseoArticulo
+      parameters:
+        - in: path
+          name: museoId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: articuloId
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Devuelve si la asociación existe
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+        404:
+          description: Museo o artículo no encontrado
+
+  /api/museo-has-articulos:
+    get:
+      summary: Listar todas las asociaciones museo-artículo
+      description: Devuelve todas las relaciones (paginadas)
+      tags:
+        - MuseoArticulo
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Lista de asociaciones
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MuseoArticuloRelation'
+                  page:
+                    type: integer
+                  pageSize:
+                    type: integer
+                  total:
+                    type: integer

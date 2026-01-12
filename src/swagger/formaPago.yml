@@ -1,0 +1,173 @@
+components:
+  schemas:
+    FormaPago:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Tarjeta"
+        descripcion:
+          type: string
+          example: "Pago con tarjeta de crédito o débito"
+        tipo:
+          type: string
+          example: "tarjeta|efectivo|transferencia"
+        activo:
+          type: boolean
+          example: true
+
+    FormaPagoCreate:
+      type: object
+      required:
+        - nombre
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        tipo:
+          type: string
+        activo:
+          type: boolean
+
+    FormaPagoUpdate:
+      type: object
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        tipo:
+          type: string
+        activo:
+          type: boolean
+
+    PaginatedFormaPago:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormaPago'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+paths:
+  /api/forma-pagos:
+    get:
+      summary: Listar formas de pago
+      description: Obtiene una lista paginada de formas de pago
+      tags:
+        - FormaPago
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFormaPago'
+
+    post:
+      summary: Crear forma de pago
+      description: Crea una nueva forma de pago
+      tags:
+        - FormaPago
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FormaPagoCreate'
+      responses:
+        201:
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormaPago'
+        400:
+          description: Datos inválidos
+
+  /api/forma-pagos/{id}:
+    get:
+      summary: Obtener forma de pago por id
+      description: Recupera una forma de pago por su identificador
+      tags:
+        - FormaPago
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormaPago'
+        404:
+          description: No encontrado
+
+    put:
+      summary: Actualizar forma de pago
+      description: Actualiza una forma de pago existente por ID
+      tags:
+        - FormaPago
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FormaPagoUpdate'
+      responses:
+        200:
+          description: Actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FormaPago'
+        400:
+          description: Datos inválidos
+        404:
+          description: No encontrado
+
+    delete:
+      summary: Eliminar forma de pago
+      description: Elimina una forma de pago por su ID
+      tags:
+        - FormaPago
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado
+        404:
+          description: No encontrado

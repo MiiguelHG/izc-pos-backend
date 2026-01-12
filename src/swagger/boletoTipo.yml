@@ -1,0 +1,175 @@
+components:
+  schemas:
+    BoletoTipo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Adulto"
+        descripcion:
+          type: string
+          example: "Entrada general adulto"
+        precio:
+          type: number
+          format: float
+          example: 100.0
+        activo:
+          type: boolean
+          example: true
+
+    BoletoTipoCreate:
+      type: object
+      required:
+        - nombre
+        - precio
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+        activo:
+          type: boolean
+
+    BoletoTipoUpdate:
+      type: object
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+        activo:
+          type: boolean
+
+    PaginatedBoletoTipo:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/BoletoTipo'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+paths:
+  /api/boleto-tipos:
+    get:
+      summary: Listar tipos de boleto
+      description: Obtiene una lista paginada de tipos de boleto
+      tags:
+        - BoletoTipo
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Lista paginada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBoletoTipo'
+
+    post:
+      summary: Crear tipo de boleto
+      description: Crea un nuevo tipo de boleto (nombre, precio, descripción, activo)
+      tags:
+        - BoletoTipo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoletoTipoCreate'
+      responses:
+        201:
+          description: Creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoletoTipo'
+        400:
+          description: Datos inválidos
+
+  /api/boleto-tipos/{id}:
+    get:
+      summary: Obtener tipo de boleto por id
+      description: Recupera un tipo de boleto por su identificador
+      tags:
+        - BoletoTipo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoletoTipo'
+        404:
+          description: No encontrado
+
+    put:
+      summary: Actualizar tipo de boleto
+      description: Actualiza un tipo de boleto existente por ID
+      tags:
+        - BoletoTipo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoletoTipoUpdate'
+      responses:
+        200:
+          description: Actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoletoTipo'
+        400:
+          description: Datos inválidos
+        404:
+          description: No encontrado
+
+    delete:
+      summary: Eliminar tipo de boleto
+      description: Elimina un tipo de boleto por ID
+      tags:
+        - BoletoTipo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado
+        404:
+          description: No encontrado

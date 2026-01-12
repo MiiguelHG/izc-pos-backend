@@ -1,0 +1,198 @@
+components:
+  schemas:
+    Museo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 2
+        nombre:
+          type: string
+          example: "Museo de Historia"
+        direccion:
+          type: string
+          example: "Av. Principal 123"
+        telefono:
+          type: string
+          example: "+52 55 1234 5678"
+        descripcion:
+          type: string
+          example: "Museo dedicado a la historia regional"
+        activo:
+          type: boolean
+          example: true
+
+    MuseoCreate:
+      type: object
+      required:
+        - nombre
+      properties:
+        nombre:
+          type: string
+        direccion:
+          type: string
+        telefono:
+          type: string
+        descripcion:
+          type: string
+        activo:
+          type: boolean
+
+    MuseoUpdate:
+      type: object
+      properties:
+        nombre:
+          type: string
+        direccion:
+          type: string
+        telefono:
+          type: string
+        descripcion:
+          type: string
+        activo:
+          type: boolean
+
+    PaginatedMuseo:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Museo'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+paths:
+  /api/museos:
+    get:
+      summary: Listar museos
+      description: Devuelve una lista paginada de museos
+      tags:
+        - Museo
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Lista paginada de museos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMuseo'
+
+    post:
+      summary: Crear museo
+      description: Registra un nuevo museo
+      tags:
+        - Museo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MuseoCreate'
+      responses:
+        201:
+          description: Museo creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Museo'
+        400:
+          description: Datos inválidos
+
+  /api/museos/{id}:
+    get:
+      summary: Obtener museo por id
+      description: Recupera un museo por su identificador
+      tags:
+        - Museo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Museo encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Museo'
+        404:
+          description: No encontrado
+
+    put:
+      summary: Actualizar museo
+      description: Actualiza un museo existente por ID
+      tags:
+        - Museo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MuseoUpdate'
+      responses:
+        200:
+          description: Museo actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Museo'
+        400:
+          description: Datos inválidos
+        404:
+          description: No encontrado
+
+    delete:
+      summary: Eliminar museo
+      description: Elimina un museo por su ID
+      tags:
+        - Museo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado correctamente
+        404:
+          description: No encontrado
+
+  /api/museos/{id}/articulos:
+    get:
+      summary: Listar artículos asociados a un museo
+      description: Este endpoint delega a la colección de relaciones museo-artículo.
+      tags:
+        - Museo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Lista de artículos (ver `museoHasArticulo.yml` para más detalles)
+        404:
+          description: Museo no encontrado
