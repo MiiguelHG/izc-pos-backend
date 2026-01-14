@@ -1,0 +1,192 @@
+components:
+  schemas:
+    Producto:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Souvenir - Postal"
+        descripcion:
+          type: string
+          example: "Postal del museo en tamaño A6"
+        precio:
+          type: number
+          format: float
+          example: 25.5
+        stock:
+          type: integer
+          example: 120
+        museoId:
+          type: integer
+          example: 2
+        activo:
+          type: boolean
+          example: true
+
+    ProductoCreate:
+      type: object
+      required:
+        - nombre
+        - precio
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+        stock:
+          type: integer
+        museoId:
+          type: integer
+        activo:
+          type: boolean
+
+    ProductoUpdate:
+      type: object
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        precio:
+          type: number
+        stock:
+          type: integer
+        activo:
+          type: boolean
+
+    PaginatedProducto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Producto'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+paths:
+  /api/productos:
+    get:
+      summary: Listar productos
+      description: Obtiene una lista paginada de productos
+      tags:
+        - Producto
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+        - in: query
+          name: museoId
+          schema:
+            type: integer
+          description: Filtrar por museo
+      responses:
+        200:
+          description: Lista paginada de productos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProducto'
+
+    post:
+      summary: Crear producto
+      description: Crea un nuevo producto y lo asocia a un museo si se proporciona `museoId`
+      tags:
+        - Producto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoCreate'
+      responses:
+        201:
+          description: Producto creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+        400:
+          description: Datos inválidos
+
+  /api/productos/{id}:
+    get:
+      summary: Obtener producto por id
+      description: Recupera un producto por su identificador
+      tags:
+        - Producto
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Producto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+        404:
+          description: No encontrado
+
+    put:
+      summary: Actualizar producto
+      description: Actualiza un producto existente por ID
+      tags:
+        - Producto
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoUpdate'
+      responses:
+        200:
+          description: Producto actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+        400:
+          description: Datos inválidos
+        404:
+          description: No encontrado
+
+    delete:
+      summary: Eliminar producto
+      description: Elimina un producto por su ID
+      tags:
+        - Producto
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado correctamente
+        404:
+          description: No encontrado

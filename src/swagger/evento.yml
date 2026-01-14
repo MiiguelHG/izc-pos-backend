@@ -1,0 +1,212 @@
+components:
+  schemas:
+    Evento:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Concierto de Música"
+        descripcion:
+          type: string
+          example: "Concierto al aire libre"
+        fechaInicio:
+          type: string
+          format: date-time
+          example: "2025-05-10T19:00:00-06:00"
+        fechaFin:
+          type: string
+          format: date-time
+          example: "2025-05-10T22:00:00-06:00"
+        lugar:
+          type: string
+          example: "Auditorio Central"
+        precioBase:
+          type: number
+          format: float
+          example: 200.0
+        capacidad:
+          type: integer
+          example: 500
+        activo:
+          type: boolean
+          example: true
+
+    EventoCreate:
+      type: object
+      required:
+        - nombre
+        - fechaInicio
+        - fechaFin
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        fechaInicio:
+          type: string
+          format: date-time
+        fechaFin:
+          type: string
+          format: date-time
+        lugar:
+          type: string
+        precioBase:
+          type: number
+        capacidad:
+          type: integer
+        activo:
+          type: boolean
+
+    EventoUpdate:
+      type: object
+      properties:
+        nombre:
+          type: string
+        descripcion:
+          type: string
+        fechaInicio:
+          type: string
+          format: date-time
+        fechaFin:
+          type: string
+          format: date-time
+        lugar:
+          type: string
+        precioBase:
+          type: number
+        capacidad:
+          type: integer
+        activo:
+          type: boolean
+
+    PaginatedEvento:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Evento'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+paths:
+  /api/eventos:
+    get:
+      summary: Listar eventos
+      description: Obtiene una lista paginada de eventos
+      tags:
+        - Evento
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          description: Página (default 1)
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+          description: Tamaño de página (default 10)
+      responses:
+        200:
+          description: Lista paginada de eventos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEvento'
+
+    post:
+      summary: Crear evento
+      description: Registra un nuevo evento
+      tags:
+        - Evento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventoCreate'
+      responses:
+        201:
+          description: Evento creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+        400:
+          description: Datos inválidos
+
+  /api/eventos/{id}:
+    get:
+      summary: Obtener evento por id
+      description: Recupera un evento por su identificador
+      tags:
+        - Evento
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Evento encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+        404:
+          description: No encontrado
+
+    put:
+      summary: Actualizar evento
+      description: Actualiza un evento existente por ID
+      tags:
+        - Evento
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventoUpdate'
+      responses:
+        200:
+          description: Evento actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evento'
+        400:
+          description: Datos inválidos
+        404:
+          description: No encontrado
+
+    delete:
+      summary: Eliminar evento
+      description: Elimina un evento por su ID
+      tags:
+        - Evento
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado correctamente
+        404:
+          description: No encontrado

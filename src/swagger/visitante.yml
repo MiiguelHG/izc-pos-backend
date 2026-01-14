@@ -1,0 +1,173 @@
+components:
+  schemas:
+    Visitante:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12
+        nombre:
+          type: string
+          example: "María López"
+        email:
+          type: string
+          format: email
+          example: "maria.lopez@example.com"
+        telefono:
+          type: string
+          example: "+52 55 9876 5432"
+        documento:
+          type: string
+          example: "A1234567"
+        creadoEn:
+          type: string
+          format: date-time
+          example: "2026-01-12T10:00:00-06:00"
+
+    VisitanteCreate:
+      type: object
+      required:
+        - nombre
+      properties:
+        nombre:
+          type: string
+        email:
+          type: string
+          format: email
+        telefono:
+          type: string
+        documento:
+          type: string
+
+    VisitanteUpdate:
+      type: object
+      properties:
+        nombre:
+          type: string
+        email:
+          type: string
+          format: email
+        telefono:
+          type: string
+        documento:
+          type: string
+
+    PaginatedVisitante:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Visitante'
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        total:
+          type: integer
+
+paths:
+  /api/visitantes:
+    get:
+      summary: Listar visitantes
+      description: Obtiene una lista paginada de visitantes
+      tags:
+        - Visitante
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+        - in: query
+          name: nombre
+          schema:
+            type: string
+          description: Buscar por nombre (filtro)
+      responses:
+        200:
+          description: Lista paginada de visitantes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVisitante'
+
+    post:
+      summary: Crear visitante
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitanteCreate'
+      responses:
+        201:
+          description: Visitante creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visitante'
+        400:
+          description: Datos inválidos
+
+  /api/visitantes/{id}:
+    get:
+      summary: Obtener visitante por id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Visitante encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visitante'
+        404:
+          description: No encontrado
+
+    put:
+      summary: Actualizar visitante
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisitanteUpdate'
+      responses:
+        200:
+          description: Visitante actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Visitante'
+        400:
+          description: Datos inválidos
+        404:
+          description: No encontrado
+
+    delete:
+      summary: Eliminar visitante
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Eliminado correctamente
+        404:
+          description: No encontrado

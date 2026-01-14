@@ -18,7 +18,6 @@ import productoVentaRoutes from './src/routes/productoVentaRoutes.js';
 import reservaEventoRoutes from './src/routes/reservaEventoRoutes.js';
 import dipomexRoutes from './src/routes/dipomexRoutes.js';
 import museoHasArticuloRoutes from './src/routes/museoHasArticuloRoutes.js';
-import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import specs from './src/swagger/swagger.js';
 import { runSeeders } from './src/seeders/index.js';
