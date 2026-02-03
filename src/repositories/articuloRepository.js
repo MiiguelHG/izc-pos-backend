@@ -1,6 +1,6 @@
 import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
-import { where } from "sequelize";
+import { Op } from "sequelize";
 
 const { articulo } = db;
 
@@ -10,7 +10,8 @@ class ArticuloRepository extends BaseRepository {
     }
 
     async findAndCountAll ({ seleccion = '', limit, offset }) {
-        const whereClause = seleccion ? { tipo: seleccion } : {};
+        const defalutClause = { [Op.or]: [ {tipo: 'servicio'}, {tipo: 'producto'}] };
+        const whereClause = seleccion ? { tipo: seleccion } : defalutClause;
 
         return await this.model.findAndCountAll({
             where: whereClause,

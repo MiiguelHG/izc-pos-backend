@@ -8,10 +8,6 @@ class BoletoTipoRepository extends BaseRepository {
     super(boletoTipo);
   }
 
-  // async createBoletoTipo({ nombre, descripcion, descuento, precioFinal, articuloId }) {
-  //   return await this.create({nombre, descripcion, descuento, precioFinal, articuloId});
-  // }
-
   async findAllbyArticuloId(articuloId) {
     return await this.model.findAll({ where: { articuloId } });
   }
