@@ -104,27 +104,12 @@ export class BoletoTipoController {
 
   static async UpdateAllBoletosPrecioFinal(req, res) {
     try {
-      const { articuloId } = req.params;
+      const { articuloId, precioEstandar } = req.body;
 
-      const articulo = await articuloRepository.findById(articuloId);
+      const updatedSuccess = await boletoTipoRepository.updatePrecioFinalByArticuloId({articuloId, precioEstandar});
 
-      if (!articulo) {
-        return sendError(res, 404, "Articulo no encontrado");
-      }
-
-      const boletosTipos = await boletoTipoRepository.findAllbyArticuloId(articuloId);
-
-      if (!boletosTipos || boletosTipos.length === 0) {
-        return sendError(res, 404, "No se encontraron tipos de boleto para el articulo dado");
-      }
-
-      for (const boletoTipo of boletosTipos) {
-        const precioFinal = articulo.precioEstandar - (articulo.precioEstandar * (boletoTipo.descuento / 100));
-
-        await boletoTipoRepository.update(
-          { id: boletoTipo.id },
-          { precioFinal }
-        );
+      if (!updatedSuccess) {
+        return sendError(res, 400, "No se pudieron actualizar los precios finales de los tipos de boleto");
       }
 
       return sendSuccess(res, 200,"Precios finales de boletos actualizados");

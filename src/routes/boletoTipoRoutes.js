@@ -3,7 +3,7 @@ import { BoletoTipoController } from "#controllers/boletoTipoController.js";
 
 const router = express.Router();
 
-router.put("/update-all/:articuloId", BoletoTipoController.UpdateAllBoletosPrecioFinal);
+router.put("/update-all", BoletoTipoController.UpdateAllBoletosPrecioFinal);
 
 router.post("/", BoletoTipoController.createBoletoTipo);
 router.get("/", BoletoTipoController.getBoletosTipos);
