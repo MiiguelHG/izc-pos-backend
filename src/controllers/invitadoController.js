@@ -29,11 +29,26 @@ export class InvitadoController {
 
   static async getInvitados(req, res) {
     try {
-      const invitados = await invitadoRepository.findAll();
-      if (!invitados) {
+      const limit = 10;
+      const page = parseInt(req.query.page) || 1;
+      const offset = (page - 1) * limit;
+
+      const { rows, count} = await invitadoRepository.findAllAndCount({ limit, offset });
+      if (!rows || rows.length === 0) {
         return sendError(res, 404, "No se encontraron invitados");
       }
-      return sendSuccess(res, 200, "Invitados recuperados exitosamente", invitados);
+
+      const totalPages = Math.ceil(count / limit);
+
+      return sendSuccess(res, 200, "Invitados recuperados exitosamente", {  
+        data: rows,
+        meta: {
+          totalItems: count,
+          currentPage: page,
+          totalPages,
+          pageSize: limit
+        }
+      });
     } catch (error) {
       return sendError(res, 500, `Error al obtener invitados: ${error.message}`);
     }
