@@ -4,7 +4,7 @@ import { boletoTipoRepository, articuloRepository } from "../repositories/index.
 export class BoletoTipoController {
   static async createBoletoTipo(req, res) {
     try {
-      const { nombre, descripcion, descuento, articuloId } = req.body;
+      const { nombre, descripcion, descuento, esEspecial, articuloId } = req.body;
       
       const articulo = await articuloRepository.findById(articuloId);
 
@@ -14,7 +14,7 @@ export class BoletoTipoController {
 
       const precioFinal = articulo.precioEstandar - (articulo.precioEstandar * (descuento / 100));
 
-      const newBoletoTipo = await boletoTipoRepository.create({ nombre, descripcion, descuento, precioFinal, articuloId });
+      const newBoletoTipo = await boletoTipoRepository.create({ nombre, descripcion, descuento, precioFinal, esEspecial, articuloId });
 
       if (!newBoletoTipo) {
         return sendError(res, 400, "No se pudo crear el tipo de boleto");
@@ -30,7 +30,15 @@ export class BoletoTipoController {
 
   static async getBoletosTipos(req, res) {
     try {
-      const boletosTipos = await boletoTipoRepository.findAll();
+      const { esEspecial } = req.query;
+
+      if (esEspecial !== undefined && esEspecial !== 'true' && esEspecial !== 'false') {
+        return sendError(res, 400, "El parámetro esEspecial debe ser 'true' o 'false'");
+      }
+
+      const esEspecialBool = esEspecial !== undefined ? esEspecial === 'true' : undefined;
+
+      const boletosTipos = await boletoTipoRepository.findAllBoletos({ esEspecial: esEspecialBool });
 
       if (!boletosTipos || boletosTipos.length === 0) {
         return sendError(res, 404, "No se encontraron tipos de boleto");
@@ -61,7 +69,7 @@ export class BoletoTipoController {
   static async boletoTipoUpdate(req, res) {
     try {
       const { id } = req.params;
-      const { nombre, descripcion, descuento, articuloId } = req.body;
+      const { nombre, descripcion, descuento, articuloId, esEspecial } = req.body;
 
       const articulo = await articuloRepository.findById(articuloId);
 
@@ -73,7 +81,7 @@ export class BoletoTipoController {
 
       const updated = await boletoTipoRepository.update(
         { id },
-        { nombre, descripcion, descuento, precioFinal, articuloId }
+        { nombre, descripcion, descuento, precioFinal, esEspecial, articuloId }
       );
 
       if (!updated) {
@@ -82,7 +90,7 @@ export class BoletoTipoController {
 
       return sendSuccess(res, 200,"Tipo de boleto actualizado" , updated);
     } catch (error) {
-      
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
   }
 
