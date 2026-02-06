@@ -23,6 +23,11 @@ export default (sequelize, Sequelize) => {
             type: DataTypes.DECIMAL(5, 2),
             allowNull: false
         },
+        esEspecial: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        },
         articuloId: {
             type: DataTypes.INTEGER,
             allowNull: false
