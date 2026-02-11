@@ -8,6 +8,11 @@ class BoletoTipoRepository extends BaseRepository {
     super(boletoTipo);
   }
 
+  async findAllBoletos({ esEspecial }) {
+    const whereClause = esEspecial !== undefined ? { esEspecial } : {};
+    return await this.findAll({ where: whereClause });
+  }
+
   async updatePrecioFinalByArticuloId({ articuloId, precioEstandar }) {
     return await sequelize.transaction(async (t) => {
       // Buscar el articulo (boleto base)
@@ -21,7 +26,7 @@ class BoletoTipoRepository extends BaseRepository {
         }
 
         // Actualizar los precios finales de los tipos de boleto asociados
-  const tiposBoletos = await this.model.findAll({ where: { articuloId }, transaction: t });
+        const tiposBoletos = await this.model.findAll({ where: { articuloId }, transaction: t });
 
         if (!tiposBoletos || tiposBoletos.length === 0) {
           throw new Error(`No se encontraron tipos de boleto para el articulo con ID ${articuloId}`);
