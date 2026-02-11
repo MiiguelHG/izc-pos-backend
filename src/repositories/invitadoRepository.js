@@ -22,7 +22,7 @@ class InvitadoRepository extends BaseRepository {
   }
 
   async findInvitadosSinIngreso() {
-    return await this.model.findAll({
+    return await this.model.findAndCountAll({
       where: {
         usado: false,
         fechaExpiracion: {

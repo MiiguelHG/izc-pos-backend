@@ -35,7 +35,7 @@ export class InvitadoController {
 
       const { rows, count} = await invitadoRepository.findAllAndCount({ limit, offset });
       if (!rows || rows.length === 0) {
-        return sendError(res, 404, "No se encontraron invitados");
+        return sendError(res, 200, "No se encontraron invitados");
       }
 
       const totalPages = Math.ceil(count / limit);
@@ -56,13 +56,18 @@ export class InvitadoController {
 
   static async getInvitadosSinIngreso(req, res) {
     try {
-      const invitados = await invitadoRepository.findInvitadosSinIngreso();
+      const { rows, count} = await invitadoRepository.findInvitadosSinIngreso();
 
-      if (!invitados) {
-        return sendError(res, 404, "No se encontraron invitados sin ingreso");
+      if (!rows || count === 0) {
+        return sendError(res, 200, "No se encontraron cortesias pendientes de ingreso");
       }
 
-      return sendSuccess(res, 200, "Invitados sin ingreso recuperados exitosamente", invitados);
+      return sendSuccess(res, 200, "Invitados sin ingreso recuperados exitosamente", {
+        data: rows,
+        meta: {
+          totalItems: count
+        }
+      });
     } catch (error) {
       return sendError(res, 500, `Error al obtener invitados sin ingreso: ${error.message}`);
     }
@@ -84,8 +89,7 @@ export class InvitadoController {
 
   static async marcarInvitadoUsado(req, res) {
     try {
-      const { id } = req.params;
-      const { boletoEmitidoId } = req.body;
+      const { id, boletoEmitidoId } = req.params;
 
       // Esto puede ir en un middleware para validar que el invitado existe y no ha expirado antes de llegar a este punto
       const invitado = await invitadoRepository.findById(id);
