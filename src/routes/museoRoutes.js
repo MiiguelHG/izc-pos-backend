@@ -3,7 +3,9 @@ import { MuseoController } from "../controllers/museoController.js";
 
 const router = express.Router();
 // Rutas base
-router.get("/", MuseoController.getAllMuseos);
+
+router.get("/all", MuseoController.getAllMuseos);
+router.get("/", MuseoController.getAndCountAllMuseos);
 router.post("/", MuseoController.createMuseo);
 
 // Rutas para operaciones sobre un solo museo
