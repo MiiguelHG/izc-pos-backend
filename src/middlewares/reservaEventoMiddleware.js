@@ -5,7 +5,9 @@ import { sendError } from "#utils/responseFormater.js";
 export async function validarReserva(req, res, next) {
     try {
         const data = req.body;
-        const { fechaInicio, fechaFin, articuloId, museoId } = data;
+        const museoId = req.user.museoId;
+        const usuarioId = req.user.id;
+        const { fechaInicio, fechaFin, articuloId } = data;
 
         const inicio = toMx(fechaInicio);
         const fin = toMx(fechaFin);
@@ -33,18 +35,17 @@ export async function validarReserva(req, res, next) {
         const HORA_MAX = 22;
 
         if (inicio.hour < HORA_MIN) {
-            return sendError(res, 400, "Los eventos no pueden iniciar antes de las 10:00 horas.");
+            return sendError(res, 400, "Los eventos no pueden iniciar antes de las 10:00 am.");
         }
 
         // límite: terminar antes o igual a las 22:00
         const limite = inicio.set({ hour: HORA_MAX, minute: 0, second: 0 });
         if (fin > limite) {
-            return sendError(res, 400, "Los eventos deben terminar a más tardar a las 22:00 horas.");
+            return sendError(res, 400, "Los eventos deben terminar a más tardar a las 10:00 pm.");
         }
 
         // VALIDACIÓN DE DISPONIBILIDAD EN BD
         const disponible = await reservaEventoRepository.validarDisponibilidad(
-            articuloId,
             museoId,
             inicio.toISO(),
             fin.toISO()
@@ -64,6 +65,8 @@ export async function validarReserva(req, res, next) {
         // Si todo está bien, guardamos la info preparada para el controller
         req.reservaData = {
             ...data,
+            usuarioId,
+            museoId,
             fechaReserva,
             fechaInicio: inicio.toISO(),
             fechaFin: fin.toISO()
@@ -78,25 +81,35 @@ export async function validarReserva(req, res, next) {
 
 export async function validarActualizacionReserva(req, res, next) {
     try {
-        const id = req.params.id;
+        const {id} = req.params;
         const data = req.body;
+
+        const usuarioId = req.user.id;
+        const museoId = req.user.museoId;
+
+        const {
+            articuloId,
+            fechaInicio,
+            fechaFin
+        } = req.body
 
         const {
             responsable,
             contactoResponsable,
-            fechaInicio,
-            fechaFin,
             total,
             estado,
-            usuarioId,
-            museoId,
-            articuloId,
             visitanteId,
             formaPagoId
         } = data;
 
         const inicio = toMx(fechaInicio);
         const fin = toMx(fechaFin);
+
+        console.log("🔥 VALIDANDO UPDATE RESERVA", {
+            id: req.params.id,
+            body: req.body,
+            user: req.user
+        });
 
         if (!inicio.isValid || !fin.isValid) {
             return sendError(res, 400, "Formato de fecha inválido.");
@@ -138,8 +151,14 @@ export async function validarActualizacionReserva(req, res, next) {
         const inicioLocal = inicio.toISO();
         const finLocal = fin.toISO();
 
-        const conflictos = await reservaEventoRepository.conflictosReserva(
+        console.log("⏱️ BUSCANDO CONFLICTOS", {
             articuloId,
+            museoId,
+            inicioLocal,
+            finLocal,
+        });
+
+        const conflictos = await reservaEventoRepository.conflictosReserva(
             museoId,
             inicioLocal,
             finLocal,
@@ -166,6 +185,9 @@ export async function validarActualizacionReserva(req, res, next) {
         // Guardar info final en req
         req.reservaActualizada = {
             ...data,
+            articuloId,
+            usuarioId,
+            museoId,
             fechaInicio: inicioLocal,
             fechaFin: finLocal
         };

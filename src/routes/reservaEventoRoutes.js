@@ -1,5 +1,6 @@
 import express from "express";
 import { validarReserva, validarActualizacionReserva } from "#middlewares/reservaEventoMiddleware.js";
+import { authJwt } from "#middlewares/authJwt.js";
 import { ReservaEventoController } from "#controllers/reservaEventoController.js";
 
 const router = express.Router();
@@ -23,11 +24,11 @@ router.post("/:id/asistido", ReservaEventoController.marcarComoAsistido);
 
 // Create (authenticated users)
 router.get("/",ReservaEventoController.getReservasEvento);
-router.post("/", validarReserva, ReservaEventoController.createReservaEvento);
+router.post("/", authJwt.verifyToken, validarReserva, ReservaEventoController.createReservaEvento);
 
 // Update / Delete (admin)
-router.put("/:id", validarActualizacionReserva, ReservaEventoController.updateReservaEvento);
-router.delete("/:id", ReservaEventoController.deleteReservaEvento);
+router.put("/:id", authJwt.verifyToken, validarActualizacionReserva, ReservaEventoController.updateReservaEvento);
+router.delete("/:id", authJwt.verifyToken, ReservaEventoController.deleteReservaEvento);
 
 // Fetch by ID (siempre la ÚLTIMA ruta dinámica)
 router.get("/:id", ReservaEventoController.getReservaEventoById);

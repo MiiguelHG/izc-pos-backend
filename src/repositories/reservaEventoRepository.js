@@ -9,9 +9,11 @@ class ReservaEventoRepository extends BaseRepository {
         super(reservaEvento);
     }
 
-    async obtenerPorRangoFechas(fechaInicio, fechaFin) {
+    async obtenerPorRangoFechas(museoId, fechaInicio, fechaFin) {
         return await this.findAll({
             where: {
+                museoId,
+                estado: { [Op.ne]: 'cancelado' },
                 [Op.or]: [
                     {
                         fechaInicio: { [Op.between]: [fechaInicio, fechaFin] },
@@ -43,11 +45,11 @@ class ReservaEventoRepository extends BaseRepository {
         });
     }
 
-    async validarDisponibilidad(articuloId, museoId, fechaInicio, fechaFin) {
+    async validarDisponibilidad(museoId, fechaInicio, fechaFin) {
         const count = await this.model.count({
             where: {
-                articuloId,
                 museoId,
+                estado: { [Op.ne]: 'cancelado' },
                 [Op.and]: [
                     {
                         fechaInicio: { [Op.lt]: fechaFin }
@@ -61,15 +63,15 @@ class ReservaEventoRepository extends BaseRepository {
         return count === 0;
     }
 
-    async conflictosReserva(articuloId, museoId, fechaInicio, fechaFin, id) {
+    async conflictosReserva(museoId, fechaInicio, fechaFin, id) {
         return await this.model.count({
             where: {
-                articuloId,
                 museoId,
-                id: { [Op.ne]: id },
+                estado: { [Op.ne]: 'cancelado' },
+                id: { [Op.ne]: Number(id) },
                 [Op.and]: [
                     { fechaInicio: { [Op.lt]: fechaFin } },
-                    { fechaFin: { [Op.gt]: fechaInicio } }
+                    { fechaFin: { [Op.gt]: fechaInicio } }  
                 ]
             }
         });

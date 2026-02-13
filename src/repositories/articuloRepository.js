@@ -2,7 +2,7 @@ import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
 import { where } from "sequelize";
 
-const { articulo } = db;
+const { articulo, museo } = db;
 
 class ArticuloRepository extends BaseRepository {
     constructor() {
@@ -26,6 +26,18 @@ class ArticuloRepository extends BaseRepository {
     async obtenerPorTipo(tipo) {
         return await this.findAll({ where: { tipo } });
     }
+
+    async obtenerServiciosPorMuseo(museoId) {
+        return await this.model.findAll({
+            where: { tipo: 'servicio' },
+            include: [{
+                model: museo, as: 'museos',
+                where: { id: museoId },
+                through: { attributes: [] }
+            }]
+        });
+    }
+
 }
 
 export const articuloRepository = new ArticuloRepository();

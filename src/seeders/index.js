@@ -31,27 +31,41 @@ export const runSeeders = async () => {
 
         await userSeeder("Miguel", "miguel@example.com", "123456", 1, 1);
         await userSeeder("Alex", "alex@example.com", "123456", 2, 1);
-        await userSeeder("Ana", "ana@example.com", "123456", 3, 2);
+        await userSeeder("Ana", "ana@example.com", "1234567", 3, 2);
+        await userSeeder("Guille", "guille@example.com", "1234567", 3, 1);
 
-        await articuloSeeder("Entrada General", "Acceso general al museo", 100.00, "boleto");
-        await articuloSeeder("Guía Audiovisual", "Dispositivo de guía audiovisual", 50.00, "producto");
-        await articuloSeeder("Café", "Bebida caliente", 15.00, "producto");
-        await articuloSeeder("Llavero", "Accesorio para llaves", 5.00, "producto");
-        await articuloSeeder("Catálogo del Museo", "Libro con información del museo", 30.00, "producto");
-        await articuloSeeder("Taza con Logo", "Taza con el logo del museo", 20.00, "producto");
-        await articuloSeeder("Postal", "Postal con imagen del museo", 3.00, "producto");
-        await articuloSeeder("Imán de Refrigerador", "Imán con diseño del museo", 4.00, "producto");
-        await articuloSeeder("Camiseta del Museo", "Camiseta con el logo del museo", 25.00, "producto");
-        await articuloSeeder("Taller de Pintura", "Taller práctico de pintura", 200.00, "servicio");
-        await articuloSeeder("Visita Guiada", "Recorrido guiado por el museo", 150.00, "servicio");
-        await articuloSeeder("Conferencia Especial", "Conferencia sobre arte y cultura", 120.00, "servicio");
+        await articuloSeeder("Entrada General", "Acceso general al museo", 100.00, "boleto"); // 1
+        await articuloSeeder("Guía Audiovisual", "Dispositivo de guía audiovisual", 50.00, "producto"); // 2
+        await articuloSeeder("Café", "Bebida caliente", 15.00, "producto"); // 3
+        await articuloSeeder("Llavero", "Accesorio para llaves", 5.00, "producto"); // 4
+        await articuloSeeder("Catálogo del Museo", "Libro con información del museo", 30.00, "producto"); // 5
+        await articuloSeeder("Taza con Logo", "Taza con el logo del museo", 20.00, "producto"); // 6
+        await articuloSeeder("Postal", "Postal con imagen del museo", 3.00, "producto"); // 7
+        await articuloSeeder("Imán de Refrigerador", "Imán con diseño del museo", 4.00, "producto"); // 8
+        await articuloSeeder("Camiseta del Museo", "Camiseta con el logo del museo", 25.00, "producto"); // 9
+        await articuloSeeder("Taller de Pintura", "Taller práctico de pintura", 200.00, "servicio"); // 10
+        await articuloSeeder("Visita Guiada", "Recorrido guiado por el museo", 150.00, "servicio"); // 11
+        await articuloSeeder("Conferencia Especial", "Conferencia sobre arte y cultura", 120.00, "servicio"); // 12
+        await articuloSeeder("Sesión de fotografías", "Sesión fotográfica en el museo", 1200.00, "servicio"); // 13
+        await articuloSeeder("Presentación especial de culturas", "Presentación cultural", 800.00, "servicio"); // 14
+        await articuloSeeder("Presentación especial de arte contemporáneo", "Presentación de arte", 800.00, "servicio"); // 15
 
+        await museoHasArticuloSeeder(2, 1);
+        await museoHasArticuloSeeder(2, 2);
         await museoHasArticuloSeeder(2, 3);
         await museoHasArticuloSeeder(2, 4);
         await museoHasArticuloSeeder(2, 5);
         await museoHasArticuloSeeder(2, 6);
+        await museoHasArticuloSeeder(2, 7);
+        await museoHasArticuloSeeder(1, 8);
+        await museoHasArticuloSeeder(1, 9);
         await museoHasArticuloSeeder(2, 10);
         await museoHasArticuloSeeder(2, 11);
+        await museoHasArticuloSeeder(2, 12);
+        await museoHasArticuloSeeder(2, 13);
+        await museoHasArticuloSeeder(1, 14);
+        await museoHasArticuloSeeder(1, 15);
+
 
         await boletoTipoSeeder("Estandar", "Boleto estándar para adultos", 0, 100.00, 1);
         await boletoTipoSeeder("Menor de edad", "Boleto para menores de edad", 50, 50.00, 1);

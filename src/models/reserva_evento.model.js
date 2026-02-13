@@ -7,7 +7,11 @@ export default (sequelize, Sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
-        responsable: {
+        nombreEvento: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        responsable: { 
             type: DataTypes.STRING,
             allowNull: false
         },

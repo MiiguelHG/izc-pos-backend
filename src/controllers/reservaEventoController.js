@@ -39,6 +39,7 @@ export class ReservaEventoController {
     }
 
     static async updateReservaEvento(req, res){
+        console.log("🚀 LLEGÓ AL CONTROLLER UPDATE", req.reservaActualizada);
         try{
             const { id } = req.params
             const updatedReserva = await reservaEventoRepository.update({ id }, req.reservaActualizada);
@@ -68,7 +69,8 @@ export class ReservaEventoController {
     static async obtenerPorRangoFechas(req, res) {
         try {
             const { fechaInicio, fechaFin } = req.query;
-            const reservas = await reservaEventoRepository.obtenerPorRangoFechas(fechaInicio, fechaFin);
+            const museoId = Number(req.query.museoId);
+            const reservas = await reservaEventoRepository.obtenerPorRangoFechas(museoId, fechaInicio, fechaFin);
             return sendSuccess(res, 200, "Reservas obtenidas exitosamente.", reservas);
         } catch (error) {
             return sendError(res, 500, `Error al obtener reservas por rango de fechas: ${error.message}`);

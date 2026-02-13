@@ -5,6 +5,8 @@ import { ArticuloController } from '../controllers/articuloController.js';
 const router = express.Router();
 
 router.get('/tipo/:tipo', ArticuloController.obtenerPorTipo);
+router.get("/museo/:museoId/servicios", ArticuloController.obtenerServiciosPorMuseo);
+
 
 router.get('/', ArticuloController.getArticulo);
 router.get('/:id', ArticuloController.getArticuloById);

@@ -92,4 +92,18 @@ export class ArticuloController {
             return sendError(res, 500, `Error al obtener artículos por tipo: ${error.message}`);
         }
     }
+
+    static async obtenerServiciosPorMuseo(req, res) {
+        try {
+            const museoId = Number(req.params.museoId);
+
+            const servicios = await articuloRepository.obtenerServiciosPorMuseo(museoId);
+
+            return sendSuccess(res, 200, "Servicios obtenidos correctamente.", servicios);
+
+        } catch (error) {
+            return sendError(res, 500, `Error al obtener servicios: ${error.message}`);
+        }
+    }
+
 }
