@@ -30,7 +30,7 @@ export const runSeeders = async () => {
         await museoSeeder("Museo de Arte Sacro", "Oaxaca");
 
         await userSeeder("Miguel", "miguel@example.com", "123456", 1, 1);
-        await userSeeder("Alex", "alex@example.com", "123456", 2, 1);
+        await userSeeder("Alex", "alex@example.com", "123456", 2, 2);
         await userSeeder("Ana", "ana@example.com", "123456", 3, 2);
 
         await articuloSeeder("Entrada General", "Acceso general al museo", 100.00, "boleto");
