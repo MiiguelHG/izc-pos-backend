@@ -3,7 +3,6 @@ import { InvitadoController } from "#controllers/invitadoController.js";
 
 const router = express.Router();  
 
-router.get("/sin-ingreso", InvitadoController.getInvitadosSinIngreso);
 router.put("/:id/boletoEmitido/:boletoEmitidoId", InvitadoController.marcarInvitadoUsado);
 
 router.post("/", InvitadoController.createInvitado);

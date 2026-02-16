@@ -54,26 +54,6 @@ export class InvitadoController {
     }
   }
 
-  static async getInvitadosSinIngreso(req, res) {
-    try {
-      const { rows, count} = await invitadoRepository.findInvitadosSinIngreso();
-
-      if (!rows || count === 0) {
-        return sendError(res, 200, "No se encontraron cortesias pendientes de ingreso");
-      }
-
-      return sendSuccess(res, 200, "Invitados sin ingreso recuperados exitosamente", {
-        data: rows,
-        meta: {
-          totalItems: count
-        }
-      });
-    } catch (error) {
-      return sendError(res, 500, `Error al obtener invitados sin ingreso: ${error.message}`);
-    }
-    
-  }
-
   static async getInvitadoById(req, res) {
     try {
       const { id } = req.params;

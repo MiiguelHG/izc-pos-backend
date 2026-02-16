@@ -20,18 +20,6 @@ class InvitadoRepository extends BaseRepository {
       order: [['id', 'DESC']]
     });
   }
-
-  async findInvitadosSinIngreso() {
-    return await this.model.findAndCountAll({
-      where: {
-        usado: false,
-        fechaExpiracion: {
-          [Op.gt]: new Date() // Solo invitados no expirados
-        }
-      },
-      order: [['id', 'DESC']]
-    })
-  }
 }
 
 export const invitadoRepository = new InvitadoRepository();
