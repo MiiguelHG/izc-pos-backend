@@ -1,4 +1,4 @@
-import { invitadoRepository } from "#repositories/index.js";
+import { invitadoRepository, boletoEmitidoRepository } from "#repositories/index.js";
 import { sendError, sendSuccess } from "#utils/responseFormater.js";
 
 export class InvitadoController {
@@ -54,13 +54,17 @@ export class InvitadoController {
     }
   }
 
-  static async getInvitadoById(req, res) {
+  static async getInvitadoByIdAndMuseoId(req, res) {
     try {
-      const { id } = req.params;
+      const { id, museoId } = req.params;
       const invitado = await invitadoRepository.findById(id);
       if (!invitado) {
-        return sendError(res, 404, "Invitado no encontrado");
+        return sendError(res, 404, "Invitación no encontrada");
       }
+      if (invitado.museoId !== Number(museoId)) {
+        return sendError(res, 400, "La invitación no corresponde a este museo");
+      }
+      
       return sendSuccess(res, 200, "Invitado recuperado exitosamente", invitado);
     } catch (error) {
       return sendError(res, 500, `Error al obtener el invitado: ${error.message}`);
@@ -73,6 +77,7 @@ export class InvitadoController {
 
       // Esto puede ir en un middleware para validar que el invitado existe y no ha expirado antes de llegar a este punto
       const invitado = await invitadoRepository.findById(id);
+      const boletoEmitido = await boletoEmitidoRepository.findById(boletoEmitidoId);
 
       if (!invitado) {
         return sendError(res, 404, "Invitado no encontrado");
@@ -81,7 +86,11 @@ export class InvitadoController {
       if (invitado.usado) {
         return sendError(res, 400, "El invitado ya ha sido usado");
       }
-      // ---------------------
+
+      if (invitado.museoId !== boletoEmitido.museoId) {
+        return sendError(res, 400, "El invitado no corresponde al museo del boleto emitido");
+      }
+      //--------------------------------
 
       const actualizado = await invitadoRepository.update(
         { id },
