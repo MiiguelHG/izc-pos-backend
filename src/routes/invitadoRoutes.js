@@ -4,7 +4,7 @@ import { InvitadoController } from "#controllers/invitadoController.js";
 const router = express.Router();  
 
 router.put("/:id/boletoEmitido/:boletoEmitidoId", InvitadoController.marcarInvitadoUsado);
-router.get("/:id/museo/:museoId", InvitadoController.getInvitadoByIdAndMuseoId);
+router.get("/:id/museo/:museoId", InvitadoController.getInvitacionVigente);
 
 router.post("/", InvitadoController.createInvitado);
 router.get("/", InvitadoController.getInvitados);

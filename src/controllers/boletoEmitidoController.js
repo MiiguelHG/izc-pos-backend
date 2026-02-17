@@ -81,7 +81,7 @@ export class BoletoEmitidoController {
       const { rows, count } = await boletoEmitidoRepository.findAllAndCountByMuseoId({ museoId, limit, offset });
 
       if (count === 0) {
-        return sendError(res, 404, "No se encontraron boletos emitidos para el museo especificado");
+        return sendError(res, 404, "No se encontraron boletos emitidos para el museo");
       }
 
       const totalPages = Math.ceil(count / limit);

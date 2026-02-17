@@ -54,20 +54,25 @@ export class InvitadoController {
     }
   }
 
-  static async getInvitadoByIdAndMuseoId(req, res) {
+  static async getInvitacionVigente(req, res) {
     try {
       const { id, museoId } = req.params;
       const invitado = await invitadoRepository.findById(id);
       if (!invitado) {
         return sendError(res, 404, "Invitación no encontrada");
       }
+
+      if (invitado.usado) {
+        return sendError(res, 400, "La invitación ya ha sido usada");
+      }
+
       if (invitado.museoId !== Number(museoId)) {
         return sendError(res, 400, "La invitación no corresponde a este museo");
       }
       
-      return sendSuccess(res, 200, "Invitado recuperado exitosamente", invitado);
+      return sendSuccess(res, 200, "Invitación vigente recuperada exitosamente", invitado);
     } catch (error) {
-      return sendError(res, 500, `Error al obtener el invitado: ${error.message}`);
+      return sendError(res, 500, `Error al obtener la invitación vigente: ${error.message}`);
     }
   }
 
