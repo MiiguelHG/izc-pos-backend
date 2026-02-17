@@ -9,10 +9,24 @@ class BoletoEmitidoRepository extends BaseRepository {
     super(boletoEmitido);
   }
 
-  async createVentaBoletosCompleta({ total, carritoBoletos, usuarioId, museoId, visitanteId, formaPagoId }) {
+  async createVentaBoletosCompleta({nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros, total, carritoBoletos, usuarioId, museoId, formaPagoId }) {
     return await sequelize.transaction(async (t) => {
+      // Proceso de registro del visitante
+      const totalVisitantes = cantidadHombres + cantidadMujeres + cantidadOtros;
+
+      if(totalVisitantes <= 0) {
+
+        throw new Error("El total de visitantes debe ser mayor a cero.");
+      }
+
+      const newVisitante = await visitante.create({nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros, totalVisitantes, museoId, usuarioId}, { transaction: t });
+
+      if(!newVisitante){
+        throw new Error("No se pudo crear el visitante.");
+      }
+
       // Crear el registro de BoletoEmitido
-      const nuevoBoletoEmitido = await this.model.create({total, usuarioId, museoId, visitanteId, formaPagoId}, { transaction: t });
+      const nuevoBoletoEmitido = await this.model.create({total, usuarioId, museoId, visitanteId: newVisitante.id, formaPagoId}, { transaction: t });
 
       // Crear los registros a insertar en BoletoVenta asociados al BoletoEmitido
       const boletosVentaData = await Promise.all(carritoBoletos.map(async (boleto) => {
@@ -32,6 +46,19 @@ class BoletoEmitidoRepository extends BaseRepository {
           boletoTipoId: boleto.boletoTipoId
         };
       }));
+
+      const totalBoletosVenta = boletosVentaData.reduce((sum, boleto) => sum + boleto.subTotal, 0);
+
+      // Validar que el total de boletos venta coincida con el total registrado en BoletoEmitido
+      if (totalBoletosVenta !== total) {
+        throw new Error("El total calculado de boletos venta no coincide con el total registrado en la venta de boletos.");
+      }
+
+      const totalBoletosCantidad = boletosVentaData.reduce((sum, boleto) => sum + boleto.cantidad, 0);
+
+      if (totalVisitantes !== totalBoletosCantidad) {
+        throw new Error("La cantidad total de boletos vendidos no coincide con el total de visitantes registrado.");
+      }
 
       // Crear los registros a insertar en BoletoVenta asociados al BoletoEmitido
       const boletosCreados = await boletoVentaRepository.createMultiple(boletosVentaData, { transaction: t });

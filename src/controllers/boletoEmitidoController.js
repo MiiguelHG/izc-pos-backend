@@ -4,15 +4,18 @@ import { sendError, sendSuccess } from "#utils/responseFormater.js";
 export class BoletoEmitidoController {
   static async createVentaBoletos (req, res) {
     try {
-      const { total, carritoBoletos, usuarioId, museoId, visitanteId, formaPagoId } = req.body;
+      const { 
+        nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros,
+        total, carritoBoletos, usuarioId, museoId, formaPagoId 
+      } = req.body;
 
-      const nuevoBoletoEmitido = await boletoEmitidoRepository.createVentaBoletosCompleta({total, carritoBoletos, usuarioId, museoId, visitanteId, formaPagoId});
+      const nuevoBoletoEmitido = await boletoEmitidoRepository.createVentaBoletosCompleta({nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros, total, carritoBoletos, usuarioId, museoId, formaPagoId});
 
       if (!nuevoBoletoEmitido) {
         return sendError(res, 500, "Error al crear la venta de boletos");
       }
 
-      const visitante = await visitanteRepository.findById(visitanteId);
+      const visitante = await visitanteRepository.findById(nuevoBoletoEmitido.visitanteId);
       const museo = await museoRepository.findById(museoId);
 
       const boletoEmitido = { ...nuevoBoletoEmitido, visitante: { ...visitante.dataValues }, museo: { ...museo.dataValues } };
@@ -78,7 +81,7 @@ export class BoletoEmitidoController {
       const { rows, count } = await boletoEmitidoRepository.findAllAndCountByMuseoId({ museoId, limit, offset });
 
       if (count === 0) {
-        return sendError(res, 404, "No se encontraron boletos emitidos para el museo especificado");
+        return sendError(res, 404, "No se encontraron boletos emitidos para el museo");
       }
 
       const totalPages = Math.ceil(count / limit);
