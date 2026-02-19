@@ -2,7 +2,7 @@ import BaseRepository from "./baseRepository.js";
 import { boletoTipoRepository, boletoVentaRepository } from "./index.js";
 import db from "../models/index.js";
 
-const { boletoEmitido, sequelize , boletoVenta, visitante} = db;
+const { boletoEmitido, sequelize , boletoVenta, visitante, usuario, formaPago, boletoTipo} = db;
 
 class BoletoEmitidoRepository extends BaseRepository {
   constructor() {
@@ -31,17 +31,17 @@ class BoletoEmitidoRepository extends BaseRepository {
       // Crear los registros a insertar en BoletoVenta asociados al BoletoEmitido
       const boletosVentaData = await Promise.all(carritoBoletos.map(async (boleto) => {
         // Obtener los datos del tipo de boleto para calcular el subtotal
-        const boletoTipo = await boletoTipoRepository.findById(boleto.boletoTipoId);
+        const boletoTipoDb = await boletoTipoRepository.findById(boleto.boletoTipoId);
 
         // Validar que el tipo de boleto exista
-        if (!boletoTipo) {
+        if (!boletoTipoDb) {
           throw new Error(`Tipo de boleto con ID ${boleto.boletoTipoId} no encontrado`);
         }
 
         // Preparar los datos para el registro de BoletoVenta
         return {
           cantidad: boleto.cantidad,
-          subTotal: boleto.cantidad * boletoTipo.precioFinal,
+          subTotal: boleto.cantidad * boletoTipoDb.precioFinal,
           boletoEmitidoId: nuevoBoletoEmitido.id,
           boletoTipoId: boleto.boletoTipoId
         };
@@ -80,8 +80,8 @@ class BoletoEmitidoRepository extends BaseRepository {
     return await this.model.findAndCountAll({ 
       where: { museoId },
       include: [
-        { model: visitante, as: 'visitante' },
-        { model: boletoVenta, as: 'boleto_ventas' }
+        { model: visitante, as: 'visitante', attributes: { exclude: ['cantidadHombres', 'cantidadMujeres', 'cantidadOtros', 'totalVisitantes','edad', 'museoId', 'usuarioId']} },
+        { model: usuario, as: 'usuario' , attributes: ['id', 'nombre'] }
       ],
       order: [['fechaEmision', 'DESC']],
       limit, 
@@ -91,9 +91,13 @@ class BoletoEmitidoRepository extends BaseRepository {
 
   async findByIdWithChildren({id}) {
     return await this.model.findByPk(id, {
+      attributes: { exclude: ['visitanteId', 'usuarioId', 'formaPagoId'] },
       include: [
-        { model: boletoVenta, as: 'boleto_ventas' }
-      ]
+        { model: boletoVenta, as: 'boleto_ventas' , attributes: ['id', 'cantidad', 'subTotal'], include: [{ model: boletoTipo, as: 'boleto_tipo', attributes: ['id', 'nombre'] }] },
+        {model: visitante, as: 'visitante', attributes: { exclude: ['museoId', 'usuarioId']} },
+        {model: usuario, as: 'usuario', attributes: ['id', 'nombre']},
+        {model: formaPago, as: 'formas_pago', attributes: ['id', 'nombre']}
+      ],
     });
   }
 }
