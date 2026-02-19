@@ -15,14 +15,10 @@ export default (sequelize, Sequelize) => {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    fechaExpiracion: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
     usado: {
-      type: DataTypes.BOOLEAN,
+      type: DataTypes.ENUM('emitido', 'usado', 'cancelado'),
       allowNull: false,
-      defaultValue: false,
+      defaultValue: 'emitido',
     },
     boletoEmitidoId: {
       type: DataTypes.INTEGER,
