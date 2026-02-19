@@ -35,7 +35,7 @@ export class InvitadoController {
 
       const { rows, count} = await invitadoRepository.findAllAndCount({ limit, offset });
       if (!rows || rows.length === 0) {
-        return sendError(res, 200, "No se encontraron invitados");
+        return sendError(res, 404, "No se encontraron cortesias");
       }
 
       const totalPages = Math.ceil(count / limit);
