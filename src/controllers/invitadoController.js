@@ -6,13 +6,9 @@ export class InvitadoController {
     try {
       const { nombre, motivo, usuarioId, museoId } = req.body;
 
-      const fechaExpiracion = new Date();
-      fechaExpiracion.setDate(fechaExpiracion.getDate() + 1); // Expira en 1 días
-
       const nuevoInvitado = await invitadoRepository.create({
         nombre,
         motivo,
-        fechaExpiracion,
         usuarioId,
         museoId
       });
@@ -35,7 +31,7 @@ export class InvitadoController {
 
       const { rows, count} = await invitadoRepository.findAllAndCount({ limit, offset });
       if (!rows || rows.length === 0) {
-        return sendError(res, 200, "No se encontraron invitados");
+        return sendError(res, 404, "No se encontraron cortesias");
       }
 
       const totalPages = Math.ceil(count / limit);
@@ -62,8 +58,12 @@ export class InvitadoController {
         return sendError(res, 404, "Invitación no encontrada");
       }
 
-      if (invitado.usado) {
+      if (invitado.usado === 'usado') {
         return sendError(res, 400, "La invitación ya ha sido usada");
+      }
+
+      if (invitado.usado === 'cancelado') {
+        return sendError(res, 400, "La invitación ha sido cancelada");
       }
 
       if (invitado.museoId !== Number(museoId)) {
@@ -88,8 +88,12 @@ export class InvitadoController {
         return sendError(res, 404, "Invitado no encontrado");
       }
 
-      if (invitado.usado) {
-        return sendError(res, 400, "El invitado ya ha sido usado");
+      if (invitado.usado === 'usado') {
+        return sendError(res, 400, "La invitación ya ha sido usada");
+      }
+
+      if (invitado.usado === 'cancelado') {
+        return sendError(res, 400, "La invitación ha sido cancelada");
       }
 
       if (invitado.museoId !== boletoEmitido.museoId) {
@@ -99,12 +103,51 @@ export class InvitadoController {
 
       const actualizado = await invitadoRepository.update(
         { id },
-        { usado: true, boletoEmitidoId }
+        { usado: 'usado', boletoEmitidoId }
       );
 
       return sendSuccess(res, 200, "Invitado marcado como usado exitosamente", actualizado);
     } catch (error) {
       return sendError(res, 500, `Error al marcar invitado como usado: ${error.message}`);
     }
+  }
+
+  static async updateInvitado(req, res) {
+    try {
+      const { id } = req.params;
+      const { nombre, motivo, usuarioId, museoId } = req.body;
+
+      const actualizado = await invitadoRepository.update(
+        { id },
+        { nombre, motivo, usuarioId, museoId }
+      );
+
+      if (!actualizado) {
+        return sendError(res, 404, "Invitación no encontrada o no se pudo actualizar");
+      }
+
+      return sendSuccess(res, 200, "Invitado actualizado exitosamente", actualizado);
+    } catch (error) {
+      return sendError(res, 500, `Error al actualizar invitado: ${error.message}`);
+    }
+
+  }
+
+  static async cancelarInvitado(req, res) {
+    try {
+      const { id } = req.params;
+      const actualizado = await invitadoRepository.update(
+        { id },
+        { usado: 'cancelado' }
+      );
+      
+      if (!actualizado) {
+        return sendError(res, 404, "Invitación no encontrada o no se pudo cancelar");
+      }
+
+      return sendSuccess(res, 200, "Invitado cancelado exitosamente", actualizado);
+    } catch (error) {
+      return sendError(res, 500, `Error al cancelar invitado: ${error.message}`);
+    }   
   }
 }
