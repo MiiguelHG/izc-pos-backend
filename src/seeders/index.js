@@ -32,6 +32,8 @@ export const runSeeders = async () => {
         await userSeeder("Miguel", "miguel@example.com", "123456", 1, 1);
         await userSeeder("Alex", "alex@example.com", "123456", 2, 2);
         await userSeeder("Ana", "ana@example.com", "123456", 3, 2);
+        await userSeeder("Sofía", "sofia@example.com", "123456", 3, 3);
+        await userSeeder("Carlos", "carlos@example.com", "123456", 3, 4);
 
         await articuloSeeder("Entrada General", "Acceso general al museo", 100.00, "boleto");
         await articuloSeeder("Guía Audiovisual", "Dispositivo de guía audiovisual", 50.00, "producto");
@@ -65,7 +67,7 @@ export const runSeeders = async () => {
         await productoDetalleSeeder(1, 100.00, 1, 1);
         await productoDetalleSeeder(1, 200.00, 2, 1);
 
-        await visitanteSeeder("Juan Pérez", 30, "12345", "México", "Ciudad de México", "Benito Juárez", 1, 0, 0, 1, 1, 2);
+        await visitanteSeeder("Juan Pérez", 30, "98600", "MX", "ZAC", "GUADALUPE", 1, 0, 0, 1, 1, 2);
 
 
         console.log("\n✅ Todos los seeders se ejecutaron exitosamente");

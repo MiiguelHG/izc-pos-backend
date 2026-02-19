@@ -18,7 +18,7 @@ export class MuseoController {
     }
   }
 
-  static async getAllMuseos(req, res) {
+  static async getAndCountAllMuseos(req, res) {
     try {
       const limit = 10;
       const page = parseInt(req.query.page) || 1;
@@ -41,6 +41,18 @@ export class MuseoController {
           pageSize: limit
         }
       });
+    } catch (error) {
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+    }
+  }
+
+  static async getAllMuseos(req, res) {
+    try {
+      const museos = await museoRepository.findAll();
+      if (!museos || museos.length === 0) {
+        return sendError(res, 404, 'No se encontraron museos');
+      }
+      return sendSuccess(res, 200, 'Museos obtenidos exitosamente', museos);
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
