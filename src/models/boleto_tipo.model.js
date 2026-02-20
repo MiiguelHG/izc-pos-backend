@@ -28,6 +28,32 @@ export default (sequelize, Sequelize) => {
             allowNull: false,
             defaultValue: false
         },
+        habilitado: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: true
+        },
+        dias: {
+            type: DataTypes.JSON,
+            allowNull: false,
+            get() {
+                const value = this.getDataValue('dias');
+                return typeof value === 'string' ? JSON.parse(value) : value;
+            },
+            validate: {
+                dontRepeat(value) {
+                    const uniqueValues = new Set(value);
+                    if (uniqueValues.size !== value.length) {
+                        throw new Error("Los días no pueden repetirse");
+                    }
+                },
+                isValidDayRange(value) {
+                    if (!Array.isArray(value) || !value.every(day => Number.isInteger(day) && day >= 0 && day <= 6)) {
+                        throw new Error("Los días deben ser valores entre 0 y 6");
+                    }
+                }
+            }
+        },
         articuloId: {
             type: DataTypes.INTEGER,
             allowNull: false

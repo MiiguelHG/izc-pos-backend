@@ -55,10 +55,10 @@ export const runSeeders = async () => {
         await museoHasArticuloSeeder(2, 10);
         await museoHasArticuloSeeder(2, 11);
 
-        await boletoTipoSeeder("Estandar", "Boleto estándar para adultos", 0, 100.00, 1, false);
-        await boletoTipoSeeder("Menor de edad", "Boleto para menores de edad", 50, 50.00, 1, false);
-        await boletoTipoSeeder("Mayor de edad", "Boleto para adultos", 50, 100.00, 1, false);
-        await boletoTipoSeeder("Estudiante", "Boleto con descuento para estudiantes", 30, 70.00, 1, false);
+        await boletoTipoSeeder("Estandar", "Boleto estándar para adultos", 0, 100.00, [0,1,2,3,4,5,6], true, 1, false);
+        await boletoTipoSeeder("Menor de edad", "Boleto para menores de edad", 50, 50.00, [0,1,2,3,4,5,6], true, 1, false);
+        await boletoTipoSeeder("Mayor de edad", "Boleto para adultos", 50, 50.00, [0,1,2,3,4,5,6], false, 1, false);
+        await boletoTipoSeeder("Estudiante", "Boleto con descuento para estudiantes", 30, 70.00, [1,2,3,4], true, 1, false);
 
         await formaPagoSeeder("Efectivo", "Pago en efectivo");
         await formaPagoSeeder("Tarjeta de crédito", "Pago con tarjeta de crédito");

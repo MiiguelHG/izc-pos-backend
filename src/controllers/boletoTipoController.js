@@ -4,7 +4,7 @@ import { boletoTipoRepository, articuloRepository } from "../repositories/index.
 export class BoletoTipoController {
   static async createBoletoTipo(req, res) {
     try {
-      const { nombre, descripcion, descuento, esEspecial, articuloId } = req.body;
+      const { nombre, descripcion, descuento, esEspecial, dias, articuloId } = req.body;
       
       const articulo = await articuloRepository.findById(articuloId);
 
@@ -14,7 +14,7 @@ export class BoletoTipoController {
 
       const precioFinal = articulo.precioEstandar - (articulo.precioEstandar * (descuento / 100));
 
-      const newBoletoTipo = await boletoTipoRepository.create({ nombre, descripcion, descuento, precioFinal, esEspecial, articuloId });
+      const newBoletoTipo = await boletoTipoRepository.create({ nombre, descripcion, descuento, precioFinal, esEspecial, dias, articuloId });
 
       if (!newBoletoTipo) {
         return sendError(res, 400, "No se pudo crear el tipo de boleto");
@@ -69,7 +69,7 @@ export class BoletoTipoController {
   static async boletoTipoUpdate(req, res) {
     try {
       const { id } = req.params;
-      const { nombre, descripcion, descuento, articuloId, esEspecial } = req.body;
+      const { nombre, descripcion, descuento, articuloId, esEspecial, dias } = req.body;
 
       const articulo = await articuloRepository.findById(articuloId);
 
@@ -81,7 +81,7 @@ export class BoletoTipoController {
 
       const updated = await boletoTipoRepository.update(
         { id },
-        { nombre, descripcion, descuento, precioFinal, esEspecial, articuloId }
+        { nombre, descripcion, descuento, precioFinal, esEspecial, dias, articuloId }
       );
 
       if (!updated) {
@@ -94,17 +94,28 @@ export class BoletoTipoController {
     }
   }
 
-  static async boletoTipoDelete(req, res) {
+  static async toggleBoletoTipo(req, res) {
     try {
       const { id } = req.params;
 
-      const deleted = await boletoTipoRepository.delete({ id });
+      const boletoTipo = await boletoTipoRepository.findById(id);
 
-      if (!deleted) {
-        return sendError(res, 400, "Tipo de boleto no encontrado o no se pudo eliminar");
+      if (!boletoTipo) {
+        return sendError(res, 404, "Tipo de boleto no encontrado");
       }
 
-      return sendSuccess(res, 200,"Tipo de boleto eliminado" , deleted);
+      const activo = !boletoTipo.habilitado;
+
+      const updated = await boletoTipoRepository.update(
+        { id },
+        { habilitado: activo }
+      );
+
+      if (!updated) {
+        return sendError(res, 400, "No se pudo actualizar el estado del tipo de boleto");
+      }
+
+      return sendSuccess(res, 200, "Estado del tipo de boleto actualizado", updated);
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
