@@ -1,10 +1,13 @@
 import express from "express";
 import { InvitadoController } from "#controllers/invitadoController.js";
+import { authJwt }  from "../middlewares/index.js";
 
-const router = express.Router();  
+const router = express.Router();
+
+router.use(authJwt.verifyToken);
 
 router.put("/:id/boletoEmitido/:boletoEmitidoId", InvitadoController.marcarInvitadoUsado);
-router.get("/:id/museo/:museoId", InvitadoController.getInvitacionVigente);
+router.get("/:id", InvitadoController.getInvitacionVigente);
 router.put("/:id/cancelar", InvitadoController.cancelarInvitado);
 
 router.post("/", InvitadoController.createInvitado);

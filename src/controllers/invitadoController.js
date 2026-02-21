@@ -29,7 +29,11 @@ export class InvitadoController {
       const page = parseInt(req.query.page) || 1;
       const offset = (page - 1) * limit;
 
-      const { rows, count} = await invitadoRepository.findAllAndCount({ limit, offset });
+      const user = req.user;
+
+      const museoId = user.rol?.nombre === 'admin' ? null : user.museo.id;
+
+      const { rows, count} = await invitadoRepository.findAllAndCount({ limit, offset, museoId });
       if (!rows || rows.length === 0) {
         return sendError(res, 404, "No se encontraron cortesias");
       }
@@ -52,7 +56,9 @@ export class InvitadoController {
 
   static async getInvitacionVigente(req, res) {
     try {
-      const { id, museoId } = req.params;
+      const { id } = req.params;
+      const user = req.user;
+
       const invitado = await invitadoRepository.findById(id);
       if (!invitado) {
         return sendError(res, 404, "Invitación no encontrada");
@@ -66,7 +72,7 @@ export class InvitadoController {
         return sendError(res, 400, "La invitación ha sido cancelada");
       }
 
-      if (invitado.museoId !== Number(museoId)) {
+      if (invitado.museoId !== user.museo.id) {
         return sendError(res, 400, "La invitación no corresponde a este museo");
       }
       
