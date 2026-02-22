@@ -6,6 +6,12 @@ export class InvitadoController {
     try {
       const { nombre, motivo, usuarioId, museoId } = req.body;
 
+      const { user } = req;
+
+      if (user.rol?.nombre !== 'admin' && user.museo.id !== museoId) {
+        return sendError(res, 403, "No tienes permiso para crear un invitado para este museo");
+      }
+
       const nuevoInvitado = await invitadoRepository.create({
         nombre,
         motivo,
@@ -29,8 +35,12 @@ export class InvitadoController {
       const page = parseInt(req.query.page) || 1;
       const offset = (page - 1) * limit;
 
-      const { rows, count} = await invitadoRepository.findAllAndCount({ limit, offset });
-      if (!rows || rows.length === 0) {
+      const user = req.user;
+
+      const museoId = user.rol?.nombre === 'admin' ? null : user.museo.id;
+
+      const { rows, count} = await invitadoRepository.findAllAndCount({ limit, offset, museoId });
+      if (count === 0) {
         return sendError(res, 404, "No se encontraron cortesias");
       }
 
@@ -52,7 +62,9 @@ export class InvitadoController {
 
   static async getInvitacionVigente(req, res) {
     try {
-      const { id, museoId } = req.params;
+      const { id } = req.params;
+      const user = req.user;
+
       const invitado = await invitadoRepository.findById(id);
       if (!invitado) {
         return sendError(res, 404, "Invitación no encontrada");
@@ -66,7 +78,7 @@ export class InvitadoController {
         return sendError(res, 400, "La invitación ha sido cancelada");
       }
 
-      if (invitado.museoId !== Number(museoId)) {
+      if (invitado.museoId !== user.museo.id) {
         return sendError(res, 400, "La invitación no corresponde a este museo");
       }
       

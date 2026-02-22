@@ -1,12 +1,14 @@
 import { boletoTipoRepository } from "../repositories/index.js";
 
-export const boletoTipoSeeder = async (nombre, descripcion, descuento, precioFinal, articuloId, esEspecial) => {
+export const boletoTipoSeeder = async (nombre, descripcion, descuento, precioFinal, dias, habilitado, articuloId, esEspecial) => {
   try {
     const boletoTipo = await boletoTipoRepository.create({
       nombre,
       descripcion,
       descuento,
       precioFinal,
+      dias,
+      habilitado,
       articuloId,
       esEspecial
     });

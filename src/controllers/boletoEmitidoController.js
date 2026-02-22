@@ -48,40 +48,14 @@ export class BoletoEmitidoController {
       const page = parseInt(req.query.page) || 1;
       const offset = (page - 1) * limit;
 
+      const { user } = req;
 
-      const { rows, count } = await boletoEmitidoRepository.findAllAndCount({ limit, offset });
+      const museoId = user.rol?.nombre === 'admin' ? null : user.museo.id;
+
+      const { rows, count } = await boletoEmitidoRepository.findAllAndCount({ limit, offset, museoId });
 
       if (count === 0) {
         return sendError(res, 404, "No se encontraron boletos emitidos");
-      }
-
-      const totalPages = Math.ceil(count / limit);
-
-      return sendSuccess(res, 200, "Boletos emitidos encontrados", { 
-        data: rows,
-        meta: {
-          totalItems: count,
-          currentPage: page,
-          totalPages: totalPages,
-          pageSize: limit
-        }
-       });
-    } catch (error) {
-      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
-    }
-  }
-
-  static async getBoletosEmitidosByMuseoId (req, res) {
-    try {
-      const { museoId } = req.params;
-      const limit = 10;
-      const page = parseInt(req.query.page) || 1;
-      const offset = (page - 1) * limit;
-
-      const { rows, count } = await boletoEmitidoRepository.findAllAndCountByMuseoId({ museoId, limit, offset });
-
-      if (count === 0) {
-        return sendError(res, 404, "No se encontraron boletos emitidos para el museo");
       }
 
       const totalPages = Math.ceil(count / limit);
