@@ -1,5 +1,6 @@
 import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
+import { Op } from "sequelize";
 
 const { boletoTipo, sequelize, articulo } = db;
 
@@ -8,9 +9,25 @@ class BoletoTipoRepository extends BaseRepository {
     super(boletoTipo);
   }
 
-  async findAllBoletos({ esEspecial }) {
-    const whereClause = esEspecial !== undefined ? { esEspecial } : {};
-    return await this.findAll({ where: whereClause });
+  async findAllBoletos({ esEspecial, esOperador, limit, offset }) {
+    const whereClause = {};
+    if (esOperador) {
+      if (esEspecial !== undefined) {
+        whereClause.esEspecial = esEspecial;
+      }
+
+      whereClause.habilitado = true;
+
+      const diaActual = new Date().getDay(); // 0 = Domingo, 6 = Sábado
+      
+      whereClause[Op.and] = [
+        sequelize.where(
+          sequelize.fn("JSON_CONTAINS", sequelize.col("dias"), JSON.stringify(diaActual)),
+          true
+        ),
+      ];
+    }
+    return await this.model.findAndCountAll({ where: whereClause, limit, offset });
   }
 
   async updatePrecioFinalByArticuloId({ articuloId, precioEstandar }) {

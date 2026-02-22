@@ -1,7 +1,10 @@
 import express from "express";
 import { BoletoTipoController } from "#controllers/boletoTipoController.js";
+import { authJwt } from "#middlewares/index.js";
 
 const router = express.Router();
+
+router.use(authJwt.verifyToken);
 
 router.put("/update-all", BoletoTipoController.UpdateAllBoletosPrecioFinal);
 router.put("/:id/toggle", BoletoTipoController.toggleBoletoTipo);

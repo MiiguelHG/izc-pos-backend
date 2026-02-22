@@ -31,6 +31,12 @@ export class BoletoTipoController {
   static async getBoletosTipos(req, res) {
     try {
       const { esEspecial } = req.query;
+      const { user } = req;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+
+      const esOperador = user.rol.nombre === 'operador';
 
       if (esEspecial !== undefined && esEspecial !== 'true' && esEspecial !== 'false') {
         return sendError(res, 400, "El parámetro esEspecial debe ser 'true' o 'false'");
@@ -38,13 +44,23 @@ export class BoletoTipoController {
 
       const esEspecialBool = esEspecial !== undefined ? esEspecial === 'true' : undefined;
 
-      const boletosTipos = await boletoTipoRepository.findAllBoletos({ esEspecial: esEspecialBool });
+      const {rows, count} = await boletoTipoRepository.findAllBoletos({ esEspecial: esEspecialBool, esOperador, limit, offset });
 
-      if (!boletosTipos || boletosTipos.length === 0) {
+      if (count === 0) {
         return sendError(res, 404, "No se encontraron tipos de boleto");
       }
 
-      return sendSuccess(res, 200,"Boletos Tipos encontrados" , boletosTipos);
+      const totalPages = Math.ceil(count / limit);
+
+      return sendSuccess(res, 200,"Boletos Tipos encontrados" , {
+        data: rows,
+        meta: {
+          totalItems: count,
+          currentPage: page,
+          totalPages: totalPages,
+          pageSize: limit
+        }
+      });
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
