@@ -9,7 +9,11 @@ export default (sequelize, Sequelize) => {
         },
         total: {
             type: DataTypes.DECIMAL(7, 2),
-            allowNull: false
+            allowNull: false,
+            validate: {
+                min: 0,
+                isDecimal: true
+            }
         },
         fechaEmision: {
             type: DataTypes.DATE,
@@ -19,23 +23,38 @@ export default (sequelize, Sequelize) => {
         estado: {
             type: DataTypes.ENUM('activo', 'usado', 'cancelado'),
             allowNull: false,
-            defaultValue: 'activo'
+            defaultValue: 'activo',
+            validate: {
+                isIn: [['activo', 'usado', 'cancelado']]
+            }
         },
         usuarioId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         museoId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         visitanteId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         formaPagoId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         }
     });
 

@@ -9,19 +9,33 @@ export default (sequelize, Sequelize) => {
         },
         cantidad: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                min: 1,
+                isInt: true
+            }
         },
         subTotal: {
             type: DataTypes.DECIMAL(7, 2),
-            allowNull: false
+            allowNull: false,
+            validate: {
+                min: 0,
+                isDecimal: true
+            }
         },
         boletoTipoId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         boletoEmitidoId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         }
     });
 

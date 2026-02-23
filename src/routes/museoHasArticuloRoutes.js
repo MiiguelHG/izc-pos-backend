@@ -1,8 +1,11 @@
 import express from 'express';
 import { MuseoHasArticuloController } from '../controllers/museoHasArticuloController.js';
 import { MuseoValidationMiddleware } from '../middlewares/museoArticuloMiddleware.js';
+import { authJwt } from '#middlewares/index.js';
 
 const router = express.Router();
+
+router.use(authJwt.verifyToken); // Proteger todas las rutas con autenticación
 
 // CRUD y utilidades para la relación Museo <-> Artículo
 router.get('/', MuseoHasArticuloController.getAllAssociations);
@@ -13,7 +16,6 @@ router.get('/museo/:id/articulos/:tipo', MuseoValidationMiddleware.validateMuseo
 router.put('/museo/:id', MuseoValidationMiddleware.validateMuseoExists, MuseoHasArticuloController.setArticulosForMuseo);
 
 router.get('/articulo/:id', MuseoHasArticuloController.getByArticulo);
-
-router.delete('/:museoId/:articuloId', MuseoValidationMiddleware.validateMuseoExists, MuseoHasArticuloController.removeArticuloFromMuseo);
+router.put('/:articuloId/toggle',authJwt.hasRole(['directorMuseo']), MuseoHasArticuloController.toggleEnableArticulosForMuseo);
 
 export default router;

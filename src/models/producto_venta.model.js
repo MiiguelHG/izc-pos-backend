@@ -9,7 +9,11 @@ export default (sequelize, Sequelize) => {
         },
         total: {
             type: DataTypes.DECIMAL(10, 2),
-            allowNull: false
+            allowNull: false,
+            validate: {
+                min: 0,
+                isDecimal: true
+            }
         },
         fechaVenta: {
             type: DataTypes.DATE,
@@ -18,15 +22,24 @@ export default (sequelize, Sequelize) => {
         },
         museoId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         usuarioId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         formaPagoId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         }
     });
 

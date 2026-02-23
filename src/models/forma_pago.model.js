@@ -9,11 +9,18 @@ export default (sequelize, Sequelize) => {
         },
         nombre: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                is: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s]+$/, // Solo letras, números y espacios
+                len: [3, 255] // Longitud entre 1 y 255 caracteres
+            }
         },
         descripcion: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: true,
+            validate: {
+                is: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s.,;:!?"'()\-]+$/ // Solo letras, números, espacios y algunos signos de puntuación
+            }
         },
     });
 

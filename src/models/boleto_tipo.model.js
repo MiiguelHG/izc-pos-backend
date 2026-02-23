@@ -9,19 +9,34 @@ export default (sequelize, Sequelize) => {
         },
         nombre: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                is: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s]+$/, // Solo letras, números y espacios
+                len: [3, 255] // Longitud entre 1 y 255 caracteres
+            }
         },
         descripcion: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: true,
+            validate: {
+                is: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s.,;:!?"'()\-]+$/ // Solo letras, números, espacios y algunos signos de puntuación
+            }
         },
         descuento: {
             type: DataTypes.DECIMAL(5, 2),
-            allowNull: false
+            allowNull: false,
+            validate: {
+                min: 0,
+                isDecimal: true
+            }
         },
         precioFinal: {
             type: DataTypes.DECIMAL(5, 2),
-            allowNull: false
+            allowNull: false,
+            validate: {
+                min: 0,
+                isDecimal: true
+            }
         },
         esEspecial: {
             type: DataTypes.BOOLEAN,
@@ -56,7 +71,10 @@ export default (sequelize, Sequelize) => {
         },
         articuloId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         }
     });
 
