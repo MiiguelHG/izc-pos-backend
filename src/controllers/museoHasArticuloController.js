@@ -1,4 +1,4 @@
-import { museoHasArticuloRepository } from "#repositories/index.js";
+import { museoHasArticuloRepository, articuloRepository } from "#repositories/index.js";
 import { sendError, sendSuccess } from "#utils/responseFormater.js";
 
 export class MuseoHasArticuloController {
@@ -92,10 +92,20 @@ export class MuseoHasArticuloController {
 
       const museoId = user.museoId;
 
+      const articulo = await articuloRepository.findById(articuloId);
+
+      if (!articulo) {
+        return sendError(res, 404, 'Artículo no encontrado');
+      }
+
       const association = await museoHasArticuloRepository.getbyId(museoId, articuloId);
 
       if (!association) {
         return sendError(res, 404, 'No se encontró la relación entre el artículo y el museo');
+      }
+
+      if (!articulo.habilitado) {
+        return sendError(res, 400, 'El artículo está deshabilitado, no se puede habilitar para el museo');
       }
 
       const updated = await museoHasArticuloRepository.update(

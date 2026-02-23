@@ -36,6 +36,11 @@ export default (sequelize, Sequelize) => {
             validate: {
                 isIn: [['boleto', 'producto', 'servicio']]
             }
+        },
+        habilitado: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: true
         }
     });
 

@@ -71,18 +71,6 @@ export class ArticuloController {
         }
     }
 
-    static async deleteArticulo(req, res) {
-        try {
-            const deleted = await articuloRepository.delete({id: req.params.id});
-            if (!deleted) {
-                return sendError(res, 404, "Artículo no encontrado.");
-            }
-            return sendSuccess(res, 200, "Artículo eliminado exitosamente.");
-        } catch (error) {
-            return sendError(res, 500, `Error al eliminar artículo: ${error.message}`);
-        }
-    }
-
     static async obtenerPorTipo(req, res) {
         try {
             const { tipo } = req.params;
@@ -91,5 +79,20 @@ export class ArticuloController {
         } catch (error) {
             return sendError(res, 500, `Error al obtener artículos por tipo: ${error.message}`);
         }
+    }
+
+    static async toggleEnableArticulo(req, res) {
+        try {
+            const { id } = req.params;
+
+            const articulo = await articuloRepository.updateHabilitado({id});
+
+            if (!articulo) {
+                return sendError(res, 404, "Artículo no encontrado.");
+            }
+            return sendSuccess(res, 200, `Artículo actualizado exitosamente.`, articulo);
+        } catch (error) {
+            return sendError(res, 500, `Error al cambiar estado del artículo: ${error.message}`);
+        }   
     }
 }
