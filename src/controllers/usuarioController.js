@@ -55,7 +55,7 @@ export class UsuarioController {
     static async update(req, res) {
         try {
             const { id } = req.params;
-            const { nombre, email, password, activo, rolId, museoId } = req.body;
+            const { nombre, email, password, rolId, museoId } = req.body;
 
             const { user } = req;
 
@@ -73,7 +73,7 @@ export class UsuarioController {
                 return sendError(res, 403, "Solo los administradores pueden actualizar usuarios a roles distintos de operador.");
             }
 
-            const updatedUser = await usuarioRepository.update({ id }, { nombre, email, password, activo, rolId, museoId });
+            const updatedUser = await usuarioRepository.update({ id }, { nombre, email, password, rolId, museoId });
 
             if (!updatedUser) {
                 return sendError(res, 404, "User not found or could not be updated.");
