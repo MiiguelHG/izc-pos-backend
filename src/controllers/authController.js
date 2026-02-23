@@ -10,7 +10,7 @@ export class AuthController {
             const rol = await rolRepository.findById(rolId);
 
             if (!rol) {
-                return sendError(res, "Role not found.", 404);
+                return sendError(res, 404, "Role not found.");
             }
             if (user.rol.nombre !== 'admin' && user.museo.id !== museoId) {
                 return sendError(res, 403, "Solo los administradores pueden crear usuarios de otros museos");

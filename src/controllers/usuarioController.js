@@ -15,7 +15,7 @@ export class UsuarioController {
             const { rows, count } = await usuarioRepository.findAllWithoutPassword({ limit, offset, museoId });
 
             if (count === 0) {
-                    return sendError(res, "No users found.", 404);
+                    return sendError(res, 404, "No users found.");
             }
 
             const totalPages = Math.ceil(count / limit);
@@ -42,7 +42,7 @@ export class UsuarioController {
             const user = await usuarioRepository.findUserById(id);
 
             if (!user) {
-                return sendError(res, "User not found.", 404);
+                return sendError(res, 404, "User not found.");
             }
 
             return sendSuccess(res, 200, "User retrieved successfully.", user);
@@ -62,7 +62,7 @@ export class UsuarioController {
             const rol = await rolRepository.findById(rolId);
 
             if (!rol) {
-                return sendError(res, "Role not found.", 404);
+                return sendError(res, 404, "Role not found.");
             }
 
             if (user.rol.nombre !== 'admin' && user.museo.id !== museoId) {
