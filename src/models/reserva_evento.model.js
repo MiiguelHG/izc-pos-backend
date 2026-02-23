@@ -9,11 +9,24 @@ export default (sequelize, Sequelize) => {
         },
         responsable: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                is: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s]+$/, 
+                len: [3, 255] 
+            }
         },
         contactoResponsable: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isPhoneOrEmail(value) {
+                    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+                    const isPhone = /^[0-9]{10}$/.test(value); // Teléfono de 10 dígitos
+                    if (!isEmail && !isPhone) {
+                        throw new Error("El contacto debe ser un correo electrónico o un número de teléfono de 10 dígitos");
+                    }
+                }
+            }
         },
         fechaReserva: {
             type: DataTypes.DATE,
@@ -30,32 +43,54 @@ export default (sequelize, Sequelize) => {
         },
         total: {
             type: DataTypes.DECIMAL(10, 2),
-            allowNull: false
+            allowNull: false,
+            validate: {
+                min: 0,
+                isDecimal: true
+            }
         },
         estado: {
             type: DataTypes.ENUM("reservado", "cancelado", "asistido"),
             allowNull: false,
-            defaultValue: "reservado"
+            defaultValue: "reservado",
+            validate: {
+                isIn: [["reservado", "cancelado", "asistido"]]
+            }
         },
         usuarioId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         museoId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         articuloId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         visitanteId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         formaPagoId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         }
     });
 

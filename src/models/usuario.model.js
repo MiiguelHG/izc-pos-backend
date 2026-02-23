@@ -10,16 +10,27 @@ export default (sequelize, Sequelize) => {
         },
         nombre: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                notEmpty: true,
+                is: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/,
+                len: [3, 100]
+            }
         },
         email: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true
+            unique: true,
+            validate: {
+                isEmail: true
+            }
         },
         password: {
             type: DataTypes.TEXT,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                len: [6, 255]
+            }
         },
         activo: {
             type: DataTypes.BOOLEAN,
@@ -27,11 +38,17 @@ export default (sequelize, Sequelize) => {
         },
         rolId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         museoId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         }
         
     });

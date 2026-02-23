@@ -9,19 +9,33 @@ export default (sequelize, Sequelize) => {
         },
         nombre: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                is: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s]+$/,
+                len: [3, 255]
+            }
         },
         descripcion: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: true,
+            validate: {
+                is: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s.,;:!?"'()\-]+$/ // Solo letras, números, espacios y algunos signos de puntuación
+            }
         },
         precioEstandar: {
             type: DataTypes.DECIMAL(5, 2),
-            allowNull: false
+            allowNull: false,
+            validate: {
+                min: 0,
+                isDecimal: true
+            }
         },
         tipo: {
             type: DataTypes.ENUM('boleto' , 'producto', 'servicio'),
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isIn: [['boleto', 'producto', 'servicio']]
+            }
         }
     });
 
