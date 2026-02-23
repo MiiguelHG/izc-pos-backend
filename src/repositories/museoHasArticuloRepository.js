@@ -9,9 +9,8 @@ class MuseoHasArticuloRepository extends BaseRepository {
         super(museoHasArticulo);
     }
 
-    // Remover relación sin validación
-    async removeArticulo(museoId, articuloId){
-        return await this.model.destroy({ where: { museoId, articuloId } });
+    async getbyId(museoId, articuloId) {
+        return await this.model.findOne({ where: { museoId, articuloId } });
     }
 
     // Reemplazar las relaciones de un museo sin validar existencia
@@ -29,8 +28,9 @@ class MuseoHasArticuloRepository extends BaseRepository {
         }
     }
 
-    async getArticulosByMuseo({museoId, tipo, limit = 10, offset = 0 }) {
+    async getArticulosByMuseo({museoId, tipo, limit = 10, offset = 0, isOperador }) {
         const defalutTipo = { [Op.or]: [ {tipo: 'servicio'}, {tipo: 'producto'}] };
+        const habilitados = isOperador ? { where: { habilitado: true } } : {};
         
         return await articulo.findAndCountAll({
             where: tipo !== 'todos' ? { tipo: tipo } : defalutTipo,
@@ -38,7 +38,8 @@ class MuseoHasArticuloRepository extends BaseRepository {
                 { 
                     model: db.museo, as: 'museos', 
                     where: { id: museoId }, 
-                    attributes: [] 
+                    attributes: [],
+                    through: habilitados // ✅ Solo artículos habilitados si es operador
                 }
             ],
             limit,

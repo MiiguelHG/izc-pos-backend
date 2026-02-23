@@ -17,6 +17,11 @@ export default (sequelize, Sequelize) => {
             validate: {
                 isInt: true
             }
+        },
+        habilitado: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: true
         }
     });
     return MuseoHasArticulo;
