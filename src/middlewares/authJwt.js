@@ -47,9 +47,9 @@ export class authJwt {
             req.user.rol?.dataValues?.nombre ||
             req.user.dataValues?.rol?.dataValues?.nombre;
 
-          const rolName = role.trim().toLowerCase();  
+          const rolName = role.trim().toLowerCase();
 
-          if(!rolesRequeridos.includes(rolName)){
+          if(!rolesRequeridos.map(r => r.toLowerCase()).includes(rolName)){
               return sendError(res, 403, `Require one of these roles: ${rolesRequeridos.join(', ')}!`);
           }
           next();

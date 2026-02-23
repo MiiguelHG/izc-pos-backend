@@ -1,4 +1,4 @@
-import { usuarioRepository } from "#repositories/index.js";
+import { usuarioRepository, rolRepository } from "#repositories/index.js";
 import { sendError, sendSuccess } from "#utils/responseFormater.js";
 
 export class UsuarioController {
@@ -8,11 +8,14 @@ export class UsuarioController {
             const limit = 10;
             const page = parseInt(req.query.page) || 1;
             const offset = (page - 1) * limit;
+            const { user } = req;
 
-            const { rows, count } = await usuarioRepository.findAllWithoutPassword({ limit, offset });
+            const museoId = user.rol.nombre !== 'admin' ? user.museoId : null;
+
+            const { rows, count } = await usuarioRepository.findAllWithoutPassword({ limit, offset, museoId });
 
             if (count === 0) {
-                    return sendError(res, "No users found.", 404);
+                    return sendError(res, 404, "No users found.");
             }
 
             const totalPages = Math.ceil(count / limit);
@@ -39,7 +42,7 @@ export class UsuarioController {
             const user = await usuarioRepository.findUserById(id);
 
             if (!user) {
-                return sendError(res, "User not found.", 404);
+                return sendError(res, 404, "User not found.");
             }
 
             return sendSuccess(res, 200, "User retrieved successfully.", user);
@@ -54,32 +57,31 @@ export class UsuarioController {
             const { id } = req.params;
             const { nombre, email, password, activo, rolId, museoId } = req.body;
 
+            const { user } = req;
+
+            const rol = await rolRepository.findById(rolId);
+
+            if (!rol) {
+                return sendError(res, 404, "Role not found.");
+            }
+
+            if (user.rol.nombre !== 'admin' && user.museo.id !== museoId) {
+                return sendError(res, 403, "Solo los administradores pueden actualizar usuarios de otros museos");
+            }
+
+            if (user.rol.nombre !== 'admin' && rol.nombre !== 'operador') {
+                return sendError(res, 403, "Solo los administradores pueden actualizar usuarios a roles distintos de operador.");
+            }
+
             const updatedUser = await usuarioRepository.update({ id }, { nombre, email, password, activo, rolId, museoId });
 
             if (!updatedUser) {
-                return sendError(res, "User not found or could not be updated.", 404);
+                return sendError(res, 404, "User not found or could not be updated.");
             }
 
             return sendSuccess(res, 200, "User updated successfully.", updatedUser);
         } catch (error) {
             return sendError(res,500, `Error updating user: ${error.message}`);
-        }
-    }
-
-    // Eliminar un usuario (solo admin)
-    static async delete(req, res) {
-        try {
-            const { id } = req.params;
-
-            const deleted = await usuarioRepository.delete({ id });
-
-            if (!deleted) {
-                return sendError(res, "User not found or could not be deleted.", 404);
-            }
-
-            return sendSuccess(res, 200, "User deleted successfully.");
-        } catch (error) {
-            return sendError(res,500, `Error deleting user: ${error.message}`);
         }
     }
 }
