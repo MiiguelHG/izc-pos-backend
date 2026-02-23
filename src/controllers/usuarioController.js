@@ -8,8 +8,11 @@ export class UsuarioController {
             const limit = 10;
             const page = parseInt(req.query.page) || 1;
             const offset = (page - 1) * limit;
+            const { user } = req;
 
-            const { rows, count } = await usuarioRepository.findAllWithoutPassword({ limit, offset });
+            const museoId = user.rol.nombre !== 'admin' ? user.museoId : null;
+
+            const { rows, count } = await usuarioRepository.findAllWithoutPassword({ limit, offset, museoId });
 
             if (count === 0) {
                     return sendError(res, "No users found.", 404);
@@ -63,23 +66,6 @@ export class UsuarioController {
             return sendSuccess(res, 200, "User updated successfully.", updatedUser);
         } catch (error) {
             return sendError(res,500, `Error updating user: ${error.message}`);
-        }
-    }
-
-    // Eliminar un usuario (solo admin)
-    static async delete(req, res) {
-        try {
-            const { id } = req.params;
-
-            const deleted = await usuarioRepository.delete({ id });
-
-            if (!deleted) {
-                return sendError(res, "User not found or could not be deleted.", 404);
-            }
-
-            return sendSuccess(res, 200, "User deleted successfully.");
-        } catch (error) {
-            return sendError(res,500, `Error deleting user: ${error.message}`);
         }
     }
 }

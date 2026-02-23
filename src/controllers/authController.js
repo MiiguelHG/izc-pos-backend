@@ -22,13 +22,13 @@ export class AuthController {
             const user = await usuarioRepository.findByAttribute("email", email);
             
             if(!user){
-                return sendError(res, 404, "User Not found.");
+                return sendError(res, 404, "Usuario no encontrado");
             }
 
             const isPasswordValid = await user.validatePassword(password);
 
             if(!isPasswordValid){
-                return sendError(res, 401, "Invalid Password!");
+                return sendError(res, 401, "Contraseña incorrecta");
             }
 
             //Quitar password del objeto user antes de enviar la respuesta
