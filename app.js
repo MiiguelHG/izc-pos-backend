@@ -104,7 +104,7 @@ db.sequelize.sync(syncOptions).then(async () => {
     console.log('Database synchronized successfully');
 
     // Inicializar roles por defecto
-    await runSeeders();
+    // await runSeeders();
 
     app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);

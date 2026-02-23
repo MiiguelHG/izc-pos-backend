@@ -100,10 +100,23 @@ export class ReservaEventoController {
     static async cancelarEvento(req, res){
         try{
             const { id } = req.params;
-            const resultado = await reservaEventoRepository.cancelarEvento(id);
+            const resultado = await reservaEventoRepository.findById(id);
+
             if (!resultado) {
                 return sendError(res, 404, "Reserva de evento no encontrada o no se pudo cancelar.");
             }
+
+            if (resultado.estado === "asistido"){
+                return sendError(res, 400, "No se puede cancelar una reserva asistida");
+            }
+
+            if (resultado.estado == "cancelado"){
+                return sendError(res, 400, "La reserva ya ha sido cancelada.")
+            }
+
+            resultado.estado = "cancelado";
+            await resultado.save();
+
             return sendSuccess(res, 200, "Reserva de evento cancelada exitosamente.", resultado);
         } catch (error) {
             return sendError(res, 500, `Error al cancelar la reserva de evento: ${error.message}`);
@@ -113,10 +126,24 @@ export class ReservaEventoController {
     static async marcarComoAsistido(req, res){
         try{
             const { id } = req.params;
-            const resultado = await reservaEventoRepository.marcarComoAsistido(id);
+            const resultado = await reservaEventoRepository.findById(id);
+
             if (!resultado) {
                 return sendError(res, 404, "Reserva de evento no encontrada o no se pudo marcar como asistido.");
             }
+
+
+            if (resultado.estado === "cancelado"){
+                return sendError(res, 400, "No se puede marcar asistencia a una reserva cancelada.");
+            }
+
+            if (resultado.estado === "asistido"){
+                return sendError(res, 400, "La asistencia ya ha sido marcada.");
+            }
+
+            resultado.estado = "asistido";
+            await   resultado.save();
+
             return sendSuccess(res, 200, "Reserva de evento marcada como asistido exitosamente.", resultado);
         } catch (error) {
             return sendError(res, 500, `Error al marcar la reserva de evento como asistido: ${error.message}`);

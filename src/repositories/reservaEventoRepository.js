@@ -13,7 +13,6 @@ class ReservaEventoRepository extends BaseRepository {
         return await this.findAll({
             where: {
                 museoId,
-                estado: { [Op.ne]: 'cancelado' },
                 [Op.or]: [
                     {
                         fechaInicio: { [Op.between]: [fechaInicio, fechaFin] },
