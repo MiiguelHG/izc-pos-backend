@@ -84,4 +84,32 @@ export class UsuarioController {
             return sendError(res,500, `Error updating user: ${error.message}`);
         }
     }
+
+    static async toggleActivo(req, res) {
+        try {
+            const { id } = req.params;
+            const { user } = req;
+
+            const userToTogle = await usuarioRepository.findById(id);
+
+            if (!userToTogle) {
+                return sendError(res, 404, "User not found.");
+            }
+
+            if (user.rol.nombre !== 'admin' && user.museo.id !== userToTogle.museoId) {
+                return sendError(res, 403, "Solo los administradores pueden actualizar usuarios de otros museos");
+            }
+
+            const enabled = !userToTogle.activo;
+            const updatedUser = await usuarioRepository.update({ id }, { activo: enabled });
+
+            if (!updatedUser) {
+                return sendError(res, 400, `No se pudo ${enabled ? 'habilitar' : 'deshabilitar'} el usuario.`);
+            }
+
+            return sendSuccess(res, 200, `Usuario ${enabled ? 'habilitado' : 'deshabilitado'} exitosamente.`, updatedUser);
+        } catch (error) {
+            return sendError(res, 500, `Error al actualizar el estado del usuario: ${error.message}`);
+        }
+    }
 }
