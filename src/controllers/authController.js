@@ -1,4 +1,4 @@
-import { usuarioRepository, refreshTokenRepository} from "../repositories/index.js";
+import { usuarioRepository, refreshTokenRepository, rolRepository} from "../repositories/index.js";
 import { generateAccessToken, generateRefreshToken, getExpirationFromToken, getUserIdFromToken } from "#utils/tokenUtils.js";
 import { sendSuccess, sendError } from "#utils/responseFormater.js";
 
@@ -6,10 +6,23 @@ export class AuthController {
     static async register(req, res) {
         try{
             const { nombre, email, password, rolId , museoId} = req.body;
+            const { user } = req;
+            const rol = await rolRepository.findById(rolId);
 
-            const user = await usuarioRepository.create({ nombre, email, password, rolId, museoId });
+            if (!rol) {
+                return sendError(res, "Role not found.", 404);
+            }
+            if (user.rol.nombre !== 'admin' && user.museo.id !== museoId) {
+                return sendError(res, 403, "Solo los administradores pueden crear usuarios de otros museos");
+            }
+
+            if (user.rol.nombre !== 'admin' && rol.nombre !== 'operador') {
+                return sendError(res, 403, "Solo los administradores pueden asignar roles distintos de operador.");
+            }
+
+            const newUser = await usuarioRepository.create({ nombre, email, password, rolId, museoId });
             
-            return sendSuccess(res, 201, "User registered successfully!", {user});
+            return sendSuccess(res, 201, "User registered successfully!", {user: newUser});
         }catch(error){
             return sendError(res, 500, `Error registering user: ${error.message}`);
         }

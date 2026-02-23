@@ -1,4 +1,4 @@
-import { usuarioRepository } from "#repositories/index.js";
+import { usuarioRepository, rolRepository } from "#repositories/index.js";
 import { sendError, sendSuccess } from "#utils/responseFormater.js";
 
 export class UsuarioController {
@@ -57,10 +57,26 @@ export class UsuarioController {
             const { id } = req.params;
             const { nombre, email, password, activo, rolId, museoId } = req.body;
 
+            const { user } = req;
+
+            const rol = await rolRepository.findById(rolId);
+
+            if (!rol) {
+                return sendError(res, "Role not found.", 404);
+            }
+
+            if (user.rol.nombre !== 'admin' && user.museo.id !== museoId) {
+                return sendError(res, 403, "Solo los administradores pueden actualizar usuarios de otros museos");
+            }
+
+            if (user.rol.nombre !== 'admin' && rol.nombre !== 'operador') {
+                return sendError(res, 403, "Solo los administradores pueden actualizar usuarios a roles distintos de operador.");
+            }
+
             const updatedUser = await usuarioRepository.update({ id }, { nombre, email, password, activo, rolId, museoId });
 
             if (!updatedUser) {
-                return sendError(res, "User not found or could not be updated.", 404);
+                return sendError(res, 404, "User not found or could not be updated.");
             }
 
             return sendSuccess(res, 200, "User updated successfully.", updatedUser);
