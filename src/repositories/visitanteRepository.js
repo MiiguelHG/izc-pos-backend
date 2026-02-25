@@ -1,6 +1,6 @@
 import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
-import { Op } from "sequelize";
+import { Op, or } from "sequelize";
 
 
 const { visitante } = db;
@@ -22,7 +22,7 @@ class VisitanteRepository extends BaseRepository {
         });
     }
 
-    async findVisitantesToInforme({fechaInicio = '', fechaFin = '', museoId = '', genero = '', cp = '', municipio = '', estado = '', nacionalidad = '', edadMin = 1, edadMax = 100}) {
+    async findVisitantesToInforme({fechaInicio = '', fechaFin = '', museoId = null, genero = '', cp = '', municipio = '', estado = '', nacionalidad = '', edadMin = 1, edadMax = 100}) {
         const whereClause = {};
 
         if (fechaInicio && fechaFin) {
@@ -38,8 +38,8 @@ class VisitanteRepository extends BaseRepository {
 
         if (museoId) whereClause.museoId = museoId;
         if (genero) {
-            if (genero === 'hombres') whereClause.cantidadHombres = { [Op.gt]: 0 };
-            else if (genero === 'mujeres') whereClause.cantidadMujeres = { [Op.gt]: 0 };
+            if (genero === 'masculino') whereClause.cantidadHombres = { [Op.gt]: 0 };
+            else if (genero === 'femenino') whereClause.cantidadMujeres = { [Op.gt]: 0 };
             else if (genero === 'otros') whereClause.cantidadOtros = { [Op.gt]: 0 };
         }
         if (cp) whereClause.cp = cp;
@@ -50,7 +50,11 @@ class VisitanteRepository extends BaseRepository {
 
         return await this.model.findAndCountAll({ 
             where: whereClause,
-            attributes: { exclude: ['nombre', 'cp', 'pais', 'estado', 'municipio', 'edad'] }
+            attributes: {
+                exclude: ['nombre', 'cp', 'pais', 'estado', 'municipio', 'edad', 'fechaRegistro'],
+                include: [[this.model.sequelize.fn('DATE', this.model.sequelize.col('fechaRegistro')), 'fechaRegistro']]
+            },
+            order: [[this.model.sequelize.col('fechaRegistro'), 'ASC']]
         });
     }
 

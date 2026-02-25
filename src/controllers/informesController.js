@@ -9,7 +9,7 @@ export class InformesController {
         const { rows, count } = await visitanteRepository.findVisitantesToInforme({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
 
         if (count === 0) {
-            return sendSuccess(res, 200, "No se encontraron visitantes para los criterios especificados.");
+            return sendError(res, 400, "No se encontraron visitantes para los criterios especificados.");
         }
 
         return sendSuccess(res, 200, "Visitantes obtenidos correctamente.", { count, data: rows } );
