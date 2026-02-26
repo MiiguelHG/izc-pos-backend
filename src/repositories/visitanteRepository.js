@@ -24,6 +24,7 @@ class VisitanteRepository extends BaseRepository {
 
     async findVisitantesToInforme({fechaInicio = '', fechaFin = '', museoId = null, genero = '', cp = '', municipio = '', estado = '', nacionalidad = '', edadMin = 1, edadMax = 100}) {
         const whereClause = {};
+        const colSelected = genero === 'masculino' ? 'cantidadHombres' : genero === 'femenino' ? 'cantidadMujeres' : genero === 'otros' ? 'cantidadOtros' : 'totalVisitantes';
 
         if (fechaInicio && fechaFin) {
             whereClause.fechaRegistro = { [Op.between]: [fechaInicio, fechaFin] };
@@ -48,13 +49,18 @@ class VisitanteRepository extends BaseRepository {
         if (nacionalidad) whereClause.pais = nacionalidad;
         whereClause.edad = { [Op.between]: [edadMin, edadMax] };
 
-        return await this.model.findAndCountAll({ 
+        return await this.model.findAll({
             where: whereClause,
-            attributes: {
-                exclude: ['nombre', 'cp', 'pais', 'estado', 'municipio', 'edad', 'fechaRegistro'],
-                include: [[this.model.sequelize.fn('DATE', this.model.sequelize.col('fechaRegistro')), 'fechaRegistro']]
-            },
-            order: [[this.model.sequelize.col('fechaRegistro'), 'ASC']]
+            attributes: [
+                // [this.model.sequelize.fn('DATE', this.model.sequelize.col('fechaRegistro')), 'fechaRegistro'],
+                'fechaRegistro',
+                [this.model.sequelize.fn('SUM', this.model.sequelize.col(colSelected)), 'total']
+            ],
+            // group: [this.model.sequelize.fn('DATE', this.model.sequelize.col('fechaRegistro'))],
+            group: ['fechaRegistro'],
+            // order: [[this.model.sequelize.fn('DATE', this.model.sequelize.col('fechaRegistro')), 'ASC']],
+            order: [['fechaRegistro', 'ASC']],
+            raw: true
         });
     }
 
