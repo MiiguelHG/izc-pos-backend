@@ -20,17 +20,17 @@ export class InformesController {
 
   static async getIngresosForInforme(req, res) {
     try {
-      const { fechaInicio, fechaFin, museoId, tipo } = req.query;
+      const { fechaInicio, fechaFin, museoId,formaPagoId, tipo } = req.query;
 
       let ingresos;
       if (tipo === 'boletos') {
-        ingresos = await informesRepository.findBoletosToInforme({fechaInicio, fechaFin, museoId});
+        ingresos = await informesRepository.findBoletosToInforme({fechaInicio, fechaFin, museoId, formaPagoId});
       } else if (tipo === 'productos') {
-        ingresos = await informesRepository.findProductosToInforme({fechaInicio, fechaFin, museoId});
+        ingresos = await informesRepository.findProductosToInforme({fechaInicio, fechaFin, museoId, formaPagoId});
       } else if (tipo === 'eventos') {
-        ingresos = await informesRepository.findEventosToInforme({fechaInicio, fechaFin, museoId});
+        ingresos = await informesRepository.findEventosToInforme({fechaInicio, fechaFin, museoId, formaPagoId});
       } else {
-        ingresos = await informesRepository.findAllIngresosToInforme({fechaInicio, fechaFin, museoId});
+        ingresos = await informesRepository.findAllIngresosToInforme({fechaInicio, fechaFin, museoId, formaPagoId});
       }
       
       if (ingresos.length === 0) {

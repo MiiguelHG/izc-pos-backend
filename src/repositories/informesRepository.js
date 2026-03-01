@@ -51,7 +51,7 @@ class InformesRepository extends BaseRepository {
     });
   }
 
-  async findBoletosToInforme({fechaInicio = '', fechaFin = '', museoId = null}) {
+  async findBoletosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
     const whereClause = {};
     if (fechaInicio && fechaFin) {
         whereClause.fechaEmision = { [Op.between]: [fechaInicio, fechaFin] };
@@ -64,7 +64,7 @@ class InformesRepository extends BaseRepository {
     }
 
     if (museoId) whereClause.museoId = museoId;
-
+    if (formaPagoId) whereClause.formaPagoId = formaPagoId;
     return await boletoEmitido.findAll({
         where: whereClause,
         attributes: [[boletoEmitido.sequelize.fn('DATE', boletoEmitido.sequelize.col('fechaEmision')), 'fechaRegistro'], [boletoEmitido.sequelize.fn('SUM', boletoEmitido.sequelize.col('total')), 'total']],
@@ -74,7 +74,7 @@ class InformesRepository extends BaseRepository {
     });
   }
 
-  async findProductosToInforme({fechaInicio = '', fechaFin = '', museoId = null}) {
+  async findProductosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
     const whereClause = {};
     if (fechaInicio && fechaFin) {
         whereClause.fechaVenta = { [Op.between]: [fechaInicio, fechaFin] };
@@ -85,6 +85,8 @@ class InformesRepository extends BaseRepository {
     } else {
         whereClause.fechaVenta = { [Op.between]: [new Date(0), new Date()] };
     }
+
+    if (formaPagoId) whereClause.formaPagoId = formaPagoId;
 
     if (museoId) whereClause.museoId = museoId;
 
@@ -97,7 +99,7 @@ class InformesRepository extends BaseRepository {
     });
   }
 
-  async findEventosToInforme({fechaInicio = '', fechaFin = '', museoId = null}) {
+  async findEventosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
     const whereClause = {};
     if (fechaInicio && fechaFin) {
       whereClause.fechaInicio = { [Op.between]: [fechaInicio, fechaFin] };
@@ -110,6 +112,7 @@ class InformesRepository extends BaseRepository {
     }
 
     if (museoId) whereClause.museoId = museoId;
+    if (formaPagoId) whereClause.formaPagoId = formaPagoId;
 
     return await reservaEvento.findAll({
       where: whereClause,
@@ -120,7 +123,7 @@ class InformesRepository extends BaseRepository {
     }); 
   }
 
-  async findAllIngresosToInforme({fechaInicio = '', fechaFin = '', museoId = null}) {
+  async findAllIngresosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
     if (!fechaInicio) fechaInicio = new Date(0);
     if (!fechaFin) fechaFin = new Date();
 
@@ -131,6 +134,8 @@ class InformesRepository extends BaseRepository {
         FROM boletos_emitidos
         WHERE fechaEmision BETWEEN :fechaInicio AND :fechaFin
         ${museoId ? 'AND museoId = :museoId' : ''}
+        ${formaPagoId ? 'AND formaPagoId = :formaPagoId' : ''}
+
 
         UNION ALL
 
@@ -138,6 +143,7 @@ class InformesRepository extends BaseRepository {
         FROM producto_ventas
         WHERE fechaVenta BETWEEN :fechaInicio AND :fechaFin
         ${museoId ? 'AND museoId = :museoId' : ''}
+        ${formaPagoId ? 'AND formaPagoId = :formaPagoId' : ''}
 
         UNION ALL
 
@@ -145,11 +151,12 @@ class InformesRepository extends BaseRepository {
         FROM reserva_eventos
         WHERE fechaReserva BETWEEN :fechaInicio AND :fechaFin
         ${museoId ? 'AND museoId = :museoId' : ''}
+        ${formaPagoId ? 'AND formaPagoId = :formaPagoId' : ''}
       ) AS Ingresos
       GROUP BY fechaRegistro
       ORDER BY fechaRegistro ASC
       `, {
-        replacements: { fechaInicio, fechaFin, museoId },
+        replacements: { fechaInicio, fechaFin, museoId, formaPagoId },
         type: sequelize.QueryTypes.SELECT
       });
 
