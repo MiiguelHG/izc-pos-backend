@@ -34,7 +34,7 @@ export class authJwt {
     }
   };
 
-  static hasRole(rolRequerido){
+  static hasRole(rolesRequeridos = []) {
     return async (req, res, next) => {
       try{
 
@@ -47,9 +47,10 @@ export class authJwt {
             req.user.rol?.dataValues?.nombre ||
             req.user.dataValues?.rol?.dataValues?.nombre;
 
-          const rolName = role.trim().toLowerCase();  
-          if(rolName !== rolRequerido.trim().toLowerCase()){
-              return sendError(res, 403, `Require ${rolRequerido} Role!`);
+          const rolName = role.trim().toLowerCase();
+
+          if(!rolesRequeridos.map(r => r.toLowerCase()).includes(rolName)){
+              return sendError(res, 403, `Require one of these roles: ${rolesRequeridos.join(', ')}!`);
           }
           next();
       }

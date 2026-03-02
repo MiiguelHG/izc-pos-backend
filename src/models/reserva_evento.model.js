@@ -17,6 +17,17 @@ export default (sequelize, Sequelize) => {
         },
         contactoResponsable: {
             type: DataTypes.STRING,
+            allowNull: false,
+            validate: {
+                // must be a cellular phone number (10 digits)
+                is: {
+                    args: [/^\d{10}$/],
+                    msg: "El contacto debe ser un número de teléfono celular válido (10 dígitos)"
+                }
+            }
+        },
+        capacidad: {
+            type: DataTypes.INTEGER,
             allowNull: false
         },
         fechaReserva: {

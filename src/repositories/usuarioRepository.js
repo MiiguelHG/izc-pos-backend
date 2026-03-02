@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import db from "../models/index.js";
 import BaseRepository from "./baseRepository.js";
 
@@ -8,11 +9,16 @@ class UsuarioRepository extends BaseRepository {
         super(usuario);
     }
 
-    async findAllWithoutPassword({limit = 10, offset = 0}) {
+    async findAllWithoutPassword({limit = 10, offset = 0, museoId}) {
+        const whereClause = museoId ? { museoId } : {};
+        const rolInclude = museoId
+            ? { model: rol, as: "rol", where: { nombre: { [Op.ne]: "admin" } }, required: true }
+            : { model: rol, as: "rol" };
         return await this.model.findAndCountAll({
+            where: whereClause,
             attributes: { exclude: ["password"] },
             include: [
-                { model: rol, as: "rol" },
+                rolInclude,
                 { model: museo, as: "museo" }
             ],
             limit,

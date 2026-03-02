@@ -4,7 +4,7 @@ import { boletoTipoRepository, articuloRepository } from "../repositories/index.
 export class BoletoTipoController {
   static async createBoletoTipo(req, res) {
     try {
-      const { nombre, descripcion, descuento, articuloId } = req.body;
+      const { nombre, descripcion, descuento, esEspecial, dias, articuloId } = req.body;
       
       const articulo = await articuloRepository.findById(articuloId);
 
@@ -14,7 +14,7 @@ export class BoletoTipoController {
 
       const precioFinal = articulo.precioEstandar - (articulo.precioEstandar * (descuento / 100));
 
-      const newBoletoTipo = await boletoTipoRepository.create({ nombre, descripcion, descuento, precioFinal, articuloId });
+      const newBoletoTipo = await boletoTipoRepository.create({ nombre, descripcion, descuento, precioFinal, esEspecial, dias, articuloId });
 
       if (!newBoletoTipo) {
         return sendError(res, 400, "No se pudo crear el tipo de boleto");
@@ -30,13 +30,37 @@ export class BoletoTipoController {
 
   static async getBoletosTipos(req, res) {
     try {
-      const boletosTipos = await boletoTipoRepository.findAll();
+      const { esEspecial } = req.query;
+      const { user } = req;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
 
-      if (!boletosTipos || boletosTipos.length === 0) {
+      const esOperador = user.rol.nombre === 'operador';
+
+      if (esEspecial !== undefined && esEspecial !== 'true' && esEspecial !== 'false') {
+        return sendError(res, 400, "El parámetro esEspecial debe ser 'true' o 'false'");
+      }
+
+      const esEspecialBool = esEspecial !== undefined ? esEspecial === 'true' : undefined;
+
+      const {rows, count} = await boletoTipoRepository.findAllBoletos({ esEspecial: esEspecialBool, esOperador, limit, offset });
+
+      if (count === 0) {
         return sendError(res, 404, "No se encontraron tipos de boleto");
       }
 
-      return sendSuccess(res, 200,"Boletos Tipos encontrados" , boletosTipos);
+      const totalPages = Math.ceil(count / limit);
+
+      return sendSuccess(res, 200,"Boletos Tipos encontrados" , {
+        data: rows,
+        meta: {
+          totalItems: count,
+          currentPage: page,
+          totalPages: totalPages,
+          pageSize: limit
+        }
+      });
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
@@ -61,7 +85,7 @@ export class BoletoTipoController {
   static async boletoTipoUpdate(req, res) {
     try {
       const { id } = req.params;
-      const { nombre, descripcion, descuento, articuloId } = req.body;
+      const { nombre, descripcion, descuento, articuloId, esEspecial, dias } = req.body;
 
       const articulo = await articuloRepository.findById(articuloId);
 
@@ -73,7 +97,7 @@ export class BoletoTipoController {
 
       const updated = await boletoTipoRepository.update(
         { id },
-        { nombre, descripcion, descuento, precioFinal, articuloId }
+        { nombre, descripcion, descuento, precioFinal, esEspecial, dias, articuloId }
       );
 
       if (!updated) {
@@ -82,21 +106,32 @@ export class BoletoTipoController {
 
       return sendSuccess(res, 200,"Tipo de boleto actualizado" , updated);
     } catch (error) {
-      
+      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
   }
 
-  static async boletoTipoDelete(req, res) {
+  static async toggleBoletoTipo(req, res) {
     try {
       const { id } = req.params;
 
-      const deleted = await boletoTipoRepository.delete({ id });
+      const boletoTipo = await boletoTipoRepository.findById(id);
 
-      if (!deleted) {
-        return sendError(res, 400, "Tipo de boleto no encontrado o no se pudo eliminar");
+      if (!boletoTipo) {
+        return sendError(res, 404, "Tipo de boleto no encontrado");
       }
 
-      return sendSuccess(res, 200,"Tipo de boleto eliminado" , deleted);
+      const activo = !boletoTipo.habilitado;
+
+      const updated = await boletoTipoRepository.update(
+        { id },
+        { habilitado: activo }
+      );
+
+      if (!updated) {
+        return sendError(res, 400, "No se pudo actualizar el estado del tipo de boleto");
+      }
+
+      return sendSuccess(res, 200, "Estado del tipo de boleto actualizado", updated);
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
@@ -104,27 +139,12 @@ export class BoletoTipoController {
 
   static async UpdateAllBoletosPrecioFinal(req, res) {
     try {
-      const { articuloId } = req.params;
+      const { articuloId, precioEstandar } = req.body;
 
-      const articulo = await articuloRepository.findById(articuloId);
+      const updatedSuccess = await boletoTipoRepository.updatePrecioFinalByArticuloId({articuloId, precioEstandar});
 
-      if (!articulo) {
-        return sendError(res, 404, "Articulo no encontrado");
-      }
-
-      const boletosTipos = await boletoTipoRepository.findAllbyArticuloId(articuloId);
-
-      if (!boletosTipos || boletosTipos.length === 0) {
-        return sendError(res, 404, "No se encontraron tipos de boleto para el articulo dado");
-      }
-
-      for (const boletoTipo of boletosTipos) {
-        const precioFinal = articulo.precioEstandar - (articulo.precioEstandar * (boletoTipo.descuento / 100));
-
-        await boletoTipoRepository.update(
-          { id: boletoTipo.id },
-          { precioFinal }
-        );
+      if (!updatedSuccess) {
+        return sendError(res, 400, "No se pudieron actualizar los precios finales de los tipos de boleto");
       }
 
       return sendSuccess(res, 200,"Precios finales de boletos actualizados");

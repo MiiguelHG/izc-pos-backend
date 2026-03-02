@@ -1,5 +1,6 @@
 import BaseRepository from "./baseRepository.js";
 import db from "#models/index.js";
+import { Op } from "sequelize";
 
 const { museoHasArticulo, articulo } = db;
 
@@ -29,8 +30,10 @@ class MuseoHasArticuloRepository extends BaseRepository {
     }
 
     async getArticulosByMuseo({museoId, tipo, limit = 10, offset = 0 }) {
+        const defalutTipo = { [Op.or]: [ {tipo: 'servicio'}, {tipo: 'producto'}] };
+        
         return await articulo.findAndCountAll({
-            where: tipo ? { tipo: tipo } : {},
+            where: tipo !== 'todos' ? { tipo: tipo } : defalutTipo,
             include: [
                 { 
                     model: db.museo, as: 'museos', 

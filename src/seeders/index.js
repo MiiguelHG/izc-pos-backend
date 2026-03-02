@@ -30,9 +30,11 @@ export const runSeeders = async () => {
         await museoSeeder("Museo de Arte Sacro", "Oaxaca");
 
         await userSeeder("Miguel", "miguel@example.com", "123456", 1, 1);
-        await userSeeder("Alex", "alex@example.com", "123456", 2, 1);
+        await userSeeder("Alex", "alex@example.com", "123456", 2, 2);
         await userSeeder("Ana", "ana@example.com", "1234567", 3, 2);
         await userSeeder("Guille", "guille@example.com", "1234567", 3, 1);
+        await userSeeder("Sofía", "sofia@example.com", "123456", 3, 3);
+        await userSeeder("Carlos", "carlos@example.com", "123456", 3, 4);
 
         await articuloSeeder("Entrada General", "Acceso general al museo", 100.00, "boleto"); // 1
         await articuloSeeder("Guía Audiovisual", "Dispositivo de guía audiovisual", 50.00, "producto"); // 2
@@ -67,10 +69,10 @@ export const runSeeders = async () => {
         await museoHasArticuloSeeder(1, 15);
 
 
-        await boletoTipoSeeder("Estandar", "Boleto estándar para adultos", 0, 100.00, 1);
-        await boletoTipoSeeder("Menor de edad", "Boleto para menores de edad", 50, 50.00, 1);
-        await boletoTipoSeeder("Mayor de edad", "Boleto para adultos", 50, 100.00, 1);
-        await boletoTipoSeeder("Estudiante", "Boleto con descuento para estudiantes", 30, 70.00, 1);
+        await boletoTipoSeeder("Estandar", "Boleto estándar para adultos", 0, 100.00, [0,1,2,3,4,5,6], true, 1, false);
+        await boletoTipoSeeder("Menor de edad", "Boleto para menores de edad", 50, 50.00, [0,1,2,3,4,5,6], true, 1, false);
+        await boletoTipoSeeder("Mayor de edad", "Boleto para adultos", 50, 50.00, [0,1,2,3,4,5,6], false, 1, false);
+        await boletoTipoSeeder("Estudiante", "Boleto con descuento para estudiantes", 30, 70.00, [1,2,3,4], true, 1, false);
 
         await formaPagoSeeder("Efectivo", "Pago en efectivo");
         await formaPagoSeeder("Tarjeta de crédito", "Pago con tarjeta de crédito");
@@ -79,7 +81,7 @@ export const runSeeders = async () => {
         await productoDetalleSeeder(1, 100.00, 1, 1);
         await productoDetalleSeeder(1, 200.00, 2, 1);
 
-        await visitanteSeeder("Juan Pérez", 30, "12345", "México", "Ciudad de México", "Benito Juárez", 1, 0, 0, 1, 1, 2);
+        await visitanteSeeder("Juan Pérez", 30, "98600", "MX", "ZAC", "GUADALUPE", 1, 0, 0, 1, 1, 2);
 
 
         console.log("\n✅ Todos los seeders se ejecutaron exitosamente");

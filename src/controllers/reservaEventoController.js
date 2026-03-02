@@ -1,14 +1,30 @@
-import { reservaEventoRepository } from "#repositories/index.js";
+import { reservaEventoRepository, visitanteRepository, museoRepository } from "#repositories/index.js";
 import { sendSuccess, sendError } from "#utils/responseFormater.js";
 
 export class ReservaEventoController {
     static async createReservaEvento(req, res) {
         try {
-            const newReserva =  await reservaEventoRepository.create(req.reservaData);
+            // cualquier validación previa (fechas, disponibilidad, etc.) ya quedó en validarReserva,
+            // aquí el middleware además dejó en `req.reservaData` los datos listos para la creación.
+            const newReserva = await reservaEventoRepository.createReservaEventoCompleta(req.reservaData);
             if (!newReserva) {
                 return sendError(res, 400, "No se pudo crear la reserva de evento.");
             }
-            return sendSuccess(res, 201, "Reserva de evento creada exitosamente.", newReserva);
+
+            // el repositorio ahora devuelve también el visitante creado, pero mantenemos la consulta
+            // para cargar el museo igual que en el flujo de boletos.
+            const visitante = newReserva.visitante
+                ? newReserva.visitante
+                : await visitanteRepository.findById(newReserva.visitanteId);
+            const museo = await museoRepository.findById(newReserva.museoId);
+
+            const reservaEvento = {
+                ...newReserva,
+                visitante: { ...visitante.dataValues ?? visitante },
+                museo: { ...museo.dataValues }
+            };
+
+            return sendSuccess(res, 201, "Reserva de evento creada exitosamente.", reservaEvento);
         } catch (error) {
             return sendError(res, 500, `Error al crear reserva de evento: ${error.message}`);
         }
@@ -163,7 +179,7 @@ export class ReservaEventoController {
     static async obtenerPorMuseo(req, res){
         try{
             const { museoId } = req.params;
-            const reservas = await reservaEventoRepository.obtenerPorMuseo(museoId);
+            const reservas = await reservaEventoRepository.obtenerPorMuseoId(museoId);
             return sendSuccess(res, 200, "Reservas obtenidas exitosamente.", reservas);
         } catch (error) {
             return sendError(res, 500, `Error al obtener reservas por museo: ${error.message}`);
@@ -173,7 +189,7 @@ export class ReservaEventoController {
     static async obtenerPorArticulo(req, res){
         try{
             const { articuloId } = req.params;
-            const reservas = await reservaEventoRepository.obtenerPorArticulo(articuloId);
+            const reservas = await reservaEventoRepository.obtenerPorArticuloId(articuloId);
             return sendSuccess(res, 200, "Reservas obtenidas exitosamente.", reservas);
         } catch (error) {
             return sendError(res, 500, `Error al obtener reservas por artículo: ${error.message}`);

@@ -7,7 +7,28 @@ export async function validarReserva(req, res, next) {
         const data = req.body;
         const museoId = req.user.museoId;
         const usuarioId = req.user.id;
-        const { fechaInicio, fechaFin, articuloId } = data;
+        const { fechaInicio, fechaFin, articuloId, nombre, edad, cp, pais, estadoVisitante, municipio, cantidadHombres, cantidadMujeres, cantidadOtros } = data;
+
+        // Validar campos requeridos del visitante
+        const camposVisitantes = { nombre, edad, cp, pais, estadoVisitante, municipio, cantidadHombres, cantidadMujeres, cantidadOtros };
+        for (const [campo, valor] of Object.entries(camposVisitantes)) {
+            if (valor === undefined || valor === null || valor === '') {
+                return sendError(res, 400, `El campo '${campo}' es requerido para el visitante.`);
+            }
+        }
+
+        // Validar que cantidades sean números
+        const cantidades = { cantidadHombres, cantidadMujeres, cantidadOtros };
+        for (const [campo, valor] of Object.entries(cantidades)) {
+            if (isNaN(valor) || valor < 0) {
+                return sendError(res, 400, `El campo '${campo}' debe ser un número mayor o igual a cero.`);
+            }
+        }
+
+        const totalVisitantes = Number(cantidadHombres) + Number(cantidadMujeres) + Number(cantidadOtros);
+        if (totalVisitantes <= 0) {
+            return sendError(res, 400, "El total de visitantes (hombres + mujeres + otros) debe ser mayor a cero.");
+        }
 
         const inicio = toMx(fechaInicio);
         const fin = toMx(fechaFin);
@@ -62,6 +83,41 @@ export async function validarReserva(req, res, next) {
             return sendError(res, 400, "Se alcanzó el límite de reservas para este día.");
         }
 
+        if (data.estado != "reservado") {
+            return sendError(res, 400, "La reserva fue finalizada.");
+        }
+
+        // Validar el contacto del responsable (debe ser un número celular de 10 dígitos)
+        let contacto = data.contactoResponsable;
+
+        if(!contacto){
+            return sendError(res, 400, "El contacto del responsable es requerido.");
+        }
+
+        contacto = contacto.replace(/\D/g, ''); // Eliminar cualquier carácter no numérico
+
+        const regex = /^\+?[1-9]\d{7,14}$/;
+
+        if (!regex.test(contacto)) {
+            return sendError(res, 400, "El contacto del responsable debe ser un número de teléfono celular válido.");
+        }
+
+        if (/^(\d)\1+$/.test(contacto)) {
+            return sendError(res, 400, "El contacto del responsable no puede ser un número con todos los dígitos iguales.");
+        }
+
+        if ("0123456789".includes(contacto)) {
+            return sendError(res, 400, "El contacto del responsable no puede ser un número ascendente.");
+        }
+
+        if ("9876543210".includes(contacto)) {
+            return sendError(res, 400, "El contacto del responsable no puede ser un número descendente.");
+        }
+
+        const capacidad = cantidadHombres + cantidadMujeres + cantidadOtros;
+        
+        data.capacidad = capacidad;
+
         // Si todo está bien, guardamos la info preparada para el controller
         req.reservaData = {
             ...data,
@@ -69,7 +125,9 @@ export async function validarReserva(req, res, next) {
             museoId,
             fechaReserva,
             fechaInicio: inicio.toISO(),
-            fechaFin: fin.toISO()
+            fechaFin: fin.toISO(),
+            estadoReserva: data.estado || 'reservado',
+            totalVisitantes
         };
 
         next();

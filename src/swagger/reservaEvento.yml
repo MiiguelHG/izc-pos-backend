@@ -8,12 +8,20 @@ components:
         - fechaInicio
         - fechaFin
         - total
-        - estado
+        - estado               # estado de la reserva
         - usuarioId
         - museoId
         - articuloId
-        - visitanteId
         - formaPagoId
+        - nombre               # datos del visitante
+        - edad
+        - cp
+        - pais
+        - estadoVisitante
+        - municipio
+        - cantidadHombres
+        - cantidadMujeres
+        - cantidadOtros
       properties:
         responsable:
           type: string
@@ -46,12 +54,38 @@ components:
         articuloId:
           type: integer
           example: 1
-        visitanteId:
-          type: integer
-          example: 1
         formaPagoId:
           type: integer
           example: 1
+        nombre:
+          type: string
+          description: "Nombre del visitante"
+          example: "María Pérez"
+        edad:
+          type: integer
+          example: 30
+        cp:
+          type: string
+          example: "06100"
+        pais:
+          type: string
+          example: "México"
+        estadoVisitante:
+          type: string
+          description: "Entidad federativa o estado del visitante"
+          example: "CDMX"
+        municipio:
+          type: string
+          example: "Benito Juárez"
+        cantidadHombres:
+          type: integer
+          example: 2
+        cantidadMujeres:
+          type: integer
+          example: 1
+        cantidadOtros:
+          type: integer
+          example: 0
 
     ReservaEventoResponse:
       type: object
@@ -187,8 +221,16 @@ paths:
               usuarioId: 1
               museoId: 1
               articuloId: 1
-              visitanteId: 1
               formaPagoId: 1
+              nombre: "María Pérez"
+              edad: 30
+              cp: "06100"
+              pais: "México"
+              estadoVisitante: "CDMX"
+              municipio: "Benito Juárez"
+              cantidadHombres: 2
+              cantidadMujeres: 1
+              cantidadOtros: 0
       responses:
         201:
           description: Reserva de evento creada exitosamente
