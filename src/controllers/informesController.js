@@ -12,7 +12,23 @@ export class InformesController {
             return sendError(res, 400, "No se encontraron visitantes para los criterios especificados.");
         }
 
-        return sendSuccess(res, 200, "Visitantes obtenidos correctamente.", { count: visitantes.length, data: visitantes } );
+        const totalVisitantes = await informesRepository.findTotalVisitantes({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
+
+        if (totalVisitantes.length === 0 || totalVisitantes[0].total === null) {
+            return sendError(res, 400, "No se pudo calcular el total de visitantes para los criterios especificados.");
+        }
+
+        const maxMinVisitantes = await informesRepository.findMaxMinVisitantesFecha({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
+
+        if (!maxMinVisitantes) {
+            return sendError(res, 400, "No se pudo calcular el máximo o mínimo de visitantes para los criterios especificados.");
+        }
+
+        const mediaVisitantes = visitantes.length > 0
+          ? Math.round(Number(totalVisitantes[0].total || 0) / visitantes.length)
+          : 0;
+
+        return sendSuccess(res, 200, "Visitantes obtenidos correctamente.", { total: totalVisitantes[0].total, maxMin: maxMinVisitantes, media: mediaVisitantes, data: visitantes } );
     } catch(error) {
         return sendError(res, 500, `Error al obtener visitantes para informe. ${error.message}`);
     }

@@ -2,6 +2,7 @@ import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
 import { buildVisitantesWhere, buildIngresosWhere } from "#utils/informeUtil.js";
 
+
 const { visitante, boletoEmitido, productoVenta, reservaEvento, sequelize } = db;
 
 class InformesRepository extends BaseRepository {
@@ -9,10 +10,9 @@ class InformesRepository extends BaseRepository {
       super(visitante);
   }
 
-  async findVisitantesToInforme({fechaInicio = '', fechaFin = '', museoId = null, genero = '', cp = '', municipio = '', estado = '', nacionalidad = '', edadMin = 1, edadMax = 100}) {
-    const colSelected = genero === 'masculino' ? 'cantidadHombres' : genero === 'femenino' ? 'cantidadMujeres' : genero === 'otros' ? 'cantidadOtros' : 'totalVisitantes';
+  async findVisitantesToInforme({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax}) {
 
-    const whereClause = buildVisitantesWhere({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
+    const { whereClause, colSelected } = buildVisitantesWhere({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
 
     return await this.model.findAll({
         where: whereClause,
@@ -28,6 +28,37 @@ class InformesRepository extends BaseRepository {
         raw: true
     });
   }
+
+  async findTotalVisitantes({fechaInicio , fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin = 1, edadMax}) {
+
+    const { whereClause, colSelected } = buildVisitantesWhere({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
+
+    return await this.model.findAll({
+      where: whereClause,
+      attributes: [[this.model.sequelize.fn('SUM', this.model.sequelize.col(colSelected)), 'total']],
+      raw: true
+    })
+  }
+
+  async findMaxMinVisitantesFecha({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax}) {
+
+    const { whereClause, colSelected } = buildVisitantesWhere({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
+
+    const visitantes = await this.model.findAll({
+      where: whereClause,
+      group: [this.model.sequelize.fn('DATE', this.model.sequelize.col('fechaRegistro'))],
+      attributes: [
+        [this.model.sequelize.fn('DATE', this.model.sequelize.col('fechaRegistro')), 'fechaRegistro'],
+        [this.model.sequelize.fn('SUM', this.model.sequelize.col(colSelected)), 'total'],
+      ],
+      order: [[this.model.sequelize.fn('SUM', this.model.sequelize.col(colSelected)), 'DESC']],
+      raw: true
+    });
+
+    return visitantes.length > 0 ? { max: visitantes[0], min: visitantes[visitantes.length - 1] } : null;
+  }
+
+  // ******** CONSULTAS PARA INFORMES DE INGRESOS ********
 
   async findBoletosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
     const whereClause = buildIngresosWhere({fechaInicio, fechaFin, museoId, formaPagoId, dateField: 'fechaEmision'});

@@ -1,17 +1,36 @@
 import { Op } from "sequelize";
 
+const getDefaultLastYearRange = () => {
+    const fechaFin = new Date();
+    const fechaInicio = new Date();
+    fechaInicio.setFullYear(fechaFin.getFullYear() - 1);
+    return { fechaInicio, fechaFin };
+};
+
+const getNormalizedRange = (fechaInicio, fechaFin) => {
+    if (fechaInicio && fechaFin) {
+        return { fechaInicio, fechaFin };
+    }
+
+    if (fechaInicio && !fechaFin) {
+        return { fechaInicio, fechaFin: new Date() };
+    }
+
+    if (!fechaInicio && fechaFin) {
+        const startFromEnd = new Date(fechaFin);
+        startFromEnd.setFullYear(startFromEnd.getFullYear() - 1);
+        return { fechaInicio: startFromEnd, fechaFin };
+    }
+
+    return getDefaultLastYearRange();
+};
+
 export const buildVisitantesWhere = ({fechaInicio = '', fechaFin = '', museoId = null, genero = '', cp = '', municipio = '', estado = '', nacionalidad = '', edadMin = 1, edadMax = 100}) => {
   const whereClause = {};
+  const colSelected = genero === 'masculino' ? 'cantidadHombres' : genero === 'femenino' ? 'cantidadMujeres' : genero === 'otros' ? 'cantidadOtros' : 'totalVisitantes';
+  const normalizedRange = getNormalizedRange(fechaInicio, fechaFin);
 
-  if (fechaInicio && fechaFin) {
-      whereClause.fechaRegistro = { [Op.between]: [fechaInicio, fechaFin] };
-  } else if (fechaInicio) {
-      whereClause.fechaRegistro = { [Op.gte]: fechaInicio };
-  } else if (fechaFin) {
-      whereClause.fechaRegistro = { [Op.lte]: fechaFin };
-  } else {
-      whereClause.fechaRegistro = { [Op.between]: [new Date(0), new Date()] };
-  }
+  whereClause.fechaRegistro = { [Op.between]: [normalizedRange.fechaInicio, normalizedRange.fechaFin] };
 
 
   if (museoId) whereClause.museoId = museoId;
@@ -26,22 +45,15 @@ export const buildVisitantesWhere = ({fechaInicio = '', fechaFin = '', museoId =
   if (nacionalidad) whereClause.pais = nacionalidad;
   whereClause.edad = { [Op.between]: [edadMin, edadMax] };
 
-  return whereClause;
+  return { whereClause, colSelected };
 }
 
 export const bulidVisitantesWhere = buildVisitantesWhere;
 
 export const buildIngresosWhere = ({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null, dateField = 'fechaEmision'}) => {
   const whereClause = {};
-  if (fechaInicio && fechaFin) {
-      whereClause[dateField] = { [Op.between]: [fechaInicio, fechaFin] };
-  } else if (fechaInicio) {
-      whereClause[dateField] = { [Op.gte]: fechaInicio };
-  } else if (fechaFin) {
-      whereClause[dateField] = { [Op.lte]: fechaFin };
-  } else {
-      whereClause[dateField] = { [Op.between]: [new Date(0), new Date()] };
-  }
+  const normalizedRange = getNormalizedRange(fechaInicio, fechaFin);
+  whereClause[dateField] = { [Op.between]: [normalizedRange.fechaInicio, normalizedRange.fechaFin] };
 
   if (museoId) whereClause.museoId = museoId;
   if (formaPagoId) whereClause.formaPagoId = formaPagoId;
