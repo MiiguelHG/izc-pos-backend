@@ -1,4 +1,13 @@
 import { Op } from "sequelize";
+import db from "../models/index.js";
+
+const { boletoEmitido, productoVenta, reservaEvento } = db;
+
+export const INGRESOS_CONFIG = {
+    boletos: { model: boletoEmitido, dateField: 'fechaEmision' },
+    productos: { model: productoVenta, dateField: 'fechaVenta' },
+    eventos: { model: reservaEvento, dateField: 'fechaReserva' }
+  };
 
 const getDefaultLastYearRange = () => {
     const fechaFin = new Date();

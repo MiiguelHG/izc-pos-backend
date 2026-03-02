@@ -39,21 +39,17 @@ export class InformesController {
       const { fechaInicio, fechaFin, museoId,formaPagoId, tipo } = req.query;
 
       let ingresos;
-      if (tipo === 'boletos') {
-        ingresos = await informesRepository.findBoletosToInforme({fechaInicio, fechaFin, museoId, formaPagoId});
-      } else if (tipo === 'productos') {
-        ingresos = await informesRepository.findProductosToInforme({fechaInicio, fechaFin, museoId, formaPagoId});
-      } else if (tipo === 'eventos') {
-        ingresos = await informesRepository.findEventosToInforme({fechaInicio, fechaFin, museoId, formaPagoId});
-      } else {
+      if (tipo === '') {
         ingresos = await informesRepository.findAllIngresosToInforme({fechaInicio, fechaFin, museoId, formaPagoId});
+      } else {
+        ingresos = await informesRepository.findIngresosByTipo({fechaInicio, fechaFin, museoId, formaPagoId, tipo});
       }
       
       if (ingresos.length === 0) {
         return sendError(res, 400, "No se encontraron ingresos para los criterios especificados.");
       }
 
-      return sendSuccess(res, 200, "Ingresos obtenidos correctamente.", { count: ingresos.length, data: ingresos } );
+      return sendSuccess(res, 200, "Ingresos obtenidos correctamente.", { data: ingresos } );
     } catch (error) {
       return sendError(res, 500, `Error al obtener ingresos para informe. ${error.message}`);
     }

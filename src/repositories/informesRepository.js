@@ -1,11 +1,12 @@
 import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
-import { buildVisitantesWhere, buildIngresosWhere } from "#utils/informeUtil.js";
+import { buildVisitantesWhere, buildIngresosWhere, INGRESOS_CONFIG } from "#utils/informeUtil.js";
 
 
-const { visitante, boletoEmitido, productoVenta, reservaEvento, sequelize } = db;
+const { visitante, sequelize } = db;
 
 class InformesRepository extends BaseRepository {
+
   constructor() {
       super(visitante);
   }
@@ -60,40 +61,25 @@ class InformesRepository extends BaseRepository {
 
   // ******** CONSULTAS PARA INFORMES DE INGRESOS ********
 
-  async findBoletosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
-    const whereClause = buildIngresosWhere({fechaInicio, fechaFin, museoId, formaPagoId, dateField: 'fechaEmision'});
+  async findIngresosByTipo({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null, tipo = 'boletos'}) {
 
-    return await boletoEmitido.findAll({
+    const config = INGRESOS_CONFIG[tipo];
+    
+    if (!config) throw new Error(`Tipo de ingreso no válido: ${tipo}`);
+    const { model: currentModel, dateField: currentDateField } = config;
+
+    const whereClause = buildIngresosWhere({fechaInicio, fechaFin, museoId, formaPagoId, dateField: currentDateField});
+
+    return await currentModel.findAll({
         where: whereClause,
-        attributes: [[boletoEmitido.sequelize.fn('DATE', boletoEmitido.sequelize.col('fechaEmision')), 'fechaRegistro'], [boletoEmitido.sequelize.fn('SUM', boletoEmitido.sequelize.col('total')), 'total']],
-        group: [boletoEmitido.sequelize.fn('DATE', boletoEmitido.sequelize.col('fechaEmision'))],
-        order: [[boletoEmitido.sequelize.fn('DATE', boletoEmitido.sequelize.col('fechaEmision')), 'ASC']],
+        attributes: [
+          [currentModel.sequelize.fn('DATE', currentModel.sequelize.col(currentDateField)), 'fechaRegistro'], 
+          [currentModel.sequelize.fn('SUM', currentModel.sequelize.col('total')), 'total']
+        ],
+        group: [currentModel.sequelize.fn('DATE', currentModel.sequelize.col(currentDateField))],
+        order: [[currentModel.sequelize.fn('DATE', currentModel.sequelize.col(currentDateField)), 'ASC']],
         raw: true
     });
-  }
-
-  async findProductosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
-    const whereClause = buildIngresosWhere({fechaInicio, fechaFin, museoId, formaPagoId, dateField: 'fechaVenta'});
-
-    return await productoVenta.findAll({
-      where: whereClause,
-      attributes: [[productoVenta.sequelize.fn('DATE', productoVenta.sequelize.col('fechaVenta')), 'fechaRegistro'], [productoVenta.sequelize.fn('SUM', productoVenta.sequelize.col('total')), 'total']],
-      group: [productoVenta.sequelize.fn('DATE', productoVenta.sequelize.col('fechaVenta'))],
-      order: [[productoVenta.sequelize.fn('DATE', productoVenta.sequelize.col('fechaVenta')), 'ASC']],
-      raw: true
-    });
-  }
-
-  async findEventosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
-    const whereClause = buildIngresosWhere({fechaInicio, fechaFin, museoId, formaPagoId, dateField: 'fechaReserva'});
-
-    return await reservaEvento.findAll({
-      where: whereClause,
-      attributes: [[reservaEvento.sequelize.fn('DATE', reservaEvento.sequelize.col('fechaReserva')), 'fechaRegistro'], [reservaEvento.sequelize.fn('SUM', reservaEvento.sequelize.col('total')), 'total']],
-      group: [reservaEvento.sequelize.fn('DATE', reservaEvento.sequelize.col('fechaReserva'))],
-      order: [[reservaEvento.sequelize.fn('DATE', reservaEvento.sequelize.col('fechaReserva')), 'ASC']],
-      raw: true
-    }); 
   }
 
   async findAllIngresosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
