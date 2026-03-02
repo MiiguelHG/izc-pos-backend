@@ -1,6 +1,6 @@
 import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
-import { Op, or } from "sequelize";
+import { buildVisitantesWhere, buildIngresosWhere } from "#utils/informeUtil.js";
 
 const { visitante, boletoEmitido, productoVenta, reservaEvento, sequelize } = db;
 
@@ -10,31 +10,9 @@ class InformesRepository extends BaseRepository {
   }
 
   async findVisitantesToInforme({fechaInicio = '', fechaFin = '', museoId = null, genero = '', cp = '', municipio = '', estado = '', nacionalidad = '', edadMin = 1, edadMax = 100}) {
-    const whereClause = {};
     const colSelected = genero === 'masculino' ? 'cantidadHombres' : genero === 'femenino' ? 'cantidadMujeres' : genero === 'otros' ? 'cantidadOtros' : 'totalVisitantes';
 
-    if (fechaInicio && fechaFin) {
-        whereClause.fechaRegistro = { [Op.between]: [fechaInicio, fechaFin] };
-    } else if (fechaInicio) {
-        whereClause.fechaRegistro = { [Op.gte]: fechaInicio };
-    } else if (fechaFin) {
-        whereClause.fechaRegistro = { [Op.lte]: fechaFin };
-    } else {
-        whereClause.fechaRegistro = { [Op.between]: [new Date(0), new Date()] };
-    }
-
-
-    if (museoId) whereClause.museoId = museoId;
-    if (genero) {
-        if (genero === 'masculino') whereClause.cantidadHombres = { [Op.gt]: 0 };
-        else if (genero === 'femenino') whereClause.cantidadMujeres = { [Op.gt]: 0 };
-        else if (genero === 'otros') whereClause.cantidadOtros = { [Op.gt]: 0 };
-    }
-    if (cp) whereClause.cp = cp;
-    if (municipio) whereClause.municipio = municipio;
-    if (estado) whereClause.estado = estado;
-    if (nacionalidad) whereClause.pais = nacionalidad;
-    whereClause.edad = { [Op.between]: [edadMin, edadMax] };
+    const whereClause = buildVisitantesWhere({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
 
     return await this.model.findAll({
         where: whereClause,
@@ -52,19 +30,8 @@ class InformesRepository extends BaseRepository {
   }
 
   async findBoletosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
-    const whereClause = {};
-    if (fechaInicio && fechaFin) {
-        whereClause.fechaEmision = { [Op.between]: [fechaInicio, fechaFin] };
-    } else if (fechaInicio) {
-        whereClause.fechaEmision = { [Op.gte]: fechaInicio };
-    } else if (fechaFin) {
-        whereClause.fechaEmision = { [Op.lte]: fechaFin };
-    } else {
-        whereClause.fechaEmision = { [Op.between]: [new Date(0), new Date()] };
-    }
+    const whereClause = buildIngresosWhere({fechaInicio, fechaFin, museoId, formaPagoId, dateField: 'fechaEmision'});
 
-    if (museoId) whereClause.museoId = museoId;
-    if (formaPagoId) whereClause.formaPagoId = formaPagoId;
     return await boletoEmitido.findAll({
         where: whereClause,
         attributes: [[boletoEmitido.sequelize.fn('DATE', boletoEmitido.sequelize.col('fechaEmision')), 'fechaRegistro'], [boletoEmitido.sequelize.fn('SUM', boletoEmitido.sequelize.col('total')), 'total']],
@@ -75,20 +42,7 @@ class InformesRepository extends BaseRepository {
   }
 
   async findProductosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
-    const whereClause = {};
-    if (fechaInicio && fechaFin) {
-        whereClause.fechaVenta = { [Op.between]: [fechaInicio, fechaFin] };
-    } else if (fechaInicio) {
-        whereClause.fechaVenta = { [Op.gte]: fechaInicio };
-    } else if (fechaFin) {
-        whereClause.fechaVenta = { [Op.lte]: fechaFin };
-    } else {
-        whereClause.fechaVenta = { [Op.between]: [new Date(0), new Date()] };
-    }
-
-    if (formaPagoId) whereClause.formaPagoId = formaPagoId;
-
-    if (museoId) whereClause.museoId = museoId;
+    const whereClause = buildIngresosWhere({fechaInicio, fechaFin, museoId, formaPagoId, dateField: 'fechaVenta'});
 
     return await productoVenta.findAll({
       where: whereClause,
@@ -100,19 +54,7 @@ class InformesRepository extends BaseRepository {
   }
 
   async findEventosToInforme({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null}) {
-    const whereClause = {};
-    if (fechaInicio && fechaFin) {
-      whereClause.fechaInicio = { [Op.between]: [fechaInicio, fechaFin] };
-    } else if (fechaInicio) {
-      whereClause.fechaInicio = { [Op.gte]: fechaInicio };
-    } else if (fechaFin) {
-      whereClause.fechaInicio = { [Op.lte]: fechaFin };
-    } else {
-      whereClause.fechaInicio = { [Op.between]: [new Date(0), new Date()] };
-    }
-
-    if (museoId) whereClause.museoId = museoId;
-    if (formaPagoId) whereClause.formaPagoId = formaPagoId;
+    const whereClause = buildIngresosWhere({fechaInicio, fechaFin, museoId, formaPagoId, dateField: 'fechaReserva'});
 
     return await reservaEvento.findAll({
       where: whereClause,
