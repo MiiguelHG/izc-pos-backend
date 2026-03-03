@@ -34,7 +34,7 @@ export class InformesController {
           return sendError(res, 400, "No se pudo calcular el resumen de visitantes para los criterios especificados.");
         }
 
-        return sendSuccess(res, 200, "Visitantes obtenidos correctamente.", { resumen: resumenVisitantes, data: visitantes } );
+        return sendSuccess(res, 200, "Visitantes obtenidos correctamente.", { resumen: resumenVisitantes[0], data: visitantes } );
     } catch(error) {
         return sendError(res, 500, `Error al obtener visitantes para informe. ${error.message}`);
     }
@@ -66,7 +66,7 @@ export class InformesController {
         return sendError(res, 400, "No se pudo calcular el resumen de ingresos para los criterios especificados.");
       }
 
-      return sendSuccess(res, 200, "Ingresos obtenidos correctamente.", { resumen: resumenIngresos, data: ingresos });
+      return sendSuccess(res, 200, "Ingresos obtenidos correctamente.", { resumen: resumenIngresos[0], data: ingresos });
     } catch (error) {
       return sendError(res, 500, `Error al obtener ingresos para informe. ${error.message}`);
     }

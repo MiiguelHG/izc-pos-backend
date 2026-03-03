@@ -79,7 +79,7 @@ class InformesRepository extends BaseRepository {
     return await currentModel.findAll({
         where: whereClause,
         attributes: [
-          [currentModel.sequelize.fn('DATE', currentModel.sequelize.col(currentDateField)), 'fechaRegistro'], 
+          [currentModel.sequelize.fn('DATE', currentModel.sequelize.col(currentDateField)), 'fecha'], 
           [currentModel.sequelize.fn('SUM', currentModel.sequelize.col('total')), 'total']
         ],
         group: [currentModel.sequelize.fn('DATE', currentModel.sequelize.col(currentDateField))],
@@ -179,7 +179,7 @@ class InformesRepository extends BaseRepository {
           ${formaPagoId ? 'AND formaPagoId = :formaPagoId' : ''}
 
           UNION ALL
-          
+
           SELECT DATE(fechaReserva) as fecha, total
           FROM reserva_eventos
           WHERE fechaReserva BETWEEN :normalizedFechaInicio AND :normalizedFechaFin
