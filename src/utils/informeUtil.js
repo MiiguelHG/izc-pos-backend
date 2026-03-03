@@ -4,9 +4,9 @@ import db from "../models/index.js";
 const { boletoEmitido, productoVenta, reservaEvento } = db;
 
 export const INGRESOS_CONFIG = {
-    boletos: { model: boletoEmitido, dateField: 'fechaEmision' },
-    productos: { model: productoVenta, dateField: 'fechaVenta' },
-    eventos: { model: reservaEvento, dateField: 'fechaReserva' }
+    boletos: { model: boletoEmitido, dateField: 'fechaEmision', tableName: 'boletos_emitidos' },
+    productos: { model: productoVenta, dateField: 'fechaVenta', tableName: 'producto_ventas' },
+    eventos: { model: reservaEvento, dateField: 'fechaReserva', tableName: 'reserva_eventos' }
   };
 
 const getDefaultLastYearRange = () => {
@@ -16,7 +16,7 @@ const getDefaultLastYearRange = () => {
     return { fechaInicio, fechaFin };
 };
 
-const getNormalizedRange = (fechaInicio, fechaFin) => {
+export const getNormalizedRange = (fechaInicio, fechaFin) => {
     if (fechaInicio && fechaFin) {
         return { fechaInicio, fechaFin };
     }
@@ -34,9 +34,22 @@ const getNormalizedRange = (fechaInicio, fechaFin) => {
     return getDefaultLastYearRange();
 };
 
+export const selectColumnaVisitantes = (genero) => {
+  switch (genero) {
+    case 'masculino':
+      return 'cantidadHombres';
+    case 'femenino':
+      return 'cantidadMujeres';
+    case 'otros':
+      return 'cantidadOtros';
+    default:
+      return 'totalVisitantes';
+  }
+};
+
 export const buildVisitantesWhere = ({fechaInicio = '', fechaFin = '', museoId = null, genero = '', cp = '', municipio = '', estado = '', nacionalidad = '', edadMin = 1, edadMax = 100}) => {
   const whereClause = {};
-  const colSelected = genero === 'masculino' ? 'cantidadHombres' : genero === 'femenino' ? 'cantidadMujeres' : genero === 'otros' ? 'cantidadOtros' : 'totalVisitantes';
+  const colSelected = selectColumnaVisitantes(genero);
   const normalizedRange = getNormalizedRange(fechaInicio, fechaFin);
 
   whereClause.fechaRegistro = { [Op.between]: [normalizedRange.fechaInicio, normalizedRange.fechaFin] };

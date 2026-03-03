@@ -12,23 +12,29 @@ export class InformesController {
             return sendError(res, 400, "No se encontraron visitantes para los criterios especificados.");
         }
 
-        const totalVisitantes = await informesRepository.findTotalVisitantes({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
+        // const totalVisitantes = await informesRepository.findTotalVisitantes({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
 
-        if (totalVisitantes.length === 0 || totalVisitantes[0].total === null) {
-            return sendError(res, 400, "No se pudo calcular el total de visitantes para los criterios especificados.");
+        // if (totalVisitantes.length === 0 || totalVisitantes[0].total === null) {
+        //     return sendError(res, 400, "No se pudo calcular el total de visitantes para los criterios especificados.");
+        // }
+
+        // const maxMinVisitantes = await informesRepository.findMaxMinVisitantesFecha({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
+
+        // if (!maxMinVisitantes) {
+        //     return sendError(res, 400, "No se pudo calcular el máximo o mínimo de visitantes para los criterios especificados.");
+        // }
+
+        // const mediaVisitantes = visitantes.length > 0
+        //   ? Math.round(Number(totalVisitantes[0].total || 0) / visitantes.length)
+        //   : 0;
+
+        const resumenVisitantes = await informesRepository.findResumenVisitantes({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
+
+        if (!resumenVisitantes) {
+          return sendError(res, 400, "No se pudo calcular el resumen de visitantes para los criterios especificados.");
         }
 
-        const maxMinVisitantes = await informesRepository.findMaxMinVisitantesFecha({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
-
-        if (!maxMinVisitantes) {
-            return sendError(res, 400, "No se pudo calcular el máximo o mínimo de visitantes para los criterios especificados.");
-        }
-
-        const mediaVisitantes = visitantes.length > 0
-          ? Math.round(Number(totalVisitantes[0].total || 0) / visitantes.length)
-          : 0;
-
-        return sendSuccess(res, 200, "Visitantes obtenidos correctamente.", { total: totalVisitantes[0].total, maxMin: maxMinVisitantes, media: mediaVisitantes, data: visitantes } );
+        return sendSuccess(res, 200, "Visitantes obtenidos correctamente.", { resumen: resumenVisitantes, data: visitantes } );
     } catch(error) {
         return sendError(res, 500, `Error al obtener visitantes para informe. ${error.message}`);
     }
@@ -39,7 +45,7 @@ export class InformesController {
       const { fechaInicio, fechaFin, museoId,formaPagoId, tipo } = req.query;
 
       let ingresos;
-      if (tipo === '') {
+      if (!tipo) {
         ingresos = await informesRepository.findAllIngresosToInforme({fechaInicio, fechaFin, museoId, formaPagoId});
       } else {
         ingresos = await informesRepository.findIngresosByTipo({fechaInicio, fechaFin, museoId, formaPagoId, tipo});
@@ -49,7 +55,18 @@ export class InformesController {
         return sendError(res, 400, "No se encontraron ingresos para los criterios especificados.");
       }
 
-      return sendSuccess(res, 200, "Ingresos obtenidos correctamente.", { data: ingresos } );
+      let resumenIngresos;
+      if (!tipo) {
+        resumenIngresos = await informesRepository.findResumenAllIngresos({fechaInicio, fechaFin, museoId, formaPagoId});
+      } else {
+        resumenIngresos = await informesRepository.findResumenIngresosByTipo({fechaInicio, fechaFin, museoId, formaPagoId, tipo});
+      }
+
+      if (!resumenIngresos || resumenIngresos.length === 0) {
+        return sendError(res, 400, "No se pudo calcular el resumen de ingresos para los criterios especificados.");
+      }
+
+      return sendSuccess(res, 200, "Ingresos obtenidos correctamente.", { resumen: resumenIngresos, data: ingresos });
     } catch (error) {
       return sendError(res, 500, `Error al obtener ingresos para informe. ${error.message}`);
     }
