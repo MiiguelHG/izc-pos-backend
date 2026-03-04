@@ -22,7 +22,11 @@ export class ArticuloController {
             const offset = (page - 1) * limit;
             const tipo = req.query.tipo || '';
 
-            const { rows, count } = await articuloRepository.findAndCountAll({ seleccion: tipo, limit, offset });
+            const { user } = req;
+
+            const rol = user.rol.nombre;
+
+            const { rows, count } = await articuloRepository.findAndCountAll({ seleccion: tipo, limit, offset, rol });
             
             if (!rows || count === 0) {
                 return sendError(res, 404, "No se encontraron artículos.");
