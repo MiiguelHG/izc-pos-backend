@@ -9,9 +9,15 @@ class ArticuloRepository extends BaseRepository {
         super(articulo);
     }
 
-    async findAndCountAll ({ seleccion = '', limit, offset }) {
+    async findAndCountAll ({ seleccion = '', limit, offset, rol }) {
         const defalutClause = { [Op.or]: [ {tipo: 'servicio'}, {tipo: 'producto'}] };
-        const whereClause = seleccion ? { tipo: seleccion } : defalutClause;
+        const whereClause = {};
+
+        seleccion ? whereClause.tipo = seleccion : defalutClause;
+        
+        if (rol !== 'admin') {
+            whereClause.habilitado = true;
+        }
 
         return await this.model.findAndCountAll({
             where: whereClause,
