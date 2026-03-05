@@ -1,0 +1,118 @@
+import { Op } from "sequelize";
+import db from "../models/index.js";
+
+const { boletoEmitido, productoVenta, reservaEvento } = db;
+
+export const INGRESOS_CONFIG = {
+    boletos: { model: boletoEmitido, dateField: 'fechaEmision', tableName: 'boletos_emitidos' },
+    productos: { model: productoVenta, dateField: 'fechaVenta', tableName: 'producto_ventas' },
+    eventos: { model: reservaEvento, dateField: 'fechaReserva', tableName: 'reserva_eventos' }
+  };
+
+const getDefaultLastYearRange = () => {
+    const fechaFin = new Date();
+    const fechaInicio = new Date();
+    fechaInicio.setFullYear(fechaFin.getFullYear() - 1);
+    return { fechaInicio, fechaFin };
+};
+
+export const getNormalizedRange = (fechaInicio, fechaFin) => {
+    if (fechaInicio && fechaFin) {
+        return { fechaInicio, fechaFin };
+    }
+
+    if (fechaInicio && !fechaFin) {
+        return { fechaInicio, fechaFin: new Date() };
+    }
+
+    if (!fechaInicio && fechaFin) {
+        const startFromEnd = new Date(fechaFin);
+        startFromEnd.setFullYear(startFromEnd.getFullYear() - 1);
+        return { fechaInicio: startFromEnd, fechaFin };
+    }
+
+    return getDefaultLastYearRange();
+};
+
+export const selectColumnaVisitantes = (genero) => {
+  switch (genero) {
+    case 'masculino':
+      return 'cantidadHombres';
+    case 'femenino':
+      return 'cantidadMujeres';
+    case 'otros':
+      return 'cantidadOtros';
+    default:
+      return 'totalVisitantes';
+  }
+};
+
+export const buildVisitantesWhere = ({fechaInicio = '', fechaFin = '', museoId = null, genero = '', cp = '', municipio = '', estado = '', nacionalidad = '', edadMin = 1, edadMax = 100}) => {
+  const whereClause = {};
+  const colSelected = selectColumnaVisitantes(genero);
+  const normalizedRange = getNormalizedRange(fechaInicio, fechaFin);
+
+  whereClause.fechaRegistro = { [Op.between]: [normalizedRange.fechaInicio, normalizedRange.fechaFin] };
+
+
+  if (museoId) whereClause.museoId = museoId;
+  if (genero) {
+      if (genero === 'masculino') whereClause.cantidadHombres = { [Op.gt]: 0 };
+      else if (genero === 'femenino') whereClause.cantidadMujeres = { [Op.gt]: 0 };
+      else if (genero === 'otros') whereClause.cantidadOtros = { [Op.gt]: 0 };
+  }
+  if (cp) whereClause.cp = cp;
+  if (municipio) whereClause.municipio = municipio;
+  if (estado) whereClause.estado = estado;
+  if (nacionalidad) whereClause.pais = nacionalidad;
+  whereClause.edad = { [Op.between]: [edadMin, edadMax] };
+
+  return { whereClause, colSelected };
+}
+
+export const bulidVisitantesWhere = buildVisitantesWhere;
+
+export const buildIngresosWhere = ({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null, dateField = 'fechaEmision'}) => {
+  const whereClause = {};
+  const normalizedRange = getNormalizedRange(fechaInicio, fechaFin);
+  whereClause[dateField] = { [Op.between]: [normalizedRange.fechaInicio, normalizedRange.fechaFin] };
+
+  if (museoId) whereClause.museoId = museoId;
+  if (formaPagoId) whereClause.formaPagoId = formaPagoId;
+
+  return whereClause;
+}
+
+export const rellenarFechasFaltantes = (dataDB = []) => {
+  if (!dataDB || dataDB.length === 0) return [];
+
+  const mapaDatos = {};
+  dataDB.forEach(item => {
+    mapaDatos[item.fecha] = item.total;
+  });
+
+  let countDiasCero = 0;
+
+  const dataCompleta = [];
+  const fechaInicio = new Date(dataDB[0].fecha);
+  const fechaFin = new Date(dataDB[dataDB.length - 1].fecha);
+
+  for (let fecha = fechaInicio; fecha <= fechaFin; fecha.setDate(fecha.getDate() + 1)) {
+    const fechaStr = fecha.toISOString().split('T')[0];
+
+    const totalDia = mapaDatos[fechaStr] || 0;
+    if (totalDia === 0) countDiasCero++;
+
+    dataCompleta.push({
+      fecha: fechaStr,
+      total: totalDia
+    });
+  }
+
+  return [dataCompleta, countDiasCero];
+}
+
+export const calcularPromedio = (total, numDias) => {
+  if (numDias === 0) return 0;
+  return total / numDias;
+}
