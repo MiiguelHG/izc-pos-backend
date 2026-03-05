@@ -15,19 +15,19 @@ export const runSeeders = async () => {
     try {
         console.log("Running initial seeders...")
         await rolSeeder();
-        await museoSeeder("Museo Nacional", "Ciudad de México");
-        await museoSeeder("Museo de Arte Moderno", "Ciudad de México");
-        await museoSeeder("Museo de Historia", "Guadalajara");
-        await museoSeeder("Museo Interactivo", "Monterrey");
-        await museoSeeder("Museo de Ciencias", "Puebla");
-        await museoSeeder("Museo de Antropología", "Ciudad de México");
-        await museoSeeder("Museo de Arte Contemporáneo", "Tijuana");
-        await museoSeeder("Museo del Ferrocarril", "Chihuahua");
-        await museoSeeder("Museo Naval", "Veracruz");
-        await museoSeeder("Museo de la Revolución", "Ciudad de México");
-        await museoSeeder("Museo del Juguete", "Ciudad de México");
-        await museoSeeder("Museo de la Ciudad", "Mérida");
-        await museoSeeder("Museo de Arte Sacro", "Oaxaca");
+        await museoSeeder("Museo Nacional", "Av. Hidalgo", 45, "Centro Histórico", "Zacatecas", "Zacatecas", 98000);
+        await museoSeeder("Museo de Arte Moderno", "Calle Tacuba", 120, "Centro", "Guadalajara", "Jalisco", 44100);
+        await museoSeeder("Museo de Historia", "Blvd. García de León", 510, "Chapultepec", "Morelia", "Michoacán", 58260);
+        await museoSeeder("Museo Interactivo", "Av. Juárez", 87, "La Paz", "Puebla", "Puebla", 72160);
+        await museoSeeder("Museo de Ciencias", "Calle Allende", 230, "Barrio de San Marcos", "Aguascalientes", "Aguascalientes", 20000);
+        await museoSeeder("Museo de Antropología", "Paseo Montejo", 485, "Centro", "Mérida", "Yucatán", 97000);
+        await museoSeeder("Museo de Arte Contemporáneo", "Av. Constitución", 350, "Zona Centro", "Monterrey", "Nuevo León", 64000);
+        await museoSeeder("Museo del Ferrocarril", "Calle 11 Norte", 1005, "Centro", "Puebla", "Puebla", 72000);
+        await museoSeeder("Museo Naval", "Av. Insurgentes", 74, "Centro", "Veracruz", "Veracruz", 91700);
+        await museoSeeder("Museo de la Revolución", "Calle Lerdo", 6, "Centro Histórico", "Chihuahua", "Chihuahua", 31000);
+        await museoSeeder("Museo del Juguete", "Av. López Mateos", 201, "Centro", "San Luis Potosí", "San Luis Potosí", 78000);
+        await museoSeeder("Museo de la Ciudad", "Calle Macedonio Alcalá", 202, "Centro", "Oaxaca", "Oaxaca", 68000);
+        await museoSeeder("Museo de Arte Sacro", "Dr. Hierro", 149, "Centro Histórico", "Zacatecas", "Zacatecas", 98000);
 
         await userSeeder("Miguel", "miguel@example.com", "123456", 1, 1);
         await userSeeder("Alex", "alex@example.com", "123456", 2, 2);
