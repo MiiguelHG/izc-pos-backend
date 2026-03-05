@@ -1,5 +1,6 @@
 import { informesRepository } from "#repositories/index.js";
 import { sendSuccess, sendError } from "#utils/responseFormater.js";
+import { rellenarFechasFaltantes, calcularPromedio } from "#utils/informeUtil.js";
 
 export class InformesController {
   static async getVisitantesForInforme(req, res) {
@@ -12,21 +13,7 @@ export class InformesController {
             return sendError(res, 400, "No se encontraron visitantes para los criterios especificados.");
         }
 
-        // const totalVisitantes = await informesRepository.findTotalVisitantes({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
-
-        // if (totalVisitantes.length === 0 || totalVisitantes[0].total === null) {
-        //     return sendError(res, 400, "No se pudo calcular el total de visitantes para los criterios especificados.");
-        // }
-
-        // const maxMinVisitantes = await informesRepository.findMaxMinVisitantesFecha({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
-
-        // if (!maxMinVisitantes) {
-        //     return sendError(res, 400, "No se pudo calcular el máximo o mínimo de visitantes para los criterios especificados.");
-        // }
-
-        // const mediaVisitantes = visitantes.length > 0
-        //   ? Math.round(Number(totalVisitantes[0].total || 0) / visitantes.length)
-        //   : 0;
+        const [visitantesRellenados, countDiasCero] = rellenarFechasFaltantes(visitantes);
 
         const resumenVisitantes = await informesRepository.findResumenVisitantes({fechaInicio, fechaFin, museoId, genero, cp, municipio, estado, nacionalidad, edadMin, edadMax});
 
@@ -34,7 +21,10 @@ export class InformesController {
           return sendError(res, 400, "No se pudo calcular el resumen de visitantes para los criterios especificados.");
         }
 
-        return sendSuccess(res, 200, "Visitantes obtenidos correctamente.", { resumen: resumenVisitantes[0], data: visitantes } );
+        resumenVisitantes[0].promedio = calcularPromedio(resumenVisitantes[0].total, visitantesRellenados.length);
+        resumenVisitantes[0].diasCero = countDiasCero;
+
+        return sendSuccess(res, 200, "Visitantes obtenidos correctamente.", { resumen: resumenVisitantes[0], data: visitantesRellenados } );
     } catch(error) {
         return sendError(res, 500, `Error al obtener visitantes para informe. ${error.message}`);
     }
@@ -55,6 +45,8 @@ export class InformesController {
         return sendError(res, 400, "No se encontraron ingresos para los criterios especificados.");
       }
 
+      const [ingresosRellenados, countDiasCero] = rellenarFechasFaltantes(ingresos);
+
       let resumenIngresos;
       if (!tipo) {
         resumenIngresos = await informesRepository.findResumenAllIngresos({fechaInicio, fechaFin, museoId, formaPagoId});
@@ -66,7 +58,10 @@ export class InformesController {
         return sendError(res, 400, "No se pudo calcular el resumen de ingresos para los criterios especificados.");
       }
 
-      return sendSuccess(res, 200, "Ingresos obtenidos correctamente.", { resumen: resumenIngresos[0], data: ingresos });
+        resumenIngresos[0].promedio = calcularPromedio(resumenIngresos[0].total, ingresosRellenados.length);
+        resumenIngresos[0].diasCero = countDiasCero;
+
+      return sendSuccess(res, 200, "Ingresos obtenidos correctamente.", { resumen: resumenIngresos[0], data: ingresosRellenados });
     } catch (error) {
       return sendError(res, 500, `Error al obtener ingresos para informe. ${error.message}`);
     }

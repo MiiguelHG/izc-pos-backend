@@ -51,13 +51,12 @@ class InformesRepository extends BaseRepository {
 
       SELECT
         (SELECT SUM(total) FROM resumenDiario) as total,
-        (SELECT AVG(total) FROM resumenDiario) as promedio,
 
         (SELECT total FROM resumenDiario ORDER BY total DESC LIMIT 1) as maximo,
         (SELECT fecha FROM resumenDiario ORDER BY total DESC LIMIT 1) as fechaMaximo,
 
-        (SELECT total FROM resumenDiario ORDER BY total ASC LIMIT 1) as minimo,
-        (SELECT fecha FROM resumenDiario ORDER BY total ASC LIMIT 1) as fechaMinimo
+        (SELECT total FROM resumenDiario WHERE total > 0 ORDER BY total ASC LIMIT 1) as minimo,
+        (SELECT fecha FROM resumenDiario WHERE total > 0 ORDER BY total ASC LIMIT 1) as fechaMinimo
 
       
       `, {
@@ -107,7 +106,6 @@ class InformesRepository extends BaseRepository {
       )
       SELECT
         (SELECT SUM(total) FROM resumen) as total,
-        (SELECT AVG(total) FROM resumen) as promedio,
 
         (SELECT total FROM resumen ORDER BY total DESC LIMIT 1) as maximo,
         (SELECT fecha FROM resumen ORDER BY total DESC LIMIT 1) as fechaMaximo,
@@ -190,7 +188,6 @@ class InformesRepository extends BaseRepository {
       )
       SELECT
         (SELECT SUM(total) FROM resumen) as total,
-        (SELECT AVG(total) FROM resumen) as promedio,
 
         (SELECT total FROM resumen ORDER BY total DESC LIMIT 1) as maximo,
         (SELECT fecha FROM resumen ORDER BY total DESC LIMIT 1) as fechaMaximo,

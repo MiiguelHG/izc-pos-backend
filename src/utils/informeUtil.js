@@ -82,3 +82,37 @@ export const buildIngresosWhere = ({fechaInicio = '', fechaFin = '', museoId = n
 
   return whereClause;
 }
+
+export const rellenarFechasFaltantes = (dataDB = []) => {
+  if (!dataDB || dataDB.length === 0) return [];
+
+  const mapaDatos = {};
+  dataDB.forEach(item => {
+    mapaDatos[item.fecha] = item.total;
+  });
+
+  let countDiasCero = 0;
+
+  const dataCompleta = [];
+  const fechaInicio = new Date(dataDB[0].fecha);
+  const fechaFin = new Date(dataDB[dataDB.length - 1].fecha);
+
+  for (let fecha = fechaInicio; fecha <= fechaFin; fecha.setDate(fecha.getDate() + 1)) {
+    const fechaStr = fecha.toISOString().split('T')[0];
+
+    const totalDia = mapaDatos[fechaStr] || 0;
+    if (totalDia === 0) countDiasCero++;
+
+    dataCompleta.push({
+      fecha: fechaStr,
+      total: totalDia
+    });
+  }
+
+  return [dataCompleta, countDiasCero];
+}
+
+export const calcularPromedio = (total, numDias) => {
+  if (numDias === 0) return 0;
+  return total / numDias;
+}
