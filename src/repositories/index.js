@@ -14,6 +14,7 @@ import { reservaEventoRepository } from "./reservaEventoRepository.js";
 import { DipomexRepository } from "./dipomexRepository.js";
 import { museoHasArticuloRepository } from "./museoHasArticuloRepository.js";
 import { invitadoRepository } from "./invitadoRepository.js";
+import { informesRepository } from "./informesRepository.js";
 
 export {
     usuarioRepository,
@@ -31,5 +32,6 @@ export {
     reservaEventoRepository,
     museoHasArticuloRepository,
     DipomexRepository,
-    invitadoRepository
+    invitadoRepository,
+    informesRepository
 }

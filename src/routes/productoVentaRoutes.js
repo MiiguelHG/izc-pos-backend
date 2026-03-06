@@ -4,6 +4,8 @@ import { authJwt } from "../middlewares/index.js";
 
 const router = express.Router();
 
+router.use(authJwt.verifyToken);
+
 router.post("/", ProductoVentaController.createVentaProductosCompleta);
 
 router.get("/", ProductoVentaController.getAllProductoVentas);

@@ -1,16 +1,18 @@
 import express from "express";
 import { EventoController } from "../controllers/eventoController.js";
-import authJwt from "../middlewares/authJwt.js";
+import { authJwt } from "#middlewares/index.js";
 
 const router = express.Router();
 
+router.use(authJwt.verifyToken);
+
 // Rutas básicas
-router.get("/", [authJwt.verifyToken], EventoController.getAllEventos);
-router.get("/:id", [authJwt.verifyToken], EventoController.getById);
+router.get("/", EventoController.getAllEventos);
+router.get("/:id", EventoController.getById);
 
 // Rutas de gestión (admin)
-router.post("/", [authJwt.verifyToken, authJwt.isAdmin], EventoController.createEvent);
-router.put("/:id", [authJwt.verifyToken, authJwt.isAdmin], EventoController.updateEvent);
-router.delete("/:id", [authJwt.verifyToken, authJwt.isAdmin], EventoController.deleteEvent);
+router.post("/", EventoController.createEvent);
+router.put("/:id", EventoController.updateEvent);
+router.delete("/:id", EventoController.deleteEvent);
 
 export default router;

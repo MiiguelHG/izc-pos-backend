@@ -10,5 +10,6 @@ router.use(authJwt.hasRole(['directorMuseo', 'admin']));
 router.get("/",UsuarioController.getAll);
 router.get("/:id", UsuarioController.getById);
 router.put("/:id", UsuarioController.update);
+router.put("/:id/toggle", UsuarioController.toggleActivo);
 
 export default router;

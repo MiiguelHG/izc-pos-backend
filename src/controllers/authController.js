@@ -47,6 +47,10 @@ export class AuthController {
                 return sendError(res, 401, "Contraseña incorrecta");
             }
 
+            if (!user.activo) {
+                return sendError(res, 403, "Cuenta desactivada");
+            }
+
             //Quitar password del objeto user antes de enviar la respuesta
             const newUser = {...user.dataValues};
             delete newUser.password;

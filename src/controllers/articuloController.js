@@ -22,7 +22,11 @@ export class ArticuloController {
             const offset = (page - 1) * limit;
             const tipo = req.query.tipo || '';
 
-            const { rows, count } = await articuloRepository.findAndCountAll({ seleccion: tipo, limit, offset });
+            const { user } = req;
+
+            const rol = user.rol.nombre;
+
+            const { rows, count } = await articuloRepository.findAndCountAll({ seleccion: tipo, limit, offset, rol });
             
             if (!rows || count === 0) {
                 return sendError(res, 404, "No se encontraron artículos.");
@@ -71,18 +75,6 @@ export class ArticuloController {
         }
     }
 
-    static async deleteArticulo(req, res) {
-        try {
-            const deleted = await articuloRepository.delete({id: req.params.id});
-            if (!deleted) {
-                return sendError(res, 404, "Artículo no encontrado.");
-            }
-            return sendSuccess(res, 200, "Artículo eliminado exitosamente.");
-        } catch (error) {
-            return sendError(res, 500, `Error al eliminar artículo: ${error.message}`);
-        }
-    }
-
     static async obtenerPorTipo(req, res) {
         try {
             const { tipo } = req.params;
@@ -106,4 +98,18 @@ export class ArticuloController {
         }
     }
 
+    static async toggleEnableArticulo(req, res) {
+        try {
+            const { id } = req.params;
+
+            const articulo = await articuloRepository.updateHabilitado({id});
+
+            if (!articulo) {
+                return sendError(res, 404, "Artículo no encontrado.");
+            }
+            return sendSuccess(res, 200, `Artículo actualizado exitosamente.`, articulo);
+        } catch (error) {
+            return sendError(res, 500, `Error al cambiar estado del artículo: ${error.message}`);
+        }   
+    }
 }

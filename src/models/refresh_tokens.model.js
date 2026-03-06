@@ -10,7 +10,10 @@ export default (sequelize, Sequelize) => {
         token: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true
+            unique: true,
+            validate: {
+                len: [64, 255]
+            }
         },
         createdAt: {
             type: DataTypes.DATE,
@@ -19,7 +22,7 @@ export default (sequelize, Sequelize) => {
         },
         expiresAt: {
             type: DataTypes.DATE,
-            allowNull: false
+            allowNull: false,
         },
         revokedAt: {
             type: DataTypes.DATE,
@@ -27,7 +30,10 @@ export default (sequelize, Sequelize) => {
         },
         usuarioId: {
             type: DataTypes.INTEGER,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         }
 
     });

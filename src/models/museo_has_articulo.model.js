@@ -5,12 +5,23 @@ export default (sequelize, Sequelize) => {
         museoId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
         },
         articuloId: {
             type: DataTypes.INTEGER,
             primaryKey: true,
-            allowNull: false
+            allowNull: false,
+            validate: {
+                isInt: true
+            }
+        },
+        habilitado: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+            defaultValue: true
         }
     });
     return MuseoHasArticulo;
