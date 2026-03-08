@@ -16,7 +16,7 @@ export class BoletoEmitidoController {
       }
 
       const visitante = await visitanteRepository.findById(nuevoBoletoEmitido.visitanteId);
-      const museo = await museoRepository.findById(museoId);
+      const museo = await museoRepository.findMuseoById(museoId);
 
       const boletoEmitido = { ...nuevoBoletoEmitido, visitante: { ...visitante.dataValues }, museo: { ...museo.dataValues } };
 
