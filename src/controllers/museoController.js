@@ -6,7 +6,7 @@ export class MuseoController {
     try {
       const { nombre, ubicacion } = req.body;
 
-      const newMuseo = await museoRepository.create({ nombre, ubicacion });
+      const newMuseo = await museoRepository.createMuseo({ nombre, ubicacion});
 
       if (!newMuseo) {
         return sendError(res, 400, 'No se pudo crear el museo');
@@ -79,7 +79,7 @@ export class MuseoController {
       const { id } = req.params;
       const { nombre, ubicacion } = req.body;
 
-      const updated = await museoRepository.update({ id }, { nombre, ubicacion });
+      const updated = await museoRepository.updateMuseo(id, { nombre, ubicacion });
 
       if (!updated) {
         return sendError(res, 400, 'No se pudo actualizar el museo');
@@ -88,22 +88,6 @@ export class MuseoController {
       // Tal vez se pueda devolver el museo actualizado aquí, pero no es obligatorio
 
       return sendSuccess(res, 200, 'Museo actualizado exitosamente', updated);
-    } catch (error) {
-      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
-    }
-  }
-
-  static async deleteMuseo(req, res) {
-    try {
-      const { id } = req.params;
-
-      const deleted = await museoRepository.delete({ id });
-      
-      if (!deleted) {
-        return sendError(res, 400, 'No se pudo eliminar el museo');
-      }
-
-      return sendSuccess(res, 200, 'Museo eliminado exitosamente', deleted);
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }

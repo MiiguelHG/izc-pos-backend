@@ -9,7 +9,7 @@ class ReservaEventoRepository extends BaseRepository {
         super(reservaEvento);
     }
 
-    async createReservaEventoCompleta({nombre, edad, cp, pais, estadoVisitante, municipio,  cantidadHombres, cantidadMujeres, cantidadOtros, nombreEvento, responsable, contactoResponsable, capacidad, fechaReserva, fechaInicio, fechaFin, total, estadoReserva, usuarioId, museoId, articuloId, formaPagoId}) {
+    async createReservaEventoCompleta({nombre, edad, cp, pais, cantidadHombres, cantidadMujeres, cantidadOtros, nombreEvento, responsable, contactoResponsable, capacidad, fechaReserva, fechaInicio, fechaFin, total, estadoReserva, usuarioId, museoId, articuloId, formaPagoId}) {
         // similar a la venta de boletos, primero registramos al visitante dentro de la misma transacción
         return await sequelize.transaction(async(t) => {
             const totalVisitantes = Number(cantidadHombres) + Number(cantidadMujeres) + Number(cantidadOtros);
@@ -24,8 +24,8 @@ class ReservaEventoRepository extends BaseRepository {
                     edad,
                     cp,
                     pais,
-                    estado: estadoVisitante,
-                    municipio,
+                    // estado: estadoVisitante,
+                    // municipio,
                     cantidadHombres,
                     cantidadMujeres,
                     cantidadOtros,

@@ -25,11 +25,19 @@ export default (sequelize, Sequelize) => {
             validate: {
                 isPhoneOrEmail(value) {
                     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-                    const isPhone = /^[0-9]{15}$/.test(value); // Teléfono de 15 dígitos
+                    const isPhone = /^[0-9]{10}$/.test(value); // Teléfono de 10 dígitos
                     if (!isEmail && !isPhone) {
-                        throw new Error("El contacto debe ser un correo electrónico o un número de teléfono de máximo 15 dígitos");
+                        throw new Error("El contacto debe ser un correo electrónico o un número de teléfono de máximo 10 dígitos");
                     }
                 }
+            }
+        },
+        capacidad: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 1,
+                isInt: true
             }
         },
         fechaReserva: {

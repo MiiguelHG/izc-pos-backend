@@ -12,17 +12,18 @@ export default (sequelize, Sequelize) => {
             allowNull: false,
             validate: {
                 is: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s]+$/, 
+                len: [3, 100]
             }
         },
-        ubicacion: {
-            type: DataTypes.STRING,
+        ubicacionId: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             validate: {
-                is: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s.,;:#&"'()\-]+$/, 
-                len: [10, 255]
+                isInt: true,
+                min: 1
             }
         }
     });
 
     return Museo;
- }
+ };

@@ -17,6 +17,7 @@ import formaPagoModel from "./forma_pago.model.js";
 import visitanteModel from "./visitante.model.js";
 import museoHasArticuloModel from "./museo_has_articulo.model.js";
 import invitadoModel from "./invitado.model.js";
+import ubicacionModel from "./ubicacion.model.js";
 
 // Definir el objeto de la base de datos
 const db = {};
@@ -39,6 +40,7 @@ db.formaPago = formaPagoModel(sequelize, Sequelize);
 db.visitante = visitanteModel(sequelize, Sequelize);
 db.museoHasArticulo = museoHasArticuloModel(sequelize, Sequelize);
 db.invitado = invitadoModel(sequelize, Sequelize);
+db.ubicacion = ubicacionModel(sequelize, Sequelize);
 // Relaciones entre tablas
 
 //Relacion usuario - rol (N:1) (Revisado)
@@ -139,6 +141,10 @@ db.usuario.hasMany(db.visitante, {foreignKey: "usuarioId"});
 // Relacion museo - usuario (1:N) (Corregido)
 db.museo.hasMany(db.usuario, {foreignKey: "museoId"});
 db.usuario.belongsTo(db.museo, {foreignKey: "museoId"});
+
+// Relacion museo - ubicacion (1:1) (Revisado)
+db.ubicacion.hasOne(db.museo, {foreignKey: "ubicacionId"});
+db.museo.belongsTo(db.ubicacion, {foreignKey: "ubicacionId", as: "ubicacion"});
 
 // Relacion museo - articulo (N:M) (Revisado)
 db.museo.belongsToMany(db.articulo, {
