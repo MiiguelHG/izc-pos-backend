@@ -55,8 +55,9 @@ export const runSeeders = async () => {
         await boletoTipoSeeder("Mayor de edad", "Boleto para adultos", 50, 50.00, [0,1,2,3,4,5,6], false, 1, false);
         await boletoTipoSeeder("Estudiante", "Boleto con descuento para estudiantes", 30, 70.00, [1,2,3,4], true, 1, false);
 
-        await formaPagoSeeder("Efectivo", "Pago en efectivo");
-        await formaPagoSeeder("Tarjeta de crédito", "Pago con tarjeta de crédito");
+        await formaPagoSeeder("Efectivo", "Pago en efectivo", true);
+        await formaPagoSeeder("Tarjeta de crédito", "Pago con tarjeta de crédito", false);
+        await formaPagoSeeder("Tarjeta de débito", "Pago con tarjeta de débito", true);
 
 
         console.log("\n✅ Todos los seeders se ejecutaron exitosamente");

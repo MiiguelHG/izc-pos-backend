@@ -22,6 +22,10 @@ export default (sequelize, Sequelize) => {
                 is: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s.,;:!?"'()\-]+$/ // Solo letras, números, espacios y algunos signos de puntuación
             }
         },
+        activo: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true
+        }
     });
 
     return FormaPago;
