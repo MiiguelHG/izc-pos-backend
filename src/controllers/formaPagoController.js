@@ -43,15 +43,5 @@ export class FormaPagoController {
         }
     }
 
-    static async deleteFormaPago(req, res) {
-        try {
-            const deleted = await formaPagoRepository.delete({id: req.params.id});
-            if (!deleted) {
-                return sendError(res, 404, "Forma de pago no encontrada.");
-            }
-            return sendSuccess(res, 200, "Forma de pago eliminada exitosamente.");
-        } catch (error) {
-            return sendError(res, 500, `Error al eliminar forma de pago: ${error.message}`);
-        }
-    }
+    
 }
