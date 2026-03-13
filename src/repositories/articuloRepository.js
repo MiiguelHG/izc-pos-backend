@@ -9,12 +9,19 @@ class ArticuloRepository extends BaseRepository {
         super(articulo);
     }
 
-    async findAndCountAll ({ seleccion = '', limit, offset, rol }) {
+    async findAndCountAll ({ seleccion = '', limit, offset, rol, search = '' }) {
         const defalutClause = { [Op.or]: [ {tipo: 'servicio'}, {tipo: 'producto'}] };
         const whereClause = {};
 
         seleccion ? whereClause.tipo = seleccion : defalutClause;
-        
+
+        if (search) {
+            whereClause[Op.or] = [
+                { nombre: { [Op.like]: `%${search}%` } },
+                { descripcion: { [Op.like]: `%${search}%` } }
+            ];
+        }
+
         if (rol !== 'admin') {
             whereClause.habilitado = true;
         }

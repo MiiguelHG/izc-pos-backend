@@ -1,5 +1,6 @@
 import BaseRepository from './baseRepository.js';
 import db from '../models/index.js';
+import { Op } from 'sequelize';
 
 const { invitado, museo, usuario } = db;
 
@@ -8,10 +9,15 @@ class InvitadoRepository extends BaseRepository {
     super(invitado);
   }
 
-  async findAllAndCount({ limit, offset, museoId }) {
+  async findAllAndCount({ limit, offset, museoId , search = ''}) {
     const whereClause = {};
     if (museoId) {
       whereClause.museoId = museoId;
+    }
+    if (search) {
+      whereClause[Op.or] = [
+        { nombre: { [Op.like]: `%${search}%` } }
+      ];
     }
 
     return this.model.findAndCountAll({

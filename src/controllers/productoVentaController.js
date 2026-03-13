@@ -63,8 +63,9 @@ export class ProductoVentaController {
             const limit = 10;
             const page = parseInt(req.query.offset) || 1;
             const offset = (page - 1) * limit;
+            const search = req.query.search;
 
-            const {rows, count} = await productoVentaRepository.findAllAndCountByMuseoId({ museoId, limit, offset });
+            const {rows, count} = await productoVentaRepository.findAllAndCountByMuseoId({ museoId, limit, offset, search });
 
             if(count === 0){
                 return sendError(res, 404, "No se encontraron ventas de productos para este museo.");
