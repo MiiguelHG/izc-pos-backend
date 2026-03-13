@@ -10,9 +10,11 @@ export class UsuarioController {
             const offset = (page - 1) * limit;
             const { user } = req;
 
+            const search = req.query.search;
+
             const museoId = user.rol.nombre !== 'admin' ? user.museoId : null;
 
-            const { rows, count } = await usuarioRepository.findAllWithoutPassword({ limit, offset, museoId });
+            const { rows, count } = await usuarioRepository.findAllWithoutPassword({ limit, offset, museoId, search });
 
             if (count === 0) {
                     return sendError(res, 404, "No users found.");

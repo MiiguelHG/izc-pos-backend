@@ -72,13 +72,18 @@ class BoletoEmitidoRepository extends BaseRepository {
     });
   }
 
-  async findAllAndCount({ limit = 10, offset = 0, museoId = null }) {
+  async findAllAndCount({ limit = 10, offset = 0, museoId = null , search = ''}) {
     const whereClause = museoId ? { museoId } : {};
+    const visitanteWhereClause = {};
+
+    if (search) {
+      visitanteWhereClause.nombre = { [Op.like]: `%${search}%` };
+    }
 
     return await this.model.findAndCountAll({ 
       where: whereClause,
       include: [
-        { model: visitante, as: 'visitante', attributes: { exclude: ['cantidadHombres', 'cantidadMujeres', 'cantidadOtros', 'totalVisitantes','edad', 'museoId', 'usuarioId']} },
+        { model: visitante, as: 'visitante', attributes: { exclude: ['cantidadHombres', 'cantidadMujeres', 'cantidadOtros', 'totalVisitantes','edad', 'museoId', 'usuarioId']}, where: visitanteWhereClause },
         { model: usuario, as: 'usuario' , attributes: ['id', 'nombre'] }
       ],
       order: [['fechaEmision', 'DESC']],

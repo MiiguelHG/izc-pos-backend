@@ -1,6 +1,7 @@
 import BaseRepository from "./baseRepository.js";
 import { productoDetalleRepository, articuloRepository } from "./index.js";
 import db from "../models/index.js";
+import { Op, where, col, cast } from "sequelize";
 
 const { productoVenta, sequelize, productoDetalle, usuario, articulo, formaPago } = db;
 
@@ -43,10 +44,25 @@ class ProductoVentaRepository extends BaseRepository {
         return await this.model.findAndCountAll({ limit, offset});
     }
 
-    async findAllAndCountByMuseoId({museoId, limit = 10, offset =0}){
+    async findAllAndCountByMuseoId({museoId, limit = 10, offset =0, search = ''}){
+        const whereClause = { museoId };
+        const searchText = String(search).trim();
+
+        // Buscar por fechaVenta o por el nombre del usuario asociado a la venta
+        if (searchText) {
+            whereClause[Op.or] = [
+                where(cast(col('fechaVenta'), 'CHAR'), { [Op.like]: `%${searchText}%` }),
+                where(col('usuario.nombre'), { [Op.like]: `%${searchText}%` })
+            ];
+        }
+
         return await this.model.findAndCountAll({ 
-            where: { museoId }, limit, offset,
-            include: [ { model: usuario, as: 'usuario', attributes: ['id', 'nombre'] } ]
+            where: whereClause,
+            include: [ { model: usuario, as: 'usuario', attributes: ['id', 'nombre'] } ],
+            order: [['fechaVenta', 'DESC']],
+            limit,
+            offset,
+            subQuery: false
         });
     }
 
