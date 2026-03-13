@@ -17,7 +17,10 @@ export class FormaPagoController {
 
     static async getFormasPago(req, res) {
         try {
-            const formasPago = await formaPagoRepository.findAll();
+            const { user } = req;
+
+            const isAdmin = user.rol.nombre === 'admin' ? true : false; // Si es admin, no filtramos por activo
+            const formasPago = await formaPagoRepository.findFormasPago({isAdmin});
             if(!formasPago) {
                 return sendError(res, 404, "No se encontraron formas de pago.");
             }
@@ -37,21 +40,27 @@ export class FormaPagoController {
             if (!updatedFormaPago) {
                 return sendError(res, 404, "Forma de pago no encontrada.");
             }
-            return sendSuccess(res, 200, "Forma de pago actualizada exitosamente.", nombre, descripcion);
+            return sendSuccess(res, 200, "Forma de pago actualizada exitosamente.", updatedFormaPago);
         } catch (error) {
             return sendError(res, 500, `Error al actualizar forma de pago: ${error.message}`);
         }
     }
 
-    static async deleteFormaPago(req, res) {
+    static async toggleActivo(req, res) {
         try {
-            const deleted = await formaPagoRepository.delete({id: req.params.id});
-            if (!deleted) {
+            const { id } = req.params;
+            const formaPago = await formaPagoRepository.findById(id);
+            if (!formaPago) {
                 return sendError(res, 404, "Forma de pago no encontrada.");
             }
-            return sendSuccess(res, 200, "Forma de pago eliminada exitosamente.");
+
+            const updatedFormaPago = await formaPagoRepository.update(
+                { id },
+                { activo: !formaPago.activo }
+            );
+            return sendSuccess(res, 200, "Estado de forma de pago actualizado exitosamente.", updatedFormaPago);
         } catch (error) {
-            return sendError(res, 500, `Error al eliminar forma de pago: ${error.message}`);
+            return sendError(res, 500, `Error al actualizar estado de forma de pago: ${error.message}`);
         }
     }
 }

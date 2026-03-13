@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser';
 
 import db from './src/models/index.js';
 import authRoutes from './src/routes/authRoutes.js';
-import refreshTokenRoutes from './src/routes/refreshTokenRoutes.js';
 import rolRoutes from './src/routes/rolesRoutes.js';
 import usuarioRoutes from './src/routes/usuarioRoutes.js';
 import articuloRoutes from './src/routes/articuloRoutes.js';
@@ -59,9 +58,6 @@ app.use('/api/articulos', articuloRoutes);
 
 // --  Rutas de formas de pago --
 app.use('/api/formas-pago', formaPagoRoutes);
-
-// // --  Rutas de tokens --
-// app.use('/api/tokens', refreshTokenRoutes);
 
 // --  Rutas de roles --
 app.use('/api/roles', rolRoutes);

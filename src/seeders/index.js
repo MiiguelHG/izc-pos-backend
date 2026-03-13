@@ -3,12 +3,7 @@ import { userSeeder } from "./userSeeder.js";
 import { museoSeeder } from "./museoSeeder.js";
 import { articuloSeeder } from "./articuloSeeder.js";
 import { boletoTipoSeeder } from "./boletoTipoSeeder.js";
-import { boletoEmitidoSeeder } from "./boletoEmitidoSeeder.js";
-import { boletoVentaSeeder } from "./boletoVentaSeeder.js";
-import { productoVentaSeeder } from "./productoVentaSeeder.js";
-import { productoDetalleSeeder } from "./productoDetalleSeeder.js";
 import { formaPagoSeeder } from "./formaPagoSeeder.js";
-import { visitanteSeeder } from "./visitanteSeeder.js";
 import { museoHasArticuloSeeder } from "./museoHasArticuloSeeder.js";
 
 export const runSeeders = async () => {
@@ -29,9 +24,9 @@ export const runSeeders = async () => {
         await museoSeeder("Museo de la Ciudad", "Calle Macedonio Alcalá", 202, "Centro", "Oaxaca", "Oaxaca", 68000);
         await museoSeeder("Museo de Arte Sacro", "Dr. Hierro", 149, "Centro Histórico", "Zacatecas", "Zacatecas", 98000);
 
-        await userSeeder("Miguel", "miguel@example.com", "123456", 1, 1);
-        await userSeeder("Alex", "alex@example.com", "123456", 2, 2);
-        await userSeeder("Ana", "ana@example.com", "123456", 3, 2);
+        await userSeeder("Jesus Miguel Hernandez Garcia", "miguel@example.com", "123456", 1, 1);
+        await userSeeder("Alex Quiroz Saucedo", "alex@example.com", "123456", 2, 2);
+        await userSeeder("Ana Sofia Sanchez Hernandez", "ana@example.com", "123456", 3, 2);
         await userSeeder("Sofía", "sofia@example.com", "123456", 3, 3);
         await userSeeder("Carlos", "carlos@example.com", "123456", 3, 4);
 
@@ -60,14 +55,9 @@ export const runSeeders = async () => {
         await boletoTipoSeeder("Mayor de edad", "Boleto para adultos", 50, 50.00, [0,1,2,3,4,5,6], false, 1, false);
         await boletoTipoSeeder("Estudiante", "Boleto con descuento para estudiantes", 30, 70.00, [1,2,3,4], true, 1, false);
 
-        await formaPagoSeeder("Efectivo", "Pago en efectivo");
-        await formaPagoSeeder("Tarjeta de crédito", "Pago con tarjeta de crédito");
-
-        await productoVentaSeeder(300.00, 1, 1, 1);
-        await productoDetalleSeeder(1, 100.00, 1, 1);
-        await productoDetalleSeeder(1, 200.00, 2, 1);
-
-        await visitanteSeeder("Juan Pérez", 30, "98600", "MX", "ZAC", "GUADALUPE", 1, 0, 0, 1, 1, 2);
+        await formaPagoSeeder("Efectivo", "Pago en efectivo", true);
+        await formaPagoSeeder("Tarjeta de crédito", "Pago con tarjeta de crédito", false);
+        await formaPagoSeeder("Tarjeta de débito", "Pago con tarjeta de débito", true);
 
 
         console.log("\n✅ Todos los seeders se ejecutaron exitosamente");

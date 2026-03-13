@@ -34,6 +34,14 @@ class MuseoRepository extends BaseRepository {
         });
     }
 
+    async findMuseoById(id) {
+        return await this.model.findByPk(id, {
+            include: [
+                { model: ubicacion, as: "ubicacion" }
+            ]
+        });
+    }
+
     async findAndCountAll({limit = 10, offset = 0}) {
         return await this.model.findAndCountAll({
             limit,
