@@ -18,6 +18,9 @@ import visitanteModel from "./visitante.model.js";
 import museoHasArticuloModel from "./museo_has_articulo.model.js";
 import invitadoModel from "./invitado.model.js";
 import ubicacionModel from "./ubicacion.model.js";
+import estadoModel from "./estado.model.js";
+import municipioModel from "./municipio.model.js";
+import codigoPostalModel from "./codigo_postal.model.js";
 
 // Definir el objeto de la base de datos
 const db = {};
@@ -41,6 +44,9 @@ db.visitante = visitanteModel(sequelize, Sequelize);
 db.museoHasArticulo = museoHasArticuloModel(sequelize, Sequelize);
 db.invitado = invitadoModel(sequelize, Sequelize);
 db.ubicacion = ubicacionModel(sequelize, Sequelize);
+db.estado = estadoModel(sequelize, Sequelize);
+db.municipio = municipioModel(sequelize, Sequelize);
+db.codigoPostal = codigoPostalModel(sequelize, Sequelize);
 // Relaciones entre tablas
 
 //Relacion usuario - rol (N:1) (Revisado)
@@ -175,6 +181,15 @@ db.museo.hasMany(db.invitado, {foreignKey: "museoId"});
 db.invitado.belongsTo(db.boletoEmitido, {foreignKey: "boletoEmitidoId"});
 db.boletoEmitido.hasOne(db.invitado, {foreignKey: "boletoEmitidoId"});
 //------------------------------------------------------------------
+
+db.municipio.belongsTo(db.estado, {foreignKey: "estadoId"});
+db.estado.hasMany(db.municipio, {foreignKey: "estadoId"});
+
+db.codigoPostal.belongsTo(db.municipio, {foreignKey: "municipioId"});
+db.municipio.hasMany(db.codigoPostal, {foreignKey: "municipioId"});
+
+db.codigoPostal.belongsTo(db.estado, {foreignKey: "estadoId"});
+db.estado.hasMany(db.codigoPostal, {foreignKey: "estadoId"});
 
 db.ROLES = ["user", "admin", "moderator"];
 

@@ -5,11 +5,14 @@ import { articuloSeeder } from "./articuloSeeder.js";
 import { boletoTipoSeeder } from "./boletoTipoSeeder.js";
 import { formaPagoSeeder } from "./formaPagoSeeder.js";
 import { museoHasArticuloSeeder } from "./museoHasArticuloSeeder.js";
+import { dipomexSeeder } from "./dipomexSeeder.js";
 
 export const runSeeders = async () => {
     try {
         console.log("Running initial seeders...")
         await rolSeeder();
+        await dipomexSeeder();
+
         await museoSeeder("Museo Nacional", "Av. Hidalgo", 45, "Centro Histórico", "Zacatecas", "Zacatecas", 98000);
         await museoSeeder("Museo de Arte Moderno", "Calle Tacuba", 120, "Centro", "Guadalajara", "Jalisco", 44100);
         await museoSeeder("Museo de Historia", "Blvd. García de León", 510, "Chapultepec", "Morelia", "Michoacán", 58260);
