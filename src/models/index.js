@@ -21,6 +21,7 @@ import ubicacionModel from "./ubicacion.model.js";
 import estadoModel from "./estado.model.js";
 import municipioModel from "./municipio.model.js";
 import codigoPostalModel from "./codigo_postal.model.js";
+import paisModel from "./pais.model.js";
 
 // Definir el objeto de la base de datos
 const db = {};
@@ -47,6 +48,8 @@ db.ubicacion = ubicacionModel(sequelize, Sequelize);
 db.estado = estadoModel(sequelize, Sequelize);
 db.municipio = municipioModel(sequelize, Sequelize);
 db.codigoPostal = codigoPostalModel(sequelize, Sequelize);
+db.pais = paisModel(sequelize, Sequelize);
+
 // Relaciones entre tablas
 
 //Relacion usuario - rol (N:1) (Revisado)

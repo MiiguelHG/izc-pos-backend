@@ -1,9 +1,9 @@
 import db from "#models/index.js";
 
-const { estado, municipio, codigoPostal, sequelize } = db;
+const { pais, estado, municipio, codigoPostal, sequelize } = db;
 
 export class DipomexRepository {
-  static async createAll(estados, municipios, codigosPostales) {
+  static async createAll(estados, municipios, codigosPostales, paises) {
     return sequelize.transaction(async (t) => {
       const newEstados = await estado.bulkCreate(estados, { transaction: t, validate: true });
 
@@ -25,13 +25,37 @@ export class DipomexRepository {
           throw new Error(`Error creating codigosPostales - expected ${batch.length}, got ${newCodigosPostales.length}`);
         }
       }
-
+      
+      const newPaises = await pais.bulkCreate(paises, { transaction: t, validate: true });
+      if (newPaises.length !== paises.length) {
+        throw new Error(`Error creating paises - expected ${paises.length}, got ${newPaises.length}`);
+      }
       return true;
     });
   }
 
   static async findAllCP() {
     return await codigoPostal.findAll();
+  }
+
+  static async findAllEstados() {
+    return await estado.findAll();
+  }
+
+  static async findByCodigoPostal(cp) {
+    return await codigoPostal.findOne({
+      where: { cp }
+    });
+  }
+
+  static async findMunicipiosByEstadoId(estadoId) {
+    return await municipio.findAll({
+      where: { estadoId }
+    });
+  }
+
+  static async findAllPaises() {
+    return await pais.findAll();
   }
   
 }

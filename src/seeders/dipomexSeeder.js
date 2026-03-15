@@ -15,12 +15,13 @@ export const dipomexSeeder = async () => {
       return;
     }
     
-    const [estados, municipios, codigosPostales] = await Promise.all([
+    const [estados, municipios, codigosPostales, paises] = await Promise.all([
       readLocalJson("./data/estados.json"),
       readLocalJson("./data/municipios.json"),
       readLocalJson("./data/cp.json"),
+      readLocalJson("./data/countries.json")
     ]);
-    const created = await DipomexRepository.createAll(estados, municipios, codigosPostales);
+    const created = await DipomexRepository.createAll(estados, municipios, codigosPostales, paises);
 
     if (!created) {
       console.error('Error occurred while seeding Dipomex data: No records were created.');
