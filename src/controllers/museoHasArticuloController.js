@@ -17,32 +17,47 @@ export class MuseoHasArticuloController {
 
   static async getArticulosByMuseoId(req, res) {
     try {
-      const { id, tipo } = req.params;
-      const limit = 10;
-  
-      const page = parseInt(req.query.page) || 1;
-      const offset = (page - 1) * limit;
-      const { user } = req;
+        const { id: museoId, tipo } = req.params;
+        const limit = 10;
+        const page = parseInt(req.query.page) || 1;
+        const offset = (page - 1) * limit;
+        const { user } = req;
+        const isOperador = user.rol.nombre === 'operador';
 
-      const isOperador = user.rol.nombre === 'operador';
+        const { rows, count } = await museoHasArticuloRepository.getArticulosByMuseo({
+            museoId, tipo, limit, offset, isOperador
+        });
 
-      const { rows, count } = await museoHasArticuloRepository.getArticulosByMuseo({ museoId: id, tipo: tipo, limit, offset, isOperador });
+        
+        const articuloIds = rows.map(r => r.id);
+        const junctions = await museoHasArticuloRepository.findAll({
+            where: { museoId, articuloId: articuloIds }
+        });
 
-      const totalPages = Math.ceil(count / limit);
+        const junctionMap = Object.fromEntries(
+            junctions.map(j => [j.articuloId, j.habilitado])
+        );
 
-      return sendSuccess(res, 200, 'Artículos obtenidos exitosamente', {
-        data: rows,
-        meta: {
-          totalItems: count,
-          currentPage: page,
-          totalPages,
-          pageSize: limit
-        }
-      });
+        const data = rows.map(row => {
+            const plain = row.toJSON();
+            return {
+                ...plain,
+                museos: undefined,
+                
+                habilitado: junctionMap[plain.id] ?? plain.habilitado
+            };
+        });
+
+        const totalPages = Math.ceil(count / limit);
+        return sendSuccess(res, 200, 'Artículos obtenidos exitosamente', {
+            data,
+            meta: { totalItems: count, currentPage: page, totalPages, pageSize: limit }
+        });
+
     } catch (error) {
-      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
+        return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
-  }
+}
 
   static async getAllAssociations(req, res) {
     try {
