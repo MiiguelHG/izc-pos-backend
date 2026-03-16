@@ -1,15 +1,16 @@
 import BaseRepository from "./baseRepository.js";
+import { Op } from "sequelize";
 import { boletoTipoRepository, boletoVentaRepository } from "./index.js";
 import db from "../models/index.js";
 
-const { boletoEmitido, sequelize , boletoVenta, visitante, usuario, formaPago, boletoTipo} = db;
+const { boletoEmitido, sequelize , boletoVenta, visitante, usuario, formaPago, boletoTipo, estado, municipio} = db;
 
 class BoletoEmitidoRepository extends BaseRepository {
   constructor() {
     super(boletoEmitido);
   }
 
-  async createVentaBoletosCompleta({nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros, total, carritoBoletos, usuarioId, museoId, formaPagoId }) {
+  async createVentaBoletosCompleta({nombre, edad, cp, pais, estadoId, municipioId, cantidadHombres, cantidadMujeres, cantidadOtros, total, carritoBoletos, usuarioId, museoId, formaPagoId }) {
     return await sequelize.transaction(async (t) => {
       // Proceso de registro del visitante
       const totalVisitantes = cantidadHombres + cantidadMujeres + cantidadOtros;
@@ -19,7 +20,7 @@ class BoletoEmitidoRepository extends BaseRepository {
         throw new Error("El total de visitantes debe ser mayor a cero.");
       }
 
-      const newVisitante = await visitante.create({nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros, totalVisitantes, museoId, usuarioId}, { transaction: t });
+      const newVisitante = await visitante.create({nombre, edad, cp, pais, estadoId, municipioId, cantidadHombres, cantidadMujeres, cantidadOtros, totalVisitantes, museoId, usuarioId}, { transaction: t });
 
       if(!newVisitante){
         throw new Error("No se pudo crear el visitante.");
@@ -83,7 +84,16 @@ class BoletoEmitidoRepository extends BaseRepository {
     return await this.model.findAndCountAll({ 
       where: whereClause,
       include: [
-        { model: visitante, as: 'visitante', attributes: { exclude: ['cantidadHombres', 'cantidadMujeres', 'cantidadOtros', 'totalVisitantes','edad', 'museoId', 'usuarioId']}, where: visitanteWhereClause },
+        {
+          model: visitante,
+          as: 'visitante',
+          attributes: { exclude: ['cantidadHombres', 'cantidadMujeres', 'cantidadOtros', 'totalVisitantes','edad', 'museoId', 'usuarioId']},
+          where: visitanteWhereClause,
+          include: [
+            { model: estado, attributes: ['id', 'nombre'] },
+            { model: municipio, attributes: ['id', 'nombre'] }
+          ]
+        },
         { model: usuario, as: 'usuario' , attributes: ['id', 'nombre'] }
       ],
       order: [['fechaEmision', 'DESC']],
@@ -97,7 +107,15 @@ class BoletoEmitidoRepository extends BaseRepository {
       attributes: { exclude: ['visitanteId', 'usuarioId', 'formaPagoId'] },
       include: [
         { model: boletoVenta, as: 'boleto_ventas' , attributes: ['id', 'cantidad', 'subTotal'], include: [{ model: boletoTipo, as: 'boleto_tipo', attributes: ['id', 'nombre'] }] },
-        {model: visitante, as: 'visitante', attributes: { exclude: ['museoId', 'usuarioId']} },
+        {
+          model: visitante,
+          as: 'visitante',
+          attributes: { exclude: ['museoId', 'usuarioId']},
+          include: [
+            { model: estado, attributes: ['id', 'nombre'] },
+            { model: municipio, attributes: ['id', 'nombre'] }
+          ]
+        },
         {model: usuario, as: 'usuario', attributes: ['id', 'nombre']},
         {model: formaPago, as: 'formas_pago', attributes: ['id', 'nombre']}
       ],

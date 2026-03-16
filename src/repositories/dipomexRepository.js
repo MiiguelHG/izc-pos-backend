@@ -1,4 +1,5 @@
 import db from "#models/index.js";
+import { or } from "sequelize";
 
 const { pais, estado, municipio, codigoPostal, sequelize } = db;
 
@@ -55,7 +56,9 @@ export class DipomexRepository {
   }
 
   static async findAllPaises() {
-    return await pais.findAll();
+    return await pais.findAll({
+      order: [['nameES', 'ASC']]
+    });
   }
   
 }
