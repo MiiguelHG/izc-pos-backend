@@ -1,47 +1,64 @@
+import db from "#models/index.js";
+import { or } from "sequelize";
+
+const { pais, estado, municipio, codigoPostal, sequelize } = db;
+
 export class DipomexRepository {
-  static URL = 'https://api.tau.com.mx/dipomex/v1';
+  static async createAll(estados, municipios, codigosPostales, paises) {
+    return sequelize.transaction(async (t) => {
+      const newEstados = await estado.bulkCreate(estados, { transaction: t, validate: true });
 
-  static async getEstados() {
-    try {
-      const res = await fetch(`${DipomexRepository.URL}/estados`,{
-        method: 'GET',
-        headers: {
-          'APIKEY': process.env.DIPOMEX_API_KEY
-        }
-      });
+      if (newEstados.length !== estados.length) {
+        throw new Error(`Error creating estados - expected ${estados.length}, got ${newEstados.length}`);
+      }
+      const newMunicipios = await municipio.bulkCreate(municipios, { transaction: t, validate: true });
 
-      if (!res.ok) {
-        throw new Error(`Error fetching estados: ${res.status}`);
+      if (newMunicipios.length !== municipios.length) {
+        throw new Error(`Error creating municipios - expected ${municipios.length}, got ${newMunicipios.length}`);
       }
 
-      const resJson = await res.json();
-      return resJson.estados;
-
-      // return resJson.estados;
-
-
-    } catch (error) {
-      throw new Error(`Error al consultar código postal: ${error}`);
-    }
-  }
-
-  static async getByCodigoPostal(codigoPostal) {
-    try {
-      const res = await fetch(`${DipomexRepository.URL}/codigo_postal?cp=${codigoPostal}`,{
-        method: 'GET',
-        headers: {
-          'APIKEY': process.env.DIPOMEX_API_KEY
+      // Hacer bulkCreate de códigos postales de 1000 en 1000 para evitar problemas de memoria
+      const batchSize = 1000;
+      for (let i = 0; i < codigosPostales.length; i += batchSize) {
+        const batch = codigosPostales.slice(i, i + batchSize);
+        const newCodigosPostales = await codigoPostal.bulkCreate(batch, { transaction: t, validate: true });
+        if (newCodigosPostales.length !== batch.length) {
+          throw new Error(`Error creating codigosPostales - expected ${batch.length}, got ${newCodigosPostales.length}`);
         }
-      });
-
-      if (!res.ok) {
-        throw new Error(`Error fetching código postal: ${res.status}`);
       }
-
-      const resJson = await res.json();
-      return resJson.codigo_postal;
-    } catch (error) {
-      throw new Error(`Error al consultar código postal: ${error}`);
-    }
+      
+      const newPaises = await pais.bulkCreate(paises, { transaction: t, validate: true });
+      if (newPaises.length !== paises.length) {
+        throw new Error(`Error creating paises - expected ${paises.length}, got ${newPaises.length}`);
+      }
+      return true;
+    });
   }
+
+  static async findAllCP() {
+    return await codigoPostal.findAll();
+  }
+
+  static async findAllEstados() {
+    return await estado.findAll();
+  }
+
+  static async findByCodigoPostal(cp) {
+    return await codigoPostal.findOne({
+      where: { cp }
+    });
+  }
+
+  static async findMunicipiosByEstadoId(estadoId) {
+    return await municipio.findAll({
+      where: { estadoId }
+    });
+  }
+
+  static async findAllPaises() {
+    return await pais.findAll({
+      order: [['nameES', 'ASC']]
+    });
+  }
+  
 }

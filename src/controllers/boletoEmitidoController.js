@@ -5,11 +5,15 @@ export class BoletoEmitidoController {
   static async createVentaBoletos (req, res) {
     try {
       const { 
-        nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros,
-        total, carritoBoletos, usuarioId, museoId, formaPagoId 
+        nombre, edad, cp, pais, estadoId, municipioId, cantidadHombres, cantidadMujeres, cantidadOtros,
+        total, carritoBoletos, formaPagoId 
       } = req.body;
 
-      const nuevoBoletoEmitido = await boletoEmitidoRepository.createVentaBoletosCompleta({nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros, total, carritoBoletos, usuarioId, museoId, formaPagoId});
+      const { user } = req;
+      const usuarioId = user.id;
+      const museoId = user.museo.id;
+
+      const nuevoBoletoEmitido = await boletoEmitidoRepository.createVentaBoletosCompleta({nombre, edad, cp, pais, estadoId, municipioId, cantidadHombres, cantidadMujeres, cantidadOtros, total, carritoBoletos, usuarioId, museoId, formaPagoId});
 
       if (!nuevoBoletoEmitido) {
         return sendError(res, 500, "Error al crear la venta de boletos");
