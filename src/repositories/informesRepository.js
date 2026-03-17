@@ -42,9 +42,9 @@ class InformesRepository extends BaseRepository {
         WHERE fechaRegistro BETWEEN :normalizedFechaInicio AND :normalizedFechaFin 
         ${museoId ? 'AND museoId = :museoId' : ''}
         ${cp ? 'AND cp = :cp' : ''}
-        ${municipio ? 'AND municipio = :municipio' : ''}
-        ${estado ? 'AND estado = :estado' : ''}
-        ${nacionalidad ? 'AND pais = :nacionalidad' : ''}
+        ${municipio ? 'AND municipioId = :municipio' : ''}
+        ${estado ? 'AND estadoId = :estado' : ''}
+        ${nacionalidad ? nacionalidad === 'internacional' ? "AND pais != 'México' " : "AND pais = 'México' " : ''}
         AND edad BETWEEN :edadMin AND :edadMax
         GROUP BY DATE(fechaRegistro)
       )

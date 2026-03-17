@@ -47,7 +47,7 @@ export const selectColumnaVisitantes = (genero) => {
   }
 };
 
-export const buildVisitantesWhere = ({fechaInicio = '', fechaFin = '', museoId = null, genero = '', cp = '', municipio = '', estado = '', nacionalidad = '', edadMin = 1, edadMax = 100}) => {
+export const buildVisitantesWhere = ({fechaInicio = '', fechaFin = '', museoId = null, genero = '', cp = '', municipio = null, estado = null, nacionalidad = '', edadMin = 1, edadMax = 100}) => {
   const whereClause = {};
   const colSelected = selectColumnaVisitantes(genero);
   const normalizedRange = getNormalizedRange(fechaInicio, fechaFin);
@@ -62,15 +62,15 @@ export const buildVisitantesWhere = ({fechaInicio = '', fechaFin = '', museoId =
       else if (genero === 'otros') whereClause.cantidadOtros = { [Op.gt]: 0 };
   }
   if (cp) whereClause.cp = cp;
-  if (municipio) whereClause.municipio = municipio;
-  if (estado) whereClause.estado = estado;
-  if (nacionalidad) whereClause.pais = nacionalidad;
+  if (municipio) whereClause.municipioId = municipio;
+  if (estado) whereClause.estadoId = estado;
+  if (nacionalidad) {
+    nacionalidad === 'internacional' ? whereClause.pais = { [Op.ne]: 'México' } : whereClause.pais = 'México';
+  }
   whereClause.edad = { [Op.between]: [edadMin, edadMax] };
 
   return { whereClause, colSelected };
 }
-
-export const bulidVisitantesWhere = buildVisitantesWhere;
 
 export const buildIngresosWhere = ({fechaInicio = '', fechaFin = '', museoId = null, formaPagoId = null, dateField = 'fechaEmision'}) => {
   const whereClause = {};
