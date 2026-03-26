@@ -5,9 +5,16 @@ import { sendError } from "#utils/responseFormater.js";
 export async function validarReserva(req, res, next) {
     try {
         const data = req.body;
-        const museoId = req.user.museoId;
         const usuarioId = req.user.id;
         const { fechaInicio, fechaFin, articuloId, nombre, edad, cp, pais, cantidadHombres, cantidadMujeres, cantidadOtros } = data;
+
+        let museoId;
+
+        if(req.user.rol.id === 1){
+            museoId = req.body.museoId;
+        }else{
+            museoId = req.user.museoId;
+        }
 
         // Validar campos requeridos del visitante
         const camposVisitantes = { nombre, edad, cp, pais, cantidadHombres, cantidadMujeres, cantidadOtros };
@@ -143,7 +150,14 @@ export async function validarActualizacionReserva(req, res, next) {
         const data = req.body;
 
         const usuarioId = req.user.id;
-        const museoId = req.user.museoId;
+        
+        let museoId;
+
+        if(req.user.rol.id === 1){
+            museoId = req.body.museoId;
+        }else{
+            museoId = req.user.museoId;
+        }
 
         const {
             articuloId,
