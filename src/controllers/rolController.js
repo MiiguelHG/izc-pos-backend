@@ -65,21 +65,4 @@ export class RolController {
             return sendError(res, 500, `Error al actualizar rol: ${error.message}`);
         }
     }
-
-    static async deleteRole(req, res) {
-        try{
-            const { id } = req.params;
-
-           const deleted = await rolRepository.delete({id: id});
-           
-           if(!deleted){
-                return sendError(res, 404, "Rol not found.");
-                // return res.status(404).json({ message: "Rol not found." });
-           }
-
-           return sendSuccess(res, 200, "Role deleted successfully.");
-        }catch(error){
-            return sendError(res, 500, `Error al eliminar rol: ${error.message}`);
-        }
-    }
 }

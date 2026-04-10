@@ -4,6 +4,7 @@ import { authJwt } from "#middlewares/index.js";
 
 
 const router = express.Router();
+router.use(authJwt.verifyToken);
 
 router.use(authJwt.verifyToken);
 
@@ -13,6 +14,8 @@ router.use(authJwt.hasRole(['admin']));
 
 router.post("/", FormaPagoController.createFormaPago);
 router.put("/:id", FormaPagoController.updateFormaPago);
-router.delete("/:id", FormaPagoController.deleteFormaPago);
+router.post("/", FormaPagoController.createFormaPago);
+router.put("/:id", FormaPagoController.updateFormaPago);
+router.put("/:id/toggle", FormaPagoController.toggleActivo);
 
 export default router;

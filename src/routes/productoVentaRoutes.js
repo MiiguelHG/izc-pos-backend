@@ -3,6 +3,7 @@ import { ProductoVentaController } from "../controllers/productoVentaController.
 import { authJwt } from "../middlewares/index.js";
 
 const router = express.Router();
+router.use(authJwt.verifyToken); // Protege todas las rutas con autenticación JWT
 
 router.use(authJwt.verifyToken);
 

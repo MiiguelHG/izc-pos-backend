@@ -26,12 +26,11 @@ export default (sequelize, Sequelize) => {
             }
         },
         cp: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNull: true,
             validate: {
-                isInt: true,
-                min: 10000,
-                max: 99999
+                is: /^[a-zA-Z0-9\s]+$/,
+                len: [3, 10]
             }
         },
         pais: {
@@ -43,20 +42,18 @@ export default (sequelize, Sequelize) => {
                 len: [2, 100]
             }
         },
-        estado: {
-            type: DataTypes.STRING,
+        estadoId: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             validate: {
-                is: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/,
-                len: [2, 100]
+                isInt: true
             }
         },
-        municipio: {
-            type: DataTypes.STRING,
+        municipioId: {
+            type: DataTypes.INTEGER,
             allowNull: true,
             validate: {
-                is: /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/,
-                len: [2, 100]
+                isInt: true
             }
         },
         cantidadHombres: {

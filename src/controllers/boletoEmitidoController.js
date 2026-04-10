@@ -5,18 +5,22 @@ export class BoletoEmitidoController {
   static async createVentaBoletos (req, res) {
     try {
       const { 
-        nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros,
-        total, carritoBoletos, usuarioId, museoId, formaPagoId 
+        nombre, edad, cp, pais, estadoId, municipioId, cantidadHombres, cantidadMujeres, cantidadOtros,
+        total, carritoBoletos, formaPagoId 
       } = req.body;
 
-      const nuevoBoletoEmitido = await boletoEmitidoRepository.createVentaBoletosCompleta({nombre, edad, cp, pais, estado, municipio, cantidadHombres, cantidadMujeres, cantidadOtros, total, carritoBoletos, usuarioId, museoId, formaPagoId});
+      const { user } = req;
+      const usuarioId = user.id;
+      const museoId = user.museo.id;
+
+      const nuevoBoletoEmitido = await boletoEmitidoRepository.createVentaBoletosCompleta({nombre, edad, cp, pais, estadoId, municipioId, cantidadHombres, cantidadMujeres, cantidadOtros, total, carritoBoletos, usuarioId, museoId, formaPagoId});
 
       if (!nuevoBoletoEmitido) {
         return sendError(res, 500, "Error al crear la venta de boletos");
       }
 
       const visitante = await visitanteRepository.findById(nuevoBoletoEmitido.visitanteId);
-      const museo = await museoRepository.findById(museoId);
+      const museo = await museoRepository.findMuseoById(museoId);
 
       const boletoEmitido = { ...nuevoBoletoEmitido, visitante: { ...visitante.dataValues }, museo: { ...museo.dataValues } };
 
@@ -47,12 +51,13 @@ export class BoletoEmitidoController {
 
       const page = parseInt(req.query.page) || 1;
       const offset = (page - 1) * limit;
+      const search = req.query.search;
 
       const { user } = req;
 
       const museoId = user.rol?.nombre === 'admin' ? null : user.museo.id;
 
-      const { rows, count } = await boletoEmitidoRepository.findAllAndCount({ limit, offset, museoId });
+      const { rows, count } = await boletoEmitidoRepository.findAllAndCount({ limit, offset, museoId, search });
 
       if (count === 0) {
         return sendError(res, 404, "No se encontraron boletos emitidos");

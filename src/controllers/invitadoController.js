@@ -34,12 +34,13 @@ export class InvitadoController {
       const limit = 10;
       const page = parseInt(req.query.page) || 1;
       const offset = (page - 1) * limit;
+      const search = req.query.search;
 
       const user = req.user;
 
       const museoId = user.rol?.nombre === 'admin' ? null : user.museo.id;
 
-      const { rows, count} = await invitadoRepository.findAllAndCount({ limit, offset, museoId });
+      const { rows, count} = await invitadoRepository.findAllAndCount({ limit, offset, museoId , search});
       if (count === 0) {
         return sendError(res, 404, "No se encontraron cortesias");
       }

@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, where } from "sequelize";
 import db from "../models/index.js";
 import BaseRepository from "./baseRepository.js";
 
@@ -9,8 +9,16 @@ class UsuarioRepository extends BaseRepository {
         super(usuario);
     }
 
-    async findAllWithoutPassword({limit = 10, offset = 0, museoId}) {
-        const whereClause = museoId ? { museoId } : {};
+    async findAllWithoutPassword({limit = 10, offset = 0, museoId, search = ''}){ 
+        const whereClause = {};
+        
+        if (museoId) whereClause.museoId = museoId;
+        if (search) {
+            whereClause[Op.or] = [
+                { nombre: { [Op.like]: `%${search}%` } },
+                { email: { [Op.like]: `%${search}%` } }
+            ];
+        }
         const rolInclude = museoId
             ? { model: rol, as: "rol", where: { nombre: { [Op.ne]: "admin" } }, required: true }
             : { model: rol, as: "rol" };

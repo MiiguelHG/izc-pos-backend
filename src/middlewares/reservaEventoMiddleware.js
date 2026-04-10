@@ -6,7 +6,7 @@ export async function validarReserva(req, res, next) {
     try {
         const data = req.body;
         const usuarioId = req.user.id;
-        const { fechaInicio, fechaFin, articuloId, nombre, edad, cp, pais, cantidadHombres, cantidadMujeres, cantidadOtros } = data;
+        const { fechaInicio, fechaFin, articuloId, nombre, edad, cp, pais, estadoId, municipioId, cantidadHombres, cantidadMujeres, cantidadOtros } = data;
 
         let museoId;
 
@@ -17,7 +17,7 @@ export async function validarReserva(req, res, next) {
         }
 
         // Validar campos requeridos del visitante
-        const camposVisitantes = { nombre, edad, cp, pais, cantidadHombres, cantidadMujeres, cantidadOtros };
+        const camposVisitantes = { nombre, edad, cp, pais, estadoId, municipioId, cantidadHombres, cantidadMujeres, cantidadOtros };
         for (const [campo, valor] of Object.entries(camposVisitantes)) {
             if (valor === undefined || valor === null || valor === '') {
                 return sendError(res, 400, `El campo '${campo}' es requerido para el visitante.`);
