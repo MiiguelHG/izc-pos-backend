@@ -27,10 +27,6 @@ export const runSeeders = async () => {
         await museoSeeder("Museo de la Ciudad", "Calle Macedonio Alcalá", 202, "Centro", "Oaxaca", "Oaxaca", 68000);
         await museoSeeder("Museo de Arte Sacro", "Dr. Hierro", 149, "Centro Histórico", "Zacatecas", "Zacatecas", 98000);
 
-        await userSeeder("Miguel", "miguel@example.com", "123456", 1, 1);
-        await userSeeder("Alex", "alex@example.com", "123456", 2, 2);
-        await userSeeder("Ana", "ana@example.com", "1234567", 3, 2);
-        await userSeeder("Guille", "guille@example.com", "1234567", 3, 1);
         await userSeeder("Jesus Miguel Hernandez Garcia", "miguel@example.com", "123456", 1, 1);
         await userSeeder("Alex Quiroz Saucedo", "alex@example.com", "123456", 2, 2);
         await userSeeder("Ana Sofia Sanchez Hernandez", "ana@example.com", "123456", 3, 2);

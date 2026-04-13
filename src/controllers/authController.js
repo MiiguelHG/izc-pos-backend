@@ -39,9 +39,6 @@ export class AuthController {
             }
 
             const isPasswordValid = await user.validatePassword(password);
-            console.log(password);
-            console.log(user.password);
-
 
             if(!isPasswordValid){
                 return sendError(res, 401, "Contraseña incorrecta");

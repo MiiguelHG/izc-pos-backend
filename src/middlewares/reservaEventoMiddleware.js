@@ -177,12 +177,6 @@ export async function validarActualizacionReserva(req, res, next) {
         const inicio = toMx(fechaInicio);
         const fin = toMx(fechaFin);
 
-        console.log("🔥 VALIDANDO UPDATE RESERVA", {
-            id: req.params.id,
-            body: req.body,
-            user: req.user
-        });
-
         if (!inicio.isValid || !fin.isValid) {
             return sendError(res, 400, "Formato de fecha inválido.");
         }
@@ -222,13 +216,6 @@ export async function validarActualizacionReserva(req, res, next) {
         // Validación de conflicto
         const inicioLocal = inicio.toISO();
         const finLocal = fin.toISO();
-
-        console.log("⏱️ BUSCANDO CONFLICTOS", {
-            articuloId,
-            museoId,
-            inicioLocal,
-            finLocal,
-        });
 
         const conflictos = await reservaEventoRepository.conflictosReserva(
             museoId,

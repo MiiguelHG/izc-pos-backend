@@ -55,7 +55,6 @@ export class ReservaEventoController {
     }
 
     static async updateReservaEvento(req, res){
-        console.log("🚀 LLEGÓ AL CONTROLLER UPDATE", req.reservaActualizada);
         try{
             const { id } = req.params
             const updatedReserva = await reservaEventoRepository.update({ id }, req.reservaActualizada);
