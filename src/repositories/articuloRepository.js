@@ -2,7 +2,7 @@ import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
 import { Op } from "sequelize";
 
-const { articulo, museoHasArticulo, sequelize } = db;
+const { articulo, museo, museoHasArticulo, sequelize } = db;
 
 class ArticuloRepository extends BaseRepository {
     constructor() {
@@ -40,6 +40,18 @@ class ArticuloRepository extends BaseRepository {
     async obtenerPorTipo(tipo) {
         return await this.findAll({ where: { tipo } });
     }
+
+    async obtenerServiciosPorMuseo(museoId) {
+        return await this.model.findAll({
+            where: { tipo: 'servicio' },
+            include: [{
+                model: museo, as: 'museos',
+                where: { id: museoId },
+                through: { attributes: [] }
+            }]
+        });
+    }
+
     async updateHabilitado({id}) {
         return await sequelize.transaction(async (t) => {
             const articuloInstance = await this.model.findByPk(id, { transaction: t });

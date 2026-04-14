@@ -5,6 +5,7 @@ import  { authJwt } from "../middlewares/index.js";
 const router = express.Router();
 
 router.use(authJwt.verifyToken);
+router.use(authJwt.hasRole("admin"));
 
 // Solo los administradores pueden gestionar roles
 router.get("/", RolController.getAllRoles);

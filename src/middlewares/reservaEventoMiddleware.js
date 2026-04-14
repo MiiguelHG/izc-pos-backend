@@ -5,7 +5,37 @@ import { sendError } from "#utils/responseFormater.js";
 export async function validarReserva(req, res, next) {
     try {
         const data = req.body;
-        const { fechaInicio, fechaFin, articuloId, museoId } = data;
+        const usuarioId = req.user.id;
+        const { fechaInicio, fechaFin, articuloId, nombre, edad, cp, pais, estadoId, municipioId, cantidadHombres, cantidadMujeres, cantidadOtros } = data;
+
+        let museoId;
+
+        if(req.user.rol.id === 1){
+            museoId = req.body.museoId;
+        }else{
+            museoId = req.user.museoId;
+        }
+
+        // Validar campos requeridos del visitante
+        const camposVisitantes = { nombre, edad, cp, pais, estadoId, municipioId, cantidadHombres, cantidadMujeres, cantidadOtros };
+        for (const [campo, valor] of Object.entries(camposVisitantes)) {
+            if (valor === undefined || valor === null || valor === '') {
+                return sendError(res, 400, `El campo '${campo}' es requerido para el visitante.`);
+            }
+        }
+
+        // Validar que cantidades sean números
+        const cantidades = { cantidadHombres, cantidadMujeres, cantidadOtros };
+        for (const [campo, valor] of Object.entries(cantidades)) {
+            if (isNaN(valor) || valor < 0) {
+                return sendError(res, 400, `El campo '${campo}' debe ser un número mayor o igual a cero.`);
+            }
+        }
+
+        const totalVisitantes = Number(cantidadHombres) + Number(cantidadMujeres) + Number(cantidadOtros);
+        if (totalVisitantes <= 0) {
+            return sendError(res, 400, "El total de visitantes (hombres + mujeres + otros) debe ser mayor a cero.");
+        }
 
         const inicio = toMx(fechaInicio);
         const fin = toMx(fechaFin);
@@ -33,18 +63,17 @@ export async function validarReserva(req, res, next) {
         const HORA_MAX = 22;
 
         if (inicio.hour < HORA_MIN) {
-            return sendError(res, 400, "Los eventos no pueden iniciar antes de las 10:00 horas.");
+            return sendError(res, 400, "Los eventos no pueden iniciar antes de las 10:00 am.");
         }
 
         // límite: terminar antes o igual a las 22:00
         const limite = inicio.set({ hour: HORA_MAX, minute: 0, second: 0 });
         if (fin > limite) {
-            return sendError(res, 400, "Los eventos deben terminar a más tardar a las 22:00 horas.");
+            return sendError(res, 400, "Los eventos deben terminar a más tardar a las 10:00 pm.");
         }
 
         // VALIDACIÓN DE DISPONIBILIDAD EN BD
         const disponible = await reservaEventoRepository.validarDisponibilidad(
-            articuloId,
             museoId,
             inicio.toISO(),
             fin.toISO()
@@ -61,12 +90,51 @@ export async function validarReserva(req, res, next) {
             return sendError(res, 400, "Se alcanzó el límite de reservas para este día.");
         }
 
+        if (data.estado != "reservado") {
+            return sendError(res, 400, "La reserva fue finalizada.");
+        }
+
+        // Validar el contacto del responsable (debe ser un número celular de 10 dígitos)
+        let contacto = data.contactoResponsable;
+
+        if(!contacto){
+            return sendError(res, 400, "El contacto del responsable es requerido.");
+        }
+
+        contacto = contacto.replace(/\D/g, ''); // Eliminar cualquier carácter no numérico
+
+        const regex = /^\+?[1-9]\d{7,14}$/;
+
+        if (!regex.test(contacto)) {
+            return sendError(res, 400, "El contacto del responsable debe ser un número de teléfono celular válido.");
+        }
+
+        if (/^(\d)\1+$/.test(contacto)) {
+            return sendError(res, 400, "El contacto del responsable no puede ser un número con todos los dígitos iguales.");
+        }
+
+        if ("0123456789".includes(contacto)) {
+            return sendError(res, 400, "El contacto del responsable no puede ser un número ascendente.");
+        }
+
+        if ("9876543210".includes(contacto)) {
+            return sendError(res, 400, "El contacto del responsable no puede ser un número descendente.");
+        }
+
+        const capacidad = cantidadHombres + cantidadMujeres + cantidadOtros;
+        
+        data.capacidad = capacidad;
+
         // Si todo está bien, guardamos la info preparada para el controller
         req.reservaData = {
             ...data,
+            usuarioId,
+            museoId,
             fechaReserva,
             fechaInicio: inicio.toISO(),
-            fechaFin: fin.toISO()
+            fechaFin: fin.toISO(),
+            estadoReserva: data.estado || 'reservado',
+            totalVisitantes
         };
 
         next();
@@ -78,19 +146,30 @@ export async function validarReserva(req, res, next) {
 
 export async function validarActualizacionReserva(req, res, next) {
     try {
-        const id = req.params.id;
+        const {id} = req.params;
         const data = req.body;
+
+        const usuarioId = req.user.id;
+        
+        let museoId;
+
+        if(req.user.rol.id === 1){
+            museoId = req.body.museoId;
+        }else{
+            museoId = req.user.museoId;
+        }
+
+        const {
+            articuloId,
+            fechaInicio,
+            fechaFin
+        } = req.body
 
         const {
             responsable,
             contactoResponsable,
-            fechaInicio,
-            fechaFin,
             total,
             estado,
-            usuarioId,
-            museoId,
-            articuloId,
             visitanteId,
             formaPagoId
         } = data;
@@ -139,7 +218,6 @@ export async function validarActualizacionReserva(req, res, next) {
         const finLocal = fin.toISO();
 
         const conflictos = await reservaEventoRepository.conflictosReserva(
-            articuloId,
             museoId,
             inicioLocal,
             finLocal,
@@ -166,6 +244,9 @@ export async function validarActualizacionReserva(req, res, next) {
         // Guardar info final en req
         req.reservaActualizada = {
             ...data,
+            articuloId,
+            usuarioId,
+            museoId,
             fechaInicio: inicioLocal,
             fechaFin: finLocal
         };

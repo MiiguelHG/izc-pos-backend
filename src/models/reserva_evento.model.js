@@ -7,7 +7,11 @@ export default (sequelize, Sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
-        responsable: {
+        nombreEvento: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+        responsable: { 
             type: DataTypes.STRING,
             allowNull: false,
             validate: {
@@ -23,9 +27,17 @@ export default (sequelize, Sequelize) => {
                     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
                     const isPhone = /^[0-9]{10}$/.test(value); // Teléfono de 10 dígitos
                     if (!isEmail && !isPhone) {
-                        throw new Error("El contacto debe ser un correo electrónico o un número de teléfono de 10 dígitos");
+                        throw new Error("El contacto debe ser un correo electrónico o un número de teléfono de máximo 10 dígitos");
                     }
                 }
+            }
+        },
+        capacidad: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            validate: {
+                min: 1,
+                isInt: true
             }
         },
         fechaReserva: {

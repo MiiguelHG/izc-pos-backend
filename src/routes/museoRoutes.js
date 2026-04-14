@@ -6,6 +6,7 @@ const router = express.Router();
 router.use(authJwt.verifyToken); // Middleware de autenticación para todas las rutas de este router
 // Rutas base
 
+
 router.get("/all", MuseoController.getAllMuseos);
 router.get("/", MuseoController.getAndCountAllMuseos);
 router.post("/", authJwt.hasRole(["admin"]), MuseoController.createMuseo);

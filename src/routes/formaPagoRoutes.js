@@ -7,6 +7,7 @@ const router = express.Router();
 router.use(authJwt.verifyToken);
 
 router.get("/", FormaPagoController.getFormasPago);
+
 router.post("/", authJwt.hasRole(['admin']), FormaPagoController.createFormaPago);
 router.put("/:id", authJwt.hasRole(['admin']), FormaPagoController.updateFormaPago);
 router.put("/:id/toggle", authJwt.hasRole(['admin']), FormaPagoController.toggleActivo);

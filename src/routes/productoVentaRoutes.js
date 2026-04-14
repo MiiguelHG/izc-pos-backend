@@ -5,6 +5,8 @@ import { authJwt } from "../middlewares/index.js";
 const router = express.Router();
 router.use(authJwt.verifyToken); // Protege todas las rutas con autenticación JWT
 
+router.use(authJwt.verifyToken);
+
 router.post("/", ProductoVentaController.createVentaProductosCompleta);
 
 router.get("/", ProductoVentaController.getAllProductoVentas);

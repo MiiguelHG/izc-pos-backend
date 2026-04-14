@@ -68,7 +68,8 @@ export default (sequelize, Sequelize) => {
 
     // Metodo para validar la contraseña
     Usuario.prototype.validatePassword = async function(password) {
-        return await bcrypt.compare(password, this.password);
+        const result = await bcrypt.compare(password, this.password);
+        return result;
     };
 
     return Usuario;

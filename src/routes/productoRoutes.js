@@ -4,13 +4,17 @@ import { authJwt } from "../middlewares/index.js";
 
 const router = express.Router();
 
+router.use(authJwt.verifyToken);
+
 // Rutas de básicas
-router.get("/", [authJwt.verifyToken], ProductoController.getAllProductos);
-router.get("/:id", [authJwt.verifyToken], ProductoController.getById);
+router.get("/", ProductoController.getAllProductos);
+router.get("/:id", ProductoController.getById);
+
+router.use(authJwt.hasRole(['admin']));
 
 // Rutas de gestión (admin)
-router.post("/", [authJwt.verifyToken], ProductoController.createProduct);
-router.put("/:id", [authJwt.verifyToken], ProductoController.updateProduct);
-router.delete("/:id", [authJwt.verifyToken], ProductoController.deleteProduct);
+router.post("/", ProductoController.createProduct);
+router.put("/:id", ProductoController.updateProduct);
+router.delete("/:id", ProductoController.deleteProduct);
 
 export default router;

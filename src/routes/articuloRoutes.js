@@ -6,6 +6,9 @@ const router = express.Router();
 
 router.use(authJwt.verifyToken);
 
+router.get('/tipo/:tipo', ArticuloController.obtenerPorTipo);
+router.get("/museo/:museoId/servicios", ArticuloController.obtenerServiciosPorMuseo);
+
 router.get('/tipo/:tipo', authJwt.hasRole(['directorMuseo', 'admin']), ArticuloController.obtenerPorTipo);
 router.put('/:id/toggle', authJwt.hasRole(['admin']), ArticuloController.toggleEnableArticulo);
 

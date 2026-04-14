@@ -1,14 +1,30 @@
-import { reservaEventoRepository } from "#repositories/index.js";
+import { reservaEventoRepository, visitanteRepository, museoRepository } from "#repositories/index.js";
 import { sendSuccess, sendError } from "#utils/responseFormater.js";
 
 export class ReservaEventoController {
     static async createReservaEvento(req, res) {
         try {
-            const newReserva =  await reservaEventoRepository.create(req.reservaData);
+            // cualquier validación previa (fechas, disponibilidad, etc.) ya quedó en validarReserva,
+            // aquí el middleware además dejó en `req.reservaData` los datos listos para la creación.
+            const newReserva = await reservaEventoRepository.createReservaEventoCompleta(req.reservaData);
             if (!newReserva) {
                 return sendError(res, 400, "No se pudo crear la reserva de evento.");
             }
-            return sendSuccess(res, 201, "Reserva de evento creada exitosamente.", newReserva);
+
+            // el repositorio ahora devuelve también el visitante creado, pero mantenemos la consulta
+            // para cargar el museo igual que en el flujo de boletos.
+            const visitante = newReserva.visitante
+                ? newReserva.visitante
+                : await visitanteRepository.findById(newReserva.visitanteId);
+            const museo = await museoRepository.findById(newReserva.museoId);
+
+            const reservaEvento = {
+                ...newReserva,
+                visitante: { ...visitante.dataValues ?? visitante },
+                museo: { ...museo.dataValues }
+            };
+
+            return sendSuccess(res, 201, "Reserva de evento creada exitosamente.", reservaEvento);
         } catch (error) {
             return sendError(res, 500, `Error al crear reserva de evento: ${error.message}`);
         }
@@ -68,7 +84,8 @@ export class ReservaEventoController {
     static async obtenerPorRangoFechas(req, res) {
         try {
             const { fechaInicio, fechaFin } = req.query;
-            const reservas = await reservaEventoRepository.obtenerPorRangoFechas(fechaInicio, fechaFin);
+            const museoId = Number(req.query.museoId);
+            const reservas = await reservaEventoRepository.obtenerPorRangoFechas(museoId, fechaInicio, fechaFin);
             return sendSuccess(res, 200, "Reservas obtenidas exitosamente.", reservas);
         } catch (error) {
             return sendError(res, 500, `Error al obtener reservas por rango de fechas: ${error.message}`);
@@ -98,10 +115,23 @@ export class ReservaEventoController {
     static async cancelarEvento(req, res){
         try{
             const { id } = req.params;
-            const resultado = await reservaEventoRepository.cancelarEvento(id);
+            const resultado = await reservaEventoRepository.findById(id);
+
             if (!resultado) {
                 return sendError(res, 404, "Reserva de evento no encontrada o no se pudo cancelar.");
             }
+
+            if (resultado.estado === "asistido"){
+                return sendError(res, 400, "No se puede cancelar una reserva asistida");
+            }
+
+            if (resultado.estado == "cancelado"){
+                return sendError(res, 400, "La reserva ya ha sido cancelada.")
+            }
+
+            resultado.estado = "cancelado";
+            await resultado.save();
+
             return sendSuccess(res, 200, "Reserva de evento cancelada exitosamente.", resultado);
         } catch (error) {
             return sendError(res, 500, `Error al cancelar la reserva de evento: ${error.message}`);
@@ -111,10 +141,24 @@ export class ReservaEventoController {
     static async marcarComoAsistido(req, res){
         try{
             const { id } = req.params;
-            const resultado = await reservaEventoRepository.marcarComoAsistido(id);
+            const resultado = await reservaEventoRepository.findById(id);
+
             if (!resultado) {
                 return sendError(res, 404, "Reserva de evento no encontrada o no se pudo marcar como asistido.");
             }
+
+
+            if (resultado.estado === "cancelado"){
+                return sendError(res, 400, "No se puede marcar asistencia a una reserva cancelada.");
+            }
+
+            if (resultado.estado === "asistido"){
+                return sendError(res, 400, "La asistencia ya ha sido marcada.");
+            }
+
+            resultado.estado = "asistido";
+            await   resultado.save();
+
             return sendSuccess(res, 200, "Reserva de evento marcada como asistido exitosamente.", resultado);
         } catch (error) {
             return sendError(res, 500, `Error al marcar la reserva de evento como asistido: ${error.message}`);
@@ -134,7 +178,7 @@ export class ReservaEventoController {
     static async obtenerPorMuseo(req, res){
         try{
             const { museoId } = req.params;
-            const reservas = await reservaEventoRepository.obtenerPorMuseo(museoId);
+            const reservas = await reservaEventoRepository.obtenerPorMuseoId(museoId);
             return sendSuccess(res, 200, "Reservas obtenidas exitosamente.", reservas);
         } catch (error) {
             return sendError(res, 500, `Error al obtener reservas por museo: ${error.message}`);
@@ -144,7 +188,7 @@ export class ReservaEventoController {
     static async obtenerPorArticulo(req, res){
         try{
             const { articuloId } = req.params;
-            const reservas = await reservaEventoRepository.obtenerPorArticulo(articuloId);
+            const reservas = await reservaEventoRepository.obtenerPorArticuloId(articuloId);
             return sendSuccess(res, 200, "Reservas obtenidas exitosamente.", reservas);
         } catch (error) {
             return sendError(res, 500, `Error al obtener reservas por artículo: ${error.message}`);

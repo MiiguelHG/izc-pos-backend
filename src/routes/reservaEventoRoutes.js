@@ -1,8 +1,11 @@
 import express from "express";
 import { validarReserva, validarActualizacionReserva } from "#middlewares/reservaEventoMiddleware.js";
+import { authJwt } from "#middlewares/authJwt.js";
 import { ReservaEventoController } from "#controllers/reservaEventoController.js";
 
 const router = express.Router();
+
+router.use(authJwt.verifyToken);
 
 // List / fetch
 router.get("/", ReservaEventoController.getReservasEvento);
