@@ -1,17 +1,17 @@
 import { rolSeeder } from "./rolSeeder.js";
 import { userSeeder } from "./userSeeder.js";
 import { museoSeeder } from "./museoSeeder.js";
-import { articuloSeeder } from "./articuloSeeder.js";
+import { boletoSeeder } from "./boletoSeeder.js";
 import { dipomexSeeder } from "./dipomexSeeder.js";
 
 export const runSeeders = async () => {
     try {
         console.log("Running initial seeders...")
-        await rolSeeder();
         await dipomexSeeder();
+        await rolSeeder();
         await museoSeeder();
         await userSeeder();
-        await articuloSeeder(); 
+        await boletoSeeder(); 
 
 
         console.log("\n✅ Todos los seeders se ejecutaron exitosamente");
