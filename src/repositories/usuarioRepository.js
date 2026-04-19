@@ -53,6 +53,27 @@ class UsuarioRepository extends BaseRepository {
             ]
         });
     }
+
+    async updateUsuario(id, data) {
+        const user = await this.model.findByPk(id);
+        const { nombre, email, password, rolId, museoId } = data;
+
+        if (!user) throw new Error("Usuario no encontrado");
+
+        
+        try {
+            if (nombre) user.nombre = nombre;
+            if (email) user.email = email;
+            if (password) user.password = password;
+            if (rolId) user.rolId = rolId;
+            if (museoId) user.museoId = museoId;
+            await user.save();
+
+            return true;
+        } catch (error) {
+            throw new Error("Error al actualizar el usuario", error);
+        }
+    }
 }
 
 export const usuarioRepository = new UsuarioRepository();
