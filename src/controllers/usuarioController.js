@@ -75,7 +75,7 @@ export class UsuarioController {
                 return sendError(res, 403, "Solo los administradores pueden actualizar usuarios a roles distintos de operador.");
             }
 
-            const updatedUser = await usuarioRepository.update({ id }, { nombre, email, password, rolId, museoId });
+            const updatedUser = await usuarioRepository.updateUsuario(id, { nombre, email, password, rolId, museoId });
 
             if (!updatedUser) {
                 return sendError(res, 404, "User not found or could not be updated.");

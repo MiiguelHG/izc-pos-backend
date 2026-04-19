@@ -9,11 +9,11 @@ class ArticuloRepository extends BaseRepository {
         super(articulo);
     }
 
-    async findAndCountAll ({ seleccion = '', limit, offset, rol, search = '' }) {
+    async findAndCountAll ({ seleccion, limit, offset, rol, search = '' }) {
         const defalutClause = { [Op.or]: [ {tipo: 'servicio'}, {tipo: 'producto'}] };
         const whereClause = {};
 
-        seleccion ? whereClause.tipo = seleccion : defalutClause;
+        seleccion !== undefined ? whereClause.tipo = seleccion : defalutClause;
 
         if (search) {
             whereClause[Op.or] = [

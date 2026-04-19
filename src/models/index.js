@@ -22,6 +22,7 @@ import estadoModel from "./estado.model.js";
 import municipioModel from "./municipio.model.js";
 import codigoPostalModel from "./codigo_postal.model.js";
 import paisModel from "./pais.model.js";
+import accesoModel from "./acceso.model.js";
 
 // Definir el objeto de la base de datos
 const db = {};
@@ -49,6 +50,7 @@ db.estado = estadoModel(sequelize, Sequelize);
 db.municipio = municipioModel(sequelize, Sequelize);
 db.codigoPostal = codigoPostalModel(sequelize, Sequelize);
 db.pais = paisModel(sequelize, Sequelize);
+db.acceso = accesoModel(sequelize, Sequelize);
 
 // Relaciones entre tablas
 
@@ -98,6 +100,10 @@ db.formaPago.hasMany(db.boletoEmitido, {foreignKey: "formaPagoId"});
 // Relacion boleto_emitido - visitante (1:1) (Revisado)
 db.boletoEmitido.belongsTo(db.visitante, {foreignKey: "visitanteId"});
 db.visitante.hasOne(db.boletoEmitido, {foreignKey: "visitanteId"});
+
+// Relacion boleto_emitido - acceso (1:1) (Revisado)
+db.boletoEmitido.hasOne(db.acceso, {foreignKey: "boletoEmitidoId"});
+db.acceso.belongsTo(db.boletoEmitido, {foreignKey: "boletoEmitidoId"});
 //------------------------------------------------------------------
 
 // Relaciones de reserva evento--------------------------------------

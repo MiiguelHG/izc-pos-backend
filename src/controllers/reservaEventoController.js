@@ -26,7 +26,7 @@ export class ReservaEventoController {
 
             return sendSuccess(res, 201, "Reserva de evento creada exitosamente.", reservaEvento);
         } catch (error) {
-            return sendError(res, 500, `Error al crear reserva de evento: ${error.message}`);
+            return sendError(res, error.status ?? 500, error.status ? error.message : `Error al crear reserva de evento: ${error.message}`);
         }
     }
 
@@ -104,8 +104,8 @@ export class ReservaEventoController {
 
     static async validarDisponibilidad(req, res) {
         try {
-            const { articuloId, museoId, fechaInicio, fechaFin } = req.query;
-            const disponible = await reservaEventoRepository.validarDisponibilidad(articuloId, museoId, fechaInicio, fechaFin);
+            const { museoId, fechaInicio, fechaFin } = req.query;
+            const disponible = await reservaEventoRepository.validarDisponibilidad(museoId, fechaInicio, fechaFin);
             return sendSuccess(res, 200, "Disponibilidad verificada exitosamente.", { disponible });
         } catch (error) {
             return sendError(res, 500, `Error al validar disponibilidad: ${error.message}`);

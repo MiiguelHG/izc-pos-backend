@@ -15,6 +15,7 @@ import { DipomexRepository } from "./dipomexRepository.js";
 import { museoHasArticuloRepository } from "./museoHasArticuloRepository.js";
 import { invitadoRepository } from "./invitadoRepository.js";
 import { informesRepository } from "./informesRepository.js";
+import { AccesoRepository } from "./accesoRepository.js";
 
 export {
     usuarioRepository,
@@ -33,5 +34,6 @@ export {
     museoHasArticuloRepository,
     DipomexRepository,
     invitadoRepository,
-    informesRepository
+    informesRepository,
+    AccesoRepository
 }
