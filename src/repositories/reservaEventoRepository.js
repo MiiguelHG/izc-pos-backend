@@ -2,7 +2,13 @@ import BaseRepository from "./baseRepository.js";
 import db from "../models/index.js";
 import { Op } from "sequelize";
 
-const { reservaEvento, sequelize, visitante, usuario } = db;
+const { reservaEvento, sequelize, visitante, museo } = db;
+
+const createHttpError = (status, message) => {
+    const error = new Error(message);
+    error.status = status;
+    return error;
+};
 
 class ReservaEventoRepository extends BaseRepository {
     constructor() {
@@ -10,8 +16,28 @@ class ReservaEventoRepository extends BaseRepository {
     }
 
     async createReservaEventoCompleta({nombre, edad, cp, pais, estadoId, municipioId, cantidadHombres, cantidadMujeres, cantidadOtros, nombreEvento, responsable, contactoResponsable, capacidad, fechaReserva, fechaInicio, fechaFin, total, estadoReserva, usuarioId, museoId, articuloId, formaPagoId}) {
-        // similar a la venta de boletos, primero registramos al visitante dentro de la misma transacción
-        return await sequelize.transaction(async(t) => {
+        return await sequelize.transaction(async (t) => {
+            const museoBloqueado = await museo.findByPk(museoId, {
+                transaction: t,
+                lock: t.LOCK.UPDATE
+            });
+
+            if (!museoBloqueado) {
+                throw createHttpError(404, `Museo con ID ${museoId} no encontrado.`);
+            }
+
+            const disponible = await this.validarDisponibilidad(museoId, fechaInicio, fechaFin, t);
+            if (!disponible) {
+                throw createHttpError(409, "Ya existe una reserva en este horario.");
+            }
+
+            const reservasHoy = await this.contarReservasPorDia(fechaInicio, t);
+            const LIMITE = 10;
+
+            if (reservasHoy >= LIMITE) {
+                throw createHttpError(400, "Se alcanzó el límite de reservas para este día.");
+            }
+
             const totalVisitantes = Number(cantidadHombres) + Number(cantidadMujeres) + Number(cantidadOtros);
 
             if (totalVisitantes <= 0) {
@@ -88,10 +114,14 @@ class ReservaEventoRepository extends BaseRepository {
         });
     }
 
-    async contarReservasPorDia(fecha) {
-        const inicioDia = new Date(fecha);
+    async contarReservasPorDia(fecha, transaction = null) {
+        const fechaBase = typeof fecha === "string" && fecha.includes("T")
+            ? fecha.slice(0, 10)
+            : fecha;
+
+        const inicioDia = new Date(fechaBase);
         inicioDia.setHours(0, 0, 0, 0);
-        const finDia = new Date(fecha);
+        const finDia = new Date(fechaBase);
         finDia.setHours(23, 59, 59, 999);
 
         return await this.model.count({
@@ -99,11 +129,12 @@ class ReservaEventoRepository extends BaseRepository {
                 fechaInicio: {
                     [Op.between]: [inicioDia, finDia]
                 }
-            }
+            },
+            transaction
         });
     }
 
-    async validarDisponibilidad(museoId, fechaInicio, fechaFin) {
+    async validarDisponibilidad(museoId, fechaInicio, fechaFin, transaction = null) {
         const count = await this.model.count({
             where: {
                 museoId,
@@ -116,7 +147,8 @@ class ReservaEventoRepository extends BaseRepository {
                         fechaFin: { [Op.gt]: fechaInicio }
                     }
                 ]
-            }
+            },
+            transaction
         });
         return count === 0;
     }
