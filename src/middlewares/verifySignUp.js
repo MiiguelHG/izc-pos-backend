@@ -1,17 +1,12 @@
 import { usuarioRepository, rolRepository } from "../repositories/index.js";
 import { sendError } from "../utils/responseFormater.js";
 
-// Verificar si el nombre o email ya existen //
+// Verificar si el email ya existe //
 export class verifySignUp{
-    static async checkDuplicateUsernameOrEmail(req, res, next){
+    static async checkDuplicateEmail(req, res, next){
         const { nombre, email } = req.body;
 
         try{
-            const userByUsername = await usuarioRepository.findByAttribute("nombre", nombre);
-
-            if(userByUsername){
-                return sendError(res, 400, "Failed! Username is already in use!");
-            }
             const userByEmail = await usuarioRepository.findByAttribute("email", email);
             
             if(userByEmail){
