@@ -19,7 +19,7 @@ export const boletoSeeder = async () => {
     }
 
     const [boletoTipodb, boletoTipoCreated] = await boletoTipo.findOrCreate({
-      where: { nombre: "Entrada general" },
+      where: { nombre: "General" },
       defaults: {
         nombre: "General",
         descripcion: "Boleto general para acceso al museo",
