@@ -4,7 +4,7 @@ import { verifySignUp, authJwt }  from "../middlewares/index.js";
 
 const router = express.Router();
 
-router.post("/register", [authJwt.verifyToken, authJwt.hasRole(['admin', 'directorMuseo']), verifySignUp.checkDuplicateUsernameOrEmail, verifySignUp.checkRolesExists], AuthController.register);
+router.post("/register", [authJwt.verifyToken, authJwt.hasRole(['admin', 'directorMuseo']), verifySignUp.checkDuplicateEmail, verifySignUp.checkRolesExists], AuthController.register);
 
 router.get("/me", authJwt.verifyToken, AuthController.getCurrentUser);
 router.post("/login", AuthController.login);
