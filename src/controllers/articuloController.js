@@ -20,8 +20,8 @@ export class ArticuloController {
             const limit = 10;
             const page = parseInt(req.query.page) || 1;
             const offset = (page - 1) * limit;
-            const tipo = req.query.tipo || '';
-            const search = req.query.search ;
+            const tipo = req.query.tipo;
+            const search = req.query.search;
 
             const { user } = req;
 
