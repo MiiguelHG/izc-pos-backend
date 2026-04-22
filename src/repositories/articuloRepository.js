@@ -10,10 +10,12 @@ class ArticuloRepository extends BaseRepository {
     }
 
     async findAndCountAll ({ seleccion, limit, offset, rol, search = '' }) {
-        const defalutClause = { [Op.or]: [ {tipo: 'servicio'}, {tipo: 'producto'}] };
+        const tiposPermitidos = ['producto', 'servicio'];
         const whereClause = {};
 
-        seleccion !== undefined ? whereClause.tipo = seleccion : defalutClause;
+        whereClause.tipo = tiposPermitidos.includes(seleccion)
+            ? seleccion
+            : { [Op.in]: tiposPermitidos };
 
         if (search) {
             whereClause[Op.or] = [
