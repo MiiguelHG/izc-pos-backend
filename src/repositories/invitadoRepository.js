@@ -16,7 +16,8 @@ class InvitadoRepository extends BaseRepository {
     }
     if (search) {
       whereClause[Op.or] = [
-        { nombre: { [Op.like]: `%${search}%` } }
+        { nombre: { [Op.like]: `%${search}%` } },
+        { id: { [Op.like]: `%${search}%` } }
       ];
     }
 

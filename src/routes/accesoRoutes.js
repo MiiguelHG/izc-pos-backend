@@ -4,7 +4,7 @@ import { authJwt } from "#middlewares/index.js";
 
 const router = express.Router();
 
-router.use(authJwt.verifyToken);
-router.post("/acceso/:boletoEmitidoId", AccesoController.controlAcceso);
+// router.use(authJwt.verifyToken);
+router.post("/validar/:boletoEmitidoId", AccesoController.controlAcceso);
 
 export default router;

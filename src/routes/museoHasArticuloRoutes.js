@@ -10,7 +10,7 @@ router.use(authJwt.verifyToken); // Proteger todas las rutas con autenticación
 // CRUD y utilidades para la relación Museo <-> Artículo
 router.get('/', MuseoHasArticuloController.getAllAssociations);
 
-router.post('/', authJwt.hasRole(['admin']), MuseoValidationMiddleware.validateMuseoExists, MuseoHasArticuloController.addArticuloToMuseo);
+router.post('/', authJwt.hasRole(['admin', 'directorMuseo']), MuseoValidationMiddleware.validateMuseoExists, MuseoHasArticuloController.addArticuloToMuseo);
 
 router.get('/museo/:id', MuseoValidationMiddleware.validateMuseoExists, MuseoHasArticuloController.getByMuseo);
 router.get('/museo/:id/articulos/:tipo', MuseoValidationMiddleware.validateMuseoExists, MuseoHasArticuloController.getArticulosByMuseoId);
