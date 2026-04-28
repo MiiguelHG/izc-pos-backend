@@ -78,6 +78,7 @@ class BoletoEmitidoRepository extends BaseRepository {
     const visitanteWhereClause = {};
 
     if (search) {
+      whereClause.id = { [Op.like]: `%${search}%` };
       visitanteWhereClause.nombre = { [Op.like]: `%${search}%` };
     }
 
@@ -89,6 +90,7 @@ class BoletoEmitidoRepository extends BaseRepository {
           as: 'visitante',
           attributes: { exclude: ['cantidadHombres', 'cantidadMujeres', 'cantidadOtros', 'totalVisitantes','edad', 'museoId', 'usuarioId']},
           where: visitanteWhereClause,
+          required: search ? false : false,
           include: [
             { model: estado, attributes: ['id', 'nombre'] },
             { model: municipio, attributes: ['id', 'nombre'] }
@@ -98,7 +100,8 @@ class BoletoEmitidoRepository extends BaseRepository {
       ],
       order: [['fechaEmision', 'DESC']],
       limit, 
-      offset 
+      offset,
+      subQuery: false
     });
   }
 
