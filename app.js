@@ -30,8 +30,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middlewares globales //
+// Permite múltiples orígenes configurables vía variable de entorno `CORS_ORIGINS`
+// Ejemplo .env: CORS_ORIGINS=http://localhost:4200,http://192.168.1.50:4200
+const rawOrigins = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN || 'http://localhost:4200';
+const allowedOrigins = rawOrigins.split(',').map(o => o.trim()).filter(Boolean);
 const corsOptions = {
-    origin: process.env.CORS_ORIGIN || 'http://localhost:4200',
+    origin: function (origin, callback) {
+        // `origin` puede ser undefined para herramientas como curl o solicitudes same-origin desde servidor
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            return callback(null, true);
+        }
+        return callback(new Error('Not allowed by CORS'));
+    },
     credentials: true // Permitir envío de cookies
 };
 app.use(cors(corsOptions));
@@ -114,7 +125,7 @@ db.sequelize.sync(syncOptions).then(async () => {
     // Inicializar roles por defecto
     await runSeeders();
 
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
         console.log(`Server is running on port ${PORT}`);
     });
 }).catch((error) => {
