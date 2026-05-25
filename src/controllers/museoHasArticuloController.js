@@ -7,7 +7,7 @@ export class MuseoHasArticuloController {
         const { museoId, articuloId } = req.body;
         const newAssociation = await museoHasArticuloRepository.create({ museoId, articuloId });
         if (!newAssociation) {
-            return sendError(res, 400, "No se pudo agregar el artículo al museo.");
+            return sendError(res, 400, "No se pudo agregar el artículo al museo");
         }
         return sendSuccess(res, 201, "Artículo agregado al museo exitosamente", newAssociation);
     } catch (error) {
@@ -131,7 +131,7 @@ export class MuseoHasArticuloController {
       if (!updated) {
         return sendError(res, 400, 'No se pudo actualizar el estado del artículo para el museo');
       }
-      return sendSuccess(res, 200, 'Artículo actualizado exitosamente', updated);
+      return sendSuccess(res, 200, `${association.habilitado ? 'Artículo deshabilitado para el museo' : 'Artículo habilitado para el museo'}`, updated);
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }

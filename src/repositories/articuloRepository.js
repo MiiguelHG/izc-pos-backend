@@ -71,9 +71,9 @@ class ArticuloRepository extends BaseRepository {
 
             // Actualiza todas las asociaciones del artículo con museos en una sola consulta
             // Si no tiene asociaciones, affectedCount será 0 y no es un error
-            await museoHasArticulo.update({ habilitado: enable }, { where: { articuloId: id }, transaction: t });
+            const updatedMuseoHasArticulo = await museoHasArticulo.update({ habilitado: enable }, { where: { articuloId: id }, transaction: t });
 
-            return true;
+            return updatedMuseoHasArticulo.habilitado;
         });
     }
 }

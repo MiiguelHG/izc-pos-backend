@@ -20,7 +20,7 @@ export class BoletoTipoController {
         return sendError(res, 400, "No se pudo crear el tipo de boleto");
       }
 
-      return sendSuccess(res, 201,"Tipo de boleto creado" , newBoletoTipo);
+      return sendSuccess(res, 201,"Tipo de boleto creado exitosamente" , newBoletoTipo);
 
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
@@ -104,7 +104,7 @@ export class BoletoTipoController {
         return sendError(res, 400, "No se pudo actualizar el tipo de boleto");
       }
 
-      return sendSuccess(res, 200,"Tipo de boleto actualizado" , updated);
+      return sendSuccess(res, 200,"Tipo de boleto actualizado exitosamente" , updated);
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
@@ -131,7 +131,7 @@ export class BoletoTipoController {
         return sendError(res, 400, "No se pudo actualizar el estado del tipo de boleto");
       }
 
-      return sendSuccess(res, 200, "Estado del tipo de boleto actualizado", updated);
+      return sendSuccess(res, 200, `Tipo de boleto ${activo ? 'habilitado' : 'deshabilitado'} exitosamente`, updated);
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
@@ -147,7 +147,7 @@ export class BoletoTipoController {
         return sendError(res, 400, "No se pudieron actualizar los precios finales de los tipos de boleto");
       }
 
-      return sendSuccess(res, 200,"Precios finales de boletos actualizados");
+      return sendSuccess(res, 200, "Precios finales de los boletos actualizados exitosamente");
     } catch (error) {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }

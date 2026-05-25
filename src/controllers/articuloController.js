@@ -9,7 +9,7 @@ export class ArticuloController {
             if(!newArticulo) {
                 return sendError(res, 400, "No se pudo crear el artículo.");
             }
-            return sendSuccess(res, 201, "Artículo creado exitosamente.", newArticulo);
+            return sendSuccess(res, 201, "Artículo creado exitosamente", newArticulo);
         } catch (error) {
             return sendError(res, 500, `Error al crear artículo: ${error.message}`);
         }
@@ -70,7 +70,7 @@ export class ArticuloController {
             if (!updatedArticulo) {
                 return sendError(res, 404, "Artículo no encontrado.");
             }
-            return sendSuccess(res, 200, "Artículo actualizado exitosamente.", updatedArticulo);
+            return sendSuccess(res, 200, "Artículo actualizado exitosamente", updatedArticulo);
         } catch (error) {
             return sendError(res, 500, `Error al actualizar artículo: ${error.message}`);
         }
@@ -105,10 +105,7 @@ export class ArticuloController {
 
             const articulo = await articuloRepository.updateHabilitado({id});
 
-            if (!articulo) {
-                return sendError(res, 404, "Artículo no encontrado.");
-            }
-            return sendSuccess(res, 200, `Artículo actualizado exitosamente.`, articulo);
+            return sendSuccess(res, 200, `${articulo ? 'Artículo habilitado exitosamente' : 'Artículo deshabilitado exitosamente'}`, articulo);
         } catch (error) {
             return sendError(res, 500, `Error al cambiar estado del artículo: ${error.message}`);
         }   
