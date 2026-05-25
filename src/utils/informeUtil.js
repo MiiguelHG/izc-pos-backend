@@ -9,28 +9,59 @@ export const INGRESOS_CONFIG = {
     eventos: { model: reservaEvento, dateField: 'fechaReserva', tableName: 'reserva_eventos' }
   };
 
+const parseDate = (fechaStr) => {
+  if (!fechaStr) return null;
+  
+  // Si es string, parsear YYYY-MM-DD
+  if (typeof fechaStr === 'string') {
+    const [year, month, day] = fechaStr.split('-').map(Number);
+    // Crear fecha usando zona local (NO UTC) para evitar desplazamientos
+    return new Date(year, month - 1, day, 0, 0, 0, 0);
+  }
+  
+  // Si ya es Date, retornar como está
+  return fechaStr instanceof Date ? fechaStr : null;
+};
+
+const setEndOfDay = (fecha) => {
+  if (!fecha || !(fecha instanceof Date)) return fecha;
+  
+  const endDate = new Date(fecha);
+  endDate.setHours(23, 59, 59, 999);
+  return endDate;
+};
+
 const getDefaultLastYearRange = () => {
     const fechaFin = new Date();
     const fechaInicio = new Date();
     fechaInicio.setFullYear(fechaFin.getFullYear() - 1);
-    return { fechaInicio, fechaFin };
+    return { fechaInicio, fechaFin: setEndOfDay(fechaFin) };
 };
 
 export const getNormalizedRange = (fechaInicio, fechaFin) => {
     if (fechaInicio && fechaFin) {
-        return { fechaInicio, fechaFin };
+        // Convertir strings a Date objects y aplicar 23:59:59 a fechaFin
+        const inicio = parseDate(fechaInicio);
+        const fin = setEndOfDay(parseDate(fechaFin));
+        return { fechaInicio: inicio, fechaFin: fin };
     }
 
     if (fechaInicio && !fechaFin) {
-        return { fechaInicio, fechaFin: new Date() };
+        // Si solo hay fechaInicio, usar hoy como fechaFin con 23:59:59
+        const inicio = parseDate(fechaInicio);
+        const fin = setEndOfDay(new Date());
+        return { fechaInicio: inicio, fechaFin: fin };
     }
 
     if (!fechaInicio && fechaFin) {
-        const startFromEnd = new Date(fechaFin);
-        startFromEnd.setFullYear(startFromEnd.getFullYear() - 1);
-        return { fechaInicio: startFromEnd, fechaFin };
+        // Si solo hay fechaFin, calcular hace 1 año desde esa fecha
+        const fin = setEndOfDay(parseDate(fechaFin));
+        const inicio = new Date(fin);
+        inicio.setFullYear(inicio.getFullYear() - 1);
+        return { fechaInicio: inicio, fechaFin: fin };
     }
 
+    // Si no hay fechas, usar rango por defecto (últimos 12 meses)
     return getDefaultLastYearRange();
 };
 
