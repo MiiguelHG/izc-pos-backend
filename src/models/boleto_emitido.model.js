@@ -20,14 +20,6 @@ export default (sequelize, Sequelize) => {
             allowNull: false,
             defaultValue: DataTypes.NOW
         },
-        estado: {
-            type: DataTypes.ENUM('activo', 'usado', 'cancelado'),
-            allowNull: false,
-            defaultValue: 'activo',
-            validate: {
-                isIn: [['activo', 'usado', 'cancelado']]
-            }
-        },
         usuarioId: {
             type: DataTypes.INTEGER,
             allowNull: false,
