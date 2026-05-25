@@ -53,14 +53,13 @@ class BoletoTipoRepository extends BaseRepository {
 
         for (const boleto of tiposBoletos) {
           const precioFinal = precioEstandar - (precioEstandar * (boleto.descuento / 100));
-          const updated = await this.model.update(
-            { precioFinal },
-            { where: { id: boleto.id }, transaction: t }
-          );
+          const boletoEncontrado = await this.model.findByPk(boleto.id, { transaction: t });
 
-          if (updated[0] !== 1) {
-            throw new Error(`No se pudo actualizar el tipo de boleto con ID ${boleto.id}`);
+          if (!boletoEncontrado) {
+            throw new Error(`No se pudo encontrar el tipo de boleto con ID ${boleto.id}`);
           }
+
+          await boletoEncontrado.update({ precioFinal }, { transaction: t });
 
           countUpdated++;
         }

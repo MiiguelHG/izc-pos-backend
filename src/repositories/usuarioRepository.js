@@ -30,7 +30,8 @@ class UsuarioRepository extends BaseRepository {
                 { model: museo, as: "museo" }
             ],
             limit,
-            offset
+            offset,
+            order: [['id', 'DESC']]
         })
     }
 

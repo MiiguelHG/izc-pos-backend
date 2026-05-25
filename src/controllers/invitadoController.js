@@ -9,7 +9,7 @@ export class InvitadoController {
       const { user } = req;
 
       if (user.rol?.nombre !== 'admin' && user.museo.id !== museoId) {
-        return sendError(res, 403, "No tienes permiso para crear un invitado para este museo");
+        return sendError(res, 403, "No tienes permiso para crear una cortesía para este museo");
       }
 
       const nuevoInvitado = await invitadoRepository.create({
@@ -20,12 +20,12 @@ export class InvitadoController {
       });
 
       if (!nuevoInvitado) {
-        return sendError(res, 500, "No se pudo crear el invitado");
+        return sendError(res, 500, "No se pudo crear la cortesía");
       }
 
-      return sendSuccess(res, 201, "Invitado creado exitosamente", nuevoInvitado);
+      return sendSuccess(res, 201, "Cortesía creada exitosamente", nuevoInvitado);
     } catch (error) {
-      return sendError(res, 500, `Error al crear el invitado: ${error.message}`);  
+      return sendError(res, 500, `Error al crear la cortesía: ${error.message}`);  
     }
   }
 
@@ -42,12 +42,12 @@ export class InvitadoController {
 
       const { rows, count} = await invitadoRepository.findAllAndCount({ limit, offset, museoId , search});
       if (count === 0) {
-        return sendError(res, 404, "No se encontraron cortesias");
+        return sendError(res, 404, "No se encontraron cortesías");
       }
 
       const totalPages = Math.ceil(count / limit);
 
-      return sendSuccess(res, 200, "Invitados recuperados exitosamente", {  
+      return sendSuccess(res, 200, "Cortesías recuperadas exitosamente", {  
         data: rows,
         meta: {
           totalItems: count,
@@ -57,7 +57,7 @@ export class InvitadoController {
         }
       });
     } catch (error) {
-      return sendError(res, 500, `Error al obtener invitados: ${error.message}`);
+      return sendError(res, 500, `Error al obtener cortesías: ${error.message}`);
     }
   }
 
@@ -68,24 +68,24 @@ export class InvitadoController {
 
       const invitado = await invitadoRepository.findById(id);
       if (!invitado) {
-        return sendError(res, 404, "Invitación no encontrada");
+        return sendError(res, 404, "Cortesía no encontrada");
       }
 
       if (invitado.usado === 'usado') {
-        return sendError(res, 400, "La invitación ya ha sido usada");
+        return sendError(res, 400, "La cortesía ya ha sido usada");
       }
 
       if (invitado.usado === 'cancelado') {
-        return sendError(res, 400, "La invitación ha sido cancelada");
+        return sendError(res, 400, "La cortesía ha sido cancelada");
       }
 
       if (invitado.museoId !== user.museo.id) {
-        return sendError(res, 400, "La invitación no corresponde a este museo");
+        return sendError(res, 400, "La cortesía no corresponde a este museo");
       }
       
-      return sendSuccess(res, 200, "Invitación vigente recuperada exitosamente", invitado);
+      return sendSuccess(res, 200, "Cortesía vigente recuperada exitosamente", invitado);
     } catch (error) {
-      return sendError(res, 500, `Error al obtener la invitación vigente: ${error.message}`);
+      return sendError(res, 500, `Error al obtener la cortesía vigente: ${error.message}`);
     }
   }
 
@@ -98,19 +98,19 @@ export class InvitadoController {
       const boletoEmitido = await boletoEmitidoRepository.findById(boletoEmitidoId);
 
       if (!invitado) {
-        return sendError(res, 404, "Invitado no encontrado");
+        return sendError(res, 404, "Cortesía no encontrada");
       }
 
       if (invitado.usado === 'usado') {
-        return sendError(res, 400, "La invitación ya ha sido usada");
+        return sendError(res, 400, "La cortesía ya ha sido usada");
       }
 
       if (invitado.usado === 'cancelado') {
-        return sendError(res, 400, "La invitación ha sido cancelada");
+        return sendError(res, 400, "La cortesía ha sido cancelada");
       }
 
       if (invitado.museoId !== boletoEmitido.museoId) {
-        return sendError(res, 400, "El invitado no corresponde al museo del boleto emitido");
+        return sendError(res, 400, "La cortesía no corresponde al museo del boleto emitido");
       }
       //--------------------------------
 
@@ -119,9 +119,9 @@ export class InvitadoController {
         { usado: 'usado', boletoEmitidoId }
       );
 
-      return sendSuccess(res, 200, "Invitado marcado como usado exitosamente", actualizado);
+      return sendSuccess(res, 200, "Cortesía marcada como usada exitosamente", actualizado);
     } catch (error) {
-      return sendError(res, 500, `Error al marcar invitado como usado: ${error.message}`);
+      return sendError(res, 500, `Error al marcar cortesía como usada: ${error.message}`);
     }
   }
 
@@ -130,18 +130,32 @@ export class InvitadoController {
       const { id } = req.params;
       const { nombre, motivo, usuarioId, museoId } = req.body;
 
+      const invitacion = await invitadoRepository.findById(id);
+
+      if (!invitacion) {
+        return sendError(res, 404, "Cortesía no encontrada");
+      }
+
+      if (invitacion.usado === 'cancelado') {
+        return sendError(res, 400, "No se puede actualizar una cortesía cancelada");
+      }
+
+      if (invitacion.usado === 'usado') {
+        return sendError(res, 400, "No se puede actualizar una cortesía usada");
+      }
+
       const actualizado = await invitadoRepository.update(
         { id },
         { nombre, motivo, usuarioId, museoId }
       );
 
       if (!actualizado) {
-        return sendError(res, 404, "Invitación no encontrada o no se pudo actualizar");
+        return sendError(res, 404, "Cortesía no encontrada o no se pudo actualizar");
       }
 
-      return sendSuccess(res, 200, "Invitado actualizado exitosamente", actualizado);
+      return sendSuccess(res, 200, "Cortesía actualizada exitosamente", actualizado);
     } catch (error) {
-      return sendError(res, 500, `Error al actualizar invitado: ${error.message}`);
+      return sendError(res, 500, `Error al actualizar cortesía: ${error.message}`);
     }
 
   }
@@ -155,12 +169,12 @@ export class InvitadoController {
       );
       
       if (!actualizado) {
-        return sendError(res, 404, "Invitación no encontrada o no se pudo cancelar");
+        return sendError(res, 404, "Cortesía no encontrada o no se pudo cancelar");
       }
 
-      return sendSuccess(res, 200, "Invitado cancelado exitosamente", actualizado);
+      return sendSuccess(res, 200, "Cortesía cancelada exitosamente", actualizado);
     } catch (error) {
-      return sendError(res, 500, `Error al cancelar invitado: ${error.message}`);
+      return sendError(res, 500, `Error al cancelar cortesía: ${error.message}`);
     }   
   }
 }

@@ -12,6 +12,11 @@ export default (sequelize, Sequelize) => {
       allowNull: false,
       defaultValue: DataTypes.NOW
     },
+    reingreso: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
+    },
     boletoEmitidoId: {
       type: DataTypes.INTEGER,
       allowNull: false,

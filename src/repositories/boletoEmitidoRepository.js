@@ -75,11 +75,14 @@ class BoletoEmitidoRepository extends BaseRepository {
 
   async findAllAndCount({ limit = 10, offset = 0, museoId = null , search = ''}) {
     const whereClause = museoId ? { museoId } : {};
-    const visitanteWhereClause = {};
+    const searchText = String(search ?? '').trim();
 
-    if (search) {
-      whereClause.id = { [Op.like]: `%${search}%` };
-      visitanteWhereClause.nombre = { [Op.like]: `%${search}%` };
+    if (searchText) {
+      // Buscar por id (como texto) o por nombre del visitante usando path $visitante.nombre$
+      whereClause[Op.or] = [
+        { id: { [Op.like]: `%${searchText}%` } },
+        { ['$visitante.nombre$']: { [Op.like]: `%${searchText}%` } }
+      ];
     }
 
     return await this.model.findAndCountAll({ 
@@ -89,8 +92,8 @@ class BoletoEmitidoRepository extends BaseRepository {
           model: visitante,
           as: 'visitante',
           attributes: { exclude: ['cantidadHombres', 'cantidadMujeres', 'cantidadOtros', 'totalVisitantes','edad', 'museoId', 'usuarioId']},
-          where: visitanteWhereClause,
-          required: search ? false : false,
+          // Hacer INNER JOIN sólo cuando haya texto de búsqueda
+          required: !!searchText,
           include: [
             { model: estado, attributes: ['id', 'nombre'] },
             { model: municipio, attributes: ['id', 'nombre'] }

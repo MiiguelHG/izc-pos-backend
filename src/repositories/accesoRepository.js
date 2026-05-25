@@ -1,6 +1,9 @@
 import db from "#models/index.js";
+import { DateTime } from "luxon";
 
 const { acceso, boletoEmitido } = db;
+const ZONA_MX = "America/Mexico_City";
+const HORA_REINGRESO = 16;
 
 const createHttpError = (status, message) => {
   const error = new Error(message);
@@ -8,9 +11,17 @@ const createHttpError = (status, message) => {
   return error;
 };
 
+const obtenerFechaActualMx = () => DateTime.now().setZone(ZONA_MX);
+
+const obtenerFechaAccesoMx = (fechaAcceso) => DateTime.fromJSDate(fechaAcceso, { zone: ZONA_MX });
+
 export class AccesoRepository {
-  static async validarAcceso({boletoEmitidoId}) {
+  static async validarAcceso({ boletoEmitidoId }) {
     return db.sequelize.transaction(async (transaction) => {
+      const fechaActualMx = obtenerFechaActualMx();
+      const esReingresoPermitido = fechaActualMx.hour >= HORA_REINGRESO;
+      const ayerMx = fechaActualMx.minus({ days: 1 }).startOf("day");
+
       const boletoExiste = await boletoEmitido.findOne({
         where: { id: boletoEmitidoId },
         transaction,
@@ -21,14 +32,12 @@ export class AccesoRepository {
         throw createHttpError(404, `Boleto emitido con ID ${boletoEmitidoId} no encontrado`);
       }
 
-      // const museoBoletoId = Number.parseInt(boletoExiste.museoId, 10);
-      // if (museoBoletoId !== museoId) {
-      //   throw createHttpError(403, `El boleto emitido con ID ${boletoEmitidoId} no corresponde al museo`);
-      // }
-
       const [accesoValido, created] = await acceso.findOrCreate({
         where: { boletoEmitidoId },
-        defaults: { boletoEmitidoId },
+        defaults: {
+          boletoEmitidoId,
+          reingreso: esReingresoPermitido
+        },
         transaction,
         lock: transaction.LOCK.UPDATE
       });
@@ -37,31 +46,20 @@ export class AccesoRepository {
         return true;
       }
 
-      // Validar si el acceso fue despues de las 4:00 PM un dia despues de la fecha de acceso
-      // const fechaAcceso = accesoValido.fechaAcceso;
-      // const fechaActual = new Date();
-      // const fechaLimite = new Date(fechaAcceso);
-      // fechaLimite.setDate(fechaLimite.getDate() + 1);
-      // fechaLimite.setHours(16, 0, 0, 0);
-
-      const fechaAccesos = new Date(accesoValido.fechaAcceso);
-      const fechaActual = new Date();
-      const diaAnterior = new Date(fechaActual);
-      diaAnterior.setDate(diaAnterior.getDate() - 1);
-      
-      // verificar que la fecha de acceso sea igual al dia anterior o a la fecha actual
-      if (fechaAccesos < diaAnterior || fechaAccesos > fechaActual) {
-        throw createHttpError(400, `El acceso con boleto emitido ID ${boletoEmitidoId} no es válido para esta fecha`);
+      if (!accesoValido.reingreso) {
+        throw createHttpError(403, `El acceso con boleto emitido ID ${boletoEmitidoId} ya fue consumido.`);
       }
 
-      // Verificar que la hora de acceso haya sido despues de las 4:00 PM
-      const horaAcceso = fechaAccesos.getHours();
-      if (horaAcceso < 16) {
-        throw createHttpError(400, `El acceso con boleto emitido ID ${boletoEmitidoId} no es válido para esta hora`);
-      }
+      const fechaAccesoMx = obtenerFechaAccesoMx(accesoValido.fechaAcceso).startOf("day");
+      const fueCreadoAyer = fechaAccesoMx.hasSame(ayerMx, "day");
 
-      if (fechaActual > fechaLimite) {
-        throw createHttpError(400, `El acceso con boleto emitido ID ${boletoEmitidoId} ha expirado`);
+      await accesoValido.update(
+        { reingreso: false },
+        { transaction }
+      );
+
+      if (!fueCreadoAyer) {
+        throw createHttpError(403, `El acceso con boleto emitido ID ${boletoEmitidoId} ya no es válido para reingreso.`);
       }
 
       return true;
