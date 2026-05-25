@@ -78,21 +78,4 @@ export class BoletoEmitidoController {
       return sendError(res, 500, `Error interno del servidor: ${error.message}`);
     }
   }
-
-  static async updateBoletoEmitidoEstado (req, res) {
-    try {
-      const { id } = req.params;
-      const { estado } = req.body;
-
-      const updated = await boletoEmitidoRepository.update({ id }, { estado });
-
-      if (!updated) {
-        return sendError(res, 500, "Error al actualizar el estado del boleto emitido");
-      }
-      return sendSuccess(res, 200, "Estado del boleto emitido actualizado exitosamente");
-    } catch (error) {
-      return sendError(res, 500, `Error interno del servidor: ${error.message}`);
-    }
-  }
-
 }
